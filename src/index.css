@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #030508;
+  --color-on-background: #FFFFFF;
+  
+  --color-surface: #030508;
+  --color-on-surface: #FFFFFF;
+  --color-surface-dim: #05070D;
+  --color-surface-bright: #0E1220;
+  --color-surface-container-lowest: #010103;
+  --color-surface-container-low: #070912;
+  --color-surface-container: #0C101F;
+  --color-surface-container-high: #12182E;
+  --color-surface-container-highest: #1A2242;
+  
+  --color-primary: #00F0FF;
+  --color-on-primary: #030508;
+  --color-primary-container: #022330;
+  --color-on-primary-container: #00F0FF;
+  --color-primary-fixed-dim: #38BDF8;
+  
+  --color-secondary: #3B82F6;
+  --color-on-secondary: #FFFFFF;
+  --color-secondary-container: #1E3A8A;
+  --color-on-secondary-container: #93C5FD;
+  
+  --color-on-surface-variant: #94A3B8;
+  --color-outline: #00F0FF;
+  --color-outline-variant: #1E293B;
+  
+  --color-on-secondary-fixed: #FFFFFF;
+
+  --font-sans: "Inter", "Geist", system-ui, sans-serif;
+  --font-serif: "Geist", "Inter", system-ui, sans-serif;
+  --font-display: "Geist", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --animate-subtle-glow: subtle-glow 3s infinite ease-in-out;
+  --animate-sweep: sweep 2s infinite alternate ease-in-out;
+}
+
+@keyframes subtle-glow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.15)); }
+  50% { filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4)); }
+}
+
+@keyframes sweep {
+  from { stroke-dashoffset: 450; }
+  to { stroke-dashoffset: 440; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(1); opacity: 0.3; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.animate-ripple-wave::before, .animate-ripple-wave::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(to right, #00F0FF, #3B82F6);
+  z-index: -1;
+  pointer-events: none;
+}
+.animate-ripple-wave::before {
+  animation: ripple 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animate-ripple-wave::after {
+  animation: ripple 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  animation-delay: 1.25s;
+}
+
+.ambient-bg {
+  background: radial-gradient(circle at 50% 35%, rgba(0, 240, 255, 0.05) 0%, transparent 60%);
+}
+
+html, body {
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #030508;
+  color: #FFFFFF;
+}
