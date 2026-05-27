@@ -1,0 +1,6 @@
+{
+  "name": "NetPulse",
+  "description": "High-performance network speed testing application featuring interactive speed tests, historically tracked measurements list, telemetry analytics, and customizable network environment simulate controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
