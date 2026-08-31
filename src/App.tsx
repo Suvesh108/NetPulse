@@ -96,8 +96,8 @@ export default function App() {
     <div className="min-h-screen w-full bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
       
       {/* Clean Transparent Header tucked inward */}
-      <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-6 sm:px-10 md:px-14 transition-all">
-        <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 flex items-center justify-between px-2 sm:px-4">
+      <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-8 sm:px-16 md:px-24 lg:px-32 transition-all">
+        <div className="w-full max-w-6xl 2xl:max-w-[1380px] mx-auto h-11 sm:h-12 flex items-center justify-between px-2 sm:px-4">
           
           {/* Brand Logo with Live Status Node */}
           <div className="flex items-center gap-2">
