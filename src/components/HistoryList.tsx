@@ -60,8 +60,6 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
         
         {/* CARD 1: Total Runs (Blue / Slate) */}
         <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-transparent"></div>
-          
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div className="flex flex-col">
               <span className="text-[10px] sm:text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">Total Tests</span>
@@ -80,8 +78,6 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
 
         {/* CARD 2: Peak Download (Emerald) */}
         <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-transparent"></div>
-          
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div className="flex flex-col">
               <span className="text-[10px] sm:text-[11px] font-extrabold text-emerald-800 uppercase tracking-wider">Peak Download</span>
@@ -100,8 +96,6 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
 
         {/* CARD 3: Avg Download (Teal / Cyan) */}
         <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-400 to-transparent"></div>
-          
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div className="flex flex-col">
               <span className="text-[10px] sm:text-[11px] font-extrabold text-teal-800 uppercase tracking-wider">Avg Download</span>
@@ -120,8 +114,6 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
 
         {/* CARD 4: Avg Latency (Amber) */}
         <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-transparent"></div>
-          
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div className="flex flex-col">
               <span className="text-[10px] sm:text-[11px] font-extrabold text-amber-800 uppercase tracking-wider">Avg Latency</span>
