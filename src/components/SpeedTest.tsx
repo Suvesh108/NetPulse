@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw, ArrowDown, ArrowUp, Tv, Gamepad2, Video, Info, ShieldCheck, Share2, Copy, Check, Clock } from 'lucide-react';
+import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw, ArrowDown, ArrowUp, Tv, Gamepad2, Video, Info, ShieldCheck, Share2, Copy, Check, Clock, ChevronRight } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
 
@@ -131,7 +131,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     timerFinishedRef.current = false;
     finalResultsRef.current = null;
 
-    // Trigger packet probing simultaneously
     probePacketLoss();
 
     try {
@@ -444,11 +443,11 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     q1Pct: number,
     q3Pct: number,
     maxPct: number,
-    color: 'emerald' | 'violet' | 'amber' | 'blue'
+    color: 'orange' | 'purple' | 'amber' | 'blue'
   ) => {
     const colorClasses = {
-      emerald: { bar: 'bg-emerald-500/20 border-emerald-500', whisker: 'bg-emerald-500', dot: 'bg-emerald-500', text: 'text-emerald-700' },
-      violet: { bar: 'bg-violet-500/20 border-violet-500', whisker: 'bg-violet-500', dot: 'bg-violet-500', text: 'text-violet-700' },
+      orange: { bar: 'bg-[#F6821F]/20 border-[#F6821F]', whisker: 'bg-[#F6821F]', dot: 'bg-[#F6821F]', text: 'text-[#F6821F]' },
+      purple: { bar: 'bg-[#8D1EB1]/20 border-[#8D1EB1]', whisker: 'bg-[#8D1EB1]', dot: 'bg-[#8D1EB1]', text: 'text-[#8D1EB1]' },
       amber: { bar: 'bg-amber-500/20 border-amber-500', whisker: 'bg-amber-500', dot: 'bg-amber-500', text: 'text-amber-700' },
       blue: { bar: 'bg-blue-500/20 border-blue-500', whisker: 'bg-blue-500', dot: 'bg-blue-500', text: 'text-blue-700' }
     }[color];
@@ -503,15 +502,16 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     <div className="w-full flex flex-col items-center gap-5 select-none" id="speed-test-section">
       
       {/* CLOUDFLARE SPEEDOMETER HERO CONSOLE ("Your Internet Speed") */}
-      <div className="w-full max-w-5xl modern-glass-card rounded-3xl p-6 sm:p-8 flex flex-col border border-slate-200/90 shadow-xl" id="dashboard-dial">
+      <div className="w-full max-w-5xl bg-white rounded-2xl p-6 sm:p-8 flex flex-col border border-slate-200 shadow-sm" id="dashboard-dial">
         
         {/* Header Title */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></div>
-            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">Your Internet Speed</h2>
+          <h2 className="text-base sm:text-lg font-bold text-[#18181B] tracking-tight">Your Internet Speed</h2>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold text-[#F6821F] uppercase tracking-wider">
+              {status === 'idle' ? 'Ready' : (status === 'completed' ? 'Finished' : 'Testing')}
+            </span>
           </div>
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Cloudflare Edge Telemetry</span>
         </div>
 
         {/* 3-Section Grid: Seamless Download | Seamless Upload | Seamless Telemetry Column */}
@@ -521,44 +521,44 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           <div className="lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-4 lg:border-r lg:border-slate-100">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Download</span>
-                <Info className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-sm font-bold text-slate-800">Download</span>
+                <Info className="w-4 h-4 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-2">
-                <span id="download-val" className="font-sans text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+                <span id="download-val" className="font-sans text-5xl sm:text-6xl font-bold text-[#18181B] tracking-tight">
                   {downloadVal !== null 
                     ? (unit === 'MB/s' ? (downloadVal / 8).toFixed(1) : downloadVal.toFixed(1)) 
                     : (status === 'downloading' 
                       ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
-                      : '--')}
+                      : '-')}
                 </span>
-                <span className="text-sm font-extrabold text-slate-500 uppercase">{unit}</span>
+                <span className="text-base font-bold text-slate-600">{unit}</span>
               </div>
             </div>
 
             {/* Area Spline Waveform */}
             <div className="relative w-full h-28 sm:h-32 mt-4 flex flex-col justify-end">
-              <div className="absolute inset-x-0 top-1/2 border-b border-slate-200/80 flex justify-start">
-                <span className="text-[9px] font-mono text-slate-400 -mt-3.5 bg-[#F8FAFC]/80 px-1 rounded">90th percentile</span>
+              <div className="absolute inset-x-0 top-1/2 border-b border-slate-200 flex justify-start">
+                <span className="text-[9px] font-mono text-slate-400 -mt-3.5 bg-white px-1">90th percentile</span>
               </div>
 
               <svg id="download-sparkline" viewBox="0 0 420 110" className="w-full h-full relative z-10 overflow-visible">
                 <defs>
                   <linearGradient id="cfDownloadGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#EA580C" stopOpacity="0.45" />
-                    <stop offset="100%" stopColor="#EA580C" stopOpacity="0.02" />
+                    <stop offset="0%" stopColor="#F6821F" stopOpacity="0.45" />
+                    <stop offset="100%" stopColor="#F6821F" stopOpacity="0.02" />
                   </linearGradient>
                 </defs>
 
                 <path d={downloadSpline.fill} fill="url(#cfDownloadGrad)" />
-                <path d={downloadSpline.stroke} fill="none" stroke="#EA580C" strokeWidth="2.5" strokeLinecap="round" />
+                <path d={downloadSpline.stroke} fill="none" stroke="#F6821F" strokeWidth="2.5" strokeLinecap="round" />
 
                 {downloadSpline.points.map((pt, idx) => (
-                  <circle key={idx} cx={pt.x} cy={pt.y} r="2.5" fill="#EA580C" />
+                  <circle key={idx} cx={pt.x} cy={pt.y} r="2.5" fill="#F6821F" />
                 ))}
 
                 {downloadSpline.hasData && status === 'downloading' && (
-                  <circle cx={downloadSpline.lastX} cy={downloadSpline.lastY} r="4" fill="#EA580C" stroke="#FFFFFF" strokeWidth="2" />
+                  <circle cx={downloadSpline.lastX} cy={downloadSpline.lastY} r="4" fill="#F6821F" stroke="#FFFFFF" strokeWidth="2" />
                 )}
               </svg>
             </div>
@@ -568,44 +568,44 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           <div className="lg:col-span-5 flex flex-col justify-between px-0 lg:px-4 lg:border-r lg:border-slate-100">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Upload</span>
-                <Info className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-sm font-bold text-slate-800">Upload</span>
+                <Info className="w-4 h-4 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-2">
-                <span id="upload-val" className="font-sans text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+                <span id="upload-val" className="font-sans text-5xl sm:text-6xl font-bold text-[#18181B] tracking-tight">
                   {uploadVal !== null 
                     ? (unit === 'MB/s' ? (uploadVal / 8).toFixed(1) : uploadVal.toFixed(1)) 
                     : (status === 'uploading' 
                       ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
-                      : '--')}
+                      : '-')}
                 </span>
-                <span className="text-sm font-extrabold text-slate-500 uppercase">{unit}</span>
+                <span className="text-base font-bold text-slate-600">{unit}</span>
               </div>
             </div>
 
             {/* Area Spline Waveform */}
             <div className="relative w-full h-28 sm:h-32 mt-4 flex flex-col justify-end">
-              <div className="absolute inset-x-0 top-1/2 border-b border-slate-200/80 flex justify-start">
-                <span className="text-[9px] font-mono text-slate-400 -mt-3.5 bg-[#F8FAFC]/80 px-1 rounded">90th percentile</span>
+              <div className="absolute inset-x-0 top-1/2 border-b border-slate-200 flex justify-start">
+                <span className="text-[9px] font-mono text-slate-400 -mt-3.5 bg-white px-1">90th percentile</span>
               </div>
 
               <svg id="upload-sparkline" viewBox="0 0 420 110" className="w-full h-full relative z-10 overflow-visible">
                 <defs>
                   <linearGradient id="cfUploadGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#9333EA" stopOpacity="0.45" />
-                    <stop offset="100%" stopColor="#9333EA" stopOpacity="0.02" />
+                    <stop offset="0%" stopColor="#8D1EB1" stopOpacity="0.45" />
+                    <stop offset="100%" stopColor="#8D1EB1" stopOpacity="0.02" />
                   </linearGradient>
                 </defs>
 
                 <path d={uploadSpline.fill} fill="url(#cfUploadGrad)" />
-                <path d={uploadSpline.stroke} fill="none" stroke="#9333EA" strokeWidth="2.5" strokeLinecap="round" />
+                <path d={uploadSpline.stroke} fill="none" stroke="#8D1EB1" strokeWidth="2.5" strokeLinecap="round" />
 
                 {uploadSpline.points.map((pt, idx) => (
-                  <circle key={idx} cx={pt.x} cy={pt.y} r="2.5" fill="#9333EA" />
+                  <circle key={idx} cx={pt.x} cy={pt.y} r="2.5" fill="#8D1EB1" />
                 ))}
 
                 {uploadSpline.hasData && status === 'uploading' && (
-                  <circle cx={uploadSpline.lastX} cy={uploadSpline.lastY} r="4" fill="#9333EA" stroke="#FFFFFF" strokeWidth="2" />
+                  <circle cx={uploadSpline.lastX} cy={uploadSpline.lastY} r="4" fill="#8D1EB1" stroke="#FFFFFF" strokeWidth="2" />
                 )}
               </svg>
             </div>
@@ -617,21 +617,21 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             {/* Latency */}
             <div className="flex flex-col">
               <div className="flex items-center gap-1">
-                <span className="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">Latency</span>
-                <Info className="w-3 h-3 text-slate-400" />
+                <span className="text-sm font-bold text-slate-800">Latency</span>
+                <Info className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span id="ping-val" className="font-sans text-2xl font-black text-slate-900">
-                  {pingVal !== null ? pingVal : '--'}
+                <span id="ping-val" className="font-sans text-2xl sm:text-3xl font-bold text-[#18181B]">
+                  {pingVal !== null ? pingVal : '-'}
                 </span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase">ms</span>
+                <span className="text-xs font-medium text-slate-500">ms</span>
               </div>
               <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono mt-0.5">
-                <span className="flex items-center text-amber-700 font-bold">
-                  <ArrowDown className="w-2.5 h-2.5 inline" /> {pingVal !== null ? `${Math.round(pingVal * 1.3)} ms` : '--'}
+                <span className="flex items-center text-[#F6821F] font-bold">
+                  <ArrowDown className="w-2.5 h-2.5 inline" /> {pingVal !== null ? `${Math.round(pingVal * 1.3)} ms` : '-'}
                 </span>
-                <span className="flex items-center text-indigo-700 font-bold">
-                  <ArrowUp className="w-2.5 h-2.5 inline" /> {pingVal !== null ? `${Math.round(pingVal * 2.1)} ms` : '--'}
+                <span className="flex items-center text-[#8D1EB1] font-bold">
+                  <ArrowUp className="w-2.5 h-2.5 inline" /> {pingVal !== null ? `${Math.round(pingVal * 2.1)} ms` : '-'}
                 </span>
               </div>
             </div>
@@ -639,21 +639,21 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             {/* Jitter */}
             <div className="flex flex-col pt-2 border-t border-slate-100">
               <div className="flex items-center gap-1">
-                <span className="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">Jitter</span>
-                <Info className="w-3 h-3 text-slate-400" />
+                <span className="text-sm font-bold text-slate-800">Jitter</span>
+                <Info className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span id="jitter-val" className="font-sans text-2xl font-black text-slate-900">
-                  {jitterVal !== null ? jitterVal : '--'}
+                <span id="jitter-val" className="font-sans text-2xl sm:text-3xl font-bold text-[#18181B]">
+                  {jitterVal !== null ? jitterVal : '-'}
                 </span>
-                <span className="text-[10px] font-bold text-slate-500 uppercase">ms</span>
+                <span className="text-xs font-medium text-slate-500">ms</span>
               </div>
               <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono mt-0.5">
-                <span className="flex items-center text-amber-700 font-bold">
-                  <ArrowDown className="w-2.5 h-2.5 inline" /> {jitterVal !== null ? `${(jitterVal * 1.4).toFixed(1)} ms` : '--'}
+                <span className="flex items-center text-[#F6821F] font-bold">
+                  <ArrowDown className="w-2.5 h-2.5 inline" /> {jitterVal !== null ? `${(jitterVal * 1.4).toFixed(1)} ms` : '-'}
                 </span>
-                <span className="flex items-center text-indigo-700 font-bold">
-                  <ArrowUp className="w-2.5 h-2.5 inline" /> {jitterVal !== null ? `${(jitterVal * 1.8).toFixed(1)} ms` : '--'}
+                <span className="flex items-center text-[#8D1EB1] font-bold">
+                  <ArrowUp className="w-2.5 h-2.5 inline" /> {jitterVal !== null ? `${(jitterVal * 1.8).toFixed(1)} ms` : '-'}
                 </span>
               </div>
             </div>
@@ -661,14 +661,14 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             {/* Packet Loss */}
             <div className="flex flex-col pt-2 border-t border-slate-100">
               <div className="flex items-center gap-1">
-                <span className="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">Packet Loss</span>
-                <Info className="w-3 h-3 text-slate-400" />
+                <span className="text-sm font-bold text-slate-800">Packet Loss</span>
+                <Info className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
-                <span id="packet-loss-val" className="font-sans text-xl font-black text-slate-900">
-                  {packetLossVal !== null ? packetLossVal.toFixed(1) : (status === 'idle' ? '--' : '0.0')}
+                <span id="packet-loss-val" className="font-sans text-2xl sm:text-3xl font-bold text-[#18181B]">
+                  {packetLossVal !== null ? packetLossVal.toFixed(1) : (status === 'idle' ? '-' : '0.0')}
                 </span>
-                <span className="text-[10px] font-bold text-slate-500">%</span>
+                <span className="text-xs font-medium text-slate-500">%</span>
               </div>
             </div>
 
@@ -676,28 +676,28 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
         </div>
 
-        {/* Console Action Bar & Metadata Footer */}
+        {/* Action Buttons & Chevron Progress Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-100 gap-4">
           
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
             <button 
               id="dial-go-button"
               onClick={handleStartTest}
               disabled={status !== 'idle' && status !== 'completed'}
-              className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md active:scale-95 transition-all duration-200 cursor-pointer ${
+              className={`px-6 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all duration-200 cursor-pointer ${
                 status === 'idle' || status === 'completed'
-                  ? 'bg-slate-900 text-white hover:bg-slate-800 hover:scale-105 shadow-slate-900/20' 
+                  ? 'bg-[#18181B] text-white hover:bg-black' 
                   : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
               }`}
             >
               {status === 'completed' ? (
                 <>
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  <RotateCcw className="w-4 h-4" />
                   <span>Retest</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <Play className="w-4 h-4 fill-current" />
                   <span>{status === 'idle' ? 'Start Test' : 'Testing...'}</span>
                 </>
               )}
@@ -705,11 +705,31 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
             <button 
               onClick={handleCopyLink}
-              className="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+              className="px-4 py-2.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold border border-slate-200 transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+              {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-500" />}
               <span>{copiedLink ? 'Copied' : 'Share'}</span>
             </button>
+          </div>
+
+          {/* Segmented Chevron Phase Indicator */}
+          <div className="flex items-center gap-1">
+            {['Latency', 'Jitter', 'Download', 'Upload'].map((phaseName, pIdx) => {
+              const activeIdx = status === 'pinging' ? 0 : status === 'jittering' ? 1 : status === 'downloading' ? 2 : status === 'uploading' ? 3 : (status === 'completed' ? 4 : -1);
+              const isCurrent = pIdx === activeIdx;
+              const isPassed = activeIdx > pIdx;
+              
+              return (
+                <div 
+                  key={phaseName}
+                  className={`px-2.5 py-1 text-[11px] font-bold rounded flex items-center gap-1 transition-colors ${
+                    isCurrent ? 'bg-[#F6821F] text-white' : (isPassed ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-400')
+                  }`}
+                >
+                  <span>{phaseName}</span>
+                </div>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
@@ -722,13 +742,13 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       </div>
 
       {/* NETWORK QUALITY SCORE STRIP */}
-      <div className="w-full max-w-5xl modern-glass-card rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm">
+      <div className="w-full max-w-5xl bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-blue-600" />
-            <span className="text-xs sm:text-sm font-black text-slate-900">Network Quality Score</span>
+            <h3 className="text-sm font-bold text-[#18181B]">Network Quality Score</h3>
+            <Info className="w-4 h-4 text-slate-400" />
           </div>
-          <span className="text-[10px] text-slate-400 font-medium">Real-World Application Experience</span>
+          <span className="text-xs text-blue-600 font-medium">AIM Assessment</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -786,48 +806,48 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-4">
         
         {/* COLUMN 1: DOWNLOAD MEASUREMENTS */}
-        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
               <div className="flex items-center gap-2">
-                <Download className="w-4 h-4 text-emerald-600" />
-                <span className="text-xs font-black text-slate-900">Download Measurements</span>
+                <span className="text-xs font-bold text-[#18181B]">Download Measurements</span>
+                <Info className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <span className="text-[10px] text-slate-400 font-mono">Payloads</span>
             </div>
 
-            {renderBoxPlotRow("100 kB download test", downloadVal !== null ? downloadVal * 0.45 : null, "10/10", 10, 18, 28, 40, 'emerald')}
-            {renderBoxPlotRow("1 MB download test", downloadVal !== null ? downloadVal * 0.72 : null, "8/8", 25, 42, 58, 68, 'emerald')}
-            {renderBoxPlotRow("10 MB download test", downloadVal !== null ? downloadVal * 0.88 : null, "6/6", 35, 52, 70, 85, 'emerald')}
-            {renderBoxPlotRow("25 MB download test", downloadVal, "4/4", 45, 65, 82, 95, 'emerald')}
+            {renderBoxPlotRow("100 kB download test", downloadVal !== null ? downloadVal * 0.45 : null, "10/10", 10, 18, 28, 40, 'orange')}
+            {renderBoxPlotRow("1 MB download test", downloadVal !== null ? downloadVal * 0.72 : null, "8/8", 25, 42, 58, 68, 'orange')}
+            {renderBoxPlotRow("10 MB download test", downloadVal !== null ? downloadVal * 0.88 : null, "6/6", 35, 52, 70, 85, 'orange')}
+            {renderBoxPlotRow("25 MB download test", downloadVal, "4/4", 45, 65, 82, 95, 'orange')}
           </div>
         </div>
 
         {/* COLUMN 2: UPLOAD MEASUREMENTS */}
-        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
               <div className="flex items-center gap-2">
-                <Upload className="w-4 h-4 text-violet-600" />
-                <span className="text-xs font-black text-slate-900">Upload Measurements</span>
+                <span className="text-xs font-bold text-[#18181B]">Upload Measurements</span>
+                <Info className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <span className="text-[10px] text-slate-400 font-mono">Payloads</span>
             </div>
 
-            {renderBoxPlotRow("100 kB upload test", uploadVal !== null ? uploadVal * 0.42 : null, "8/8", 12, 20, 32, 45, 'violet')}
-            {renderBoxPlotRow("1 MB upload test", uploadVal !== null ? uploadVal * 0.68 : null, "6/6", 28, 45, 60, 72, 'violet')}
-            {renderBoxPlotRow("10 MB upload test", uploadVal !== null ? uploadVal * 0.85 : null, "4/4", 40, 58, 74, 86, 'violet')}
-            {renderBoxPlotRow("25 MB upload test", uploadVal, "4/4", 48, 68, 80, 92, 'violet')}
+            {renderBoxPlotRow("100 kB upload test", uploadVal !== null ? uploadVal * 0.42 : null, "8/8", 12, 20, 32, 45, 'purple')}
+            {renderBoxPlotRow("1 MB upload test", uploadVal !== null ? uploadVal * 0.68 : null, "6/6", 28, 45, 60, 72, 'purple')}
+            {renderBoxPlotRow("10 MB upload test", uploadVal !== null ? uploadVal * 0.85 : null, "4/4", 40, 58, 74, 86, 'purple')}
+            {renderBoxPlotRow("25 MB upload test", uploadVal, "4/4", 48, 68, 80, 92, 'purple')}
           </div>
         </div>
 
         {/* COLUMN 3: LATENCY & PACKET MEASUREMENTS */}
-        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
               <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-amber-600" />
-                <span className="text-xs font-black text-slate-900">Latency & Signal</span>
+                <span className="text-xs font-bold text-[#18181B]">Latency Measurements</span>
+                <Info className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <span className="text-[10px] text-slate-400 font-mono">ms</span>
             </div>
@@ -837,11 +857,11 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-800">Unloaded latency</span>
                 <span className="font-mono text-xs font-black text-amber-700">
-                  {pingVal !== null ? `${pingVal} ms` : '--'}
+                  {pingVal !== null ? `${pingVal} ms` : '-'}
                 </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div className="bg-amber-500 h-full rounded-full" style={{ width: `${Math.min(100, (pingVal || 0) * 1.2)}%` }}></div>
+                <div className="bg-[#F6821F] h-full rounded-full" style={{ width: `${Math.min(100, (pingVal || 0) * 1.2)}%` }}></div>
               </div>
             </div>
 
@@ -849,12 +869,12 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             <div className="flex flex-col gap-1 py-2 border-b border-slate-100">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-800">Latency during download</span>
-                <span className="font-mono text-xs font-black text-teal-700">
-                  {pingVal !== null ? `${Math.round(pingVal * 1.3)} ms` : '--'}
+                <span className="font-mono text-xs font-black text-[#F6821F]">
+                  {pingVal !== null ? `${Math.round(pingVal * 1.3)} ms` : '-'}
                 </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div className="bg-teal-500 h-full rounded-full" style={{ width: `${Math.min(100, (pingVal || 0) * 1.6)}%` }}></div>
+                <div className="bg-[#F6821F] h-full rounded-full" style={{ width: `${Math.min(100, (pingVal || 0) * 1.6)}%` }}></div>
               </div>
             </div>
 
@@ -862,12 +882,12 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             <div className="flex flex-col gap-1 py-2 border-b border-slate-100">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-800">Latency during upload</span>
-                <span className="font-mono text-xs font-black text-indigo-700">
-                  {pingVal !== null ? `${Math.round(pingVal * 2.1)} ms` : '--'}
+                <span className="font-mono text-xs font-black text-[#8D1EB1]">
+                  {pingVal !== null ? `${Math.round(pingVal * 2.1)} ms` : '-'}
                 </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${Math.min(100, (pingVal || 0) * 2.2)}%` }}></div>
+                <div className="bg-[#8D1EB1] h-full rounded-full" style={{ width: `${Math.min(100, (pingVal || 0) * 2.2)}%` }}></div>
               </div>
             </div>
 
