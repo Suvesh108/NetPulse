@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Upload, MapPin, CheckCircle2, Zap, ArrowDownRight, ArrowUpRight, Gauge, Activity } from 'lucide-react';
+import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
 
@@ -13,13 +13,12 @@ interface SpeedTestProps {
 export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, unit = 'Mbps' }: SpeedTestProps) {
   const [status, setStatus] = useState<TestStatus>('idle');
   const [currentSpeed, setCurrentSpeed] = useState<number>(0);
-  const [gaugeValue, setGaugeValue] = useState<number>(0); // 0 to 180 (progress normalized)
   const [downloadVal, setDownloadVal] = useState<number | null>(null);
   const [uploadVal, setUploadVal] = useState<number | null>(null);
   const [pingVal, setPingVal] = useState<number | null>(null);
   const [jitterVal, setJitterVal] = useState<number | null>(null);
   
-  // Real-time speed curve data points for drawing SVG spline graph
+  // Real-time speed curve data points for drawing SVG spline graphs
   const [downloadSpeedHistory, setDownloadSpeedHistory] = useState<number[]>([]);
   const [uploadSpeedHistory, setUploadSpeedHistory] = useState<number[]>([]);
   
@@ -134,10 +133,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
               setDownloadSpeedHistory(historyMbps);
             }
-            
-            const dynamicMax = dnMbps > 950 ? 2500 : (dnMbps > 250 ? 1000 : (dnMbps > 90 ? 300 : 100));
-            const rawDegree = (rampedSpeed / dynamicMax) * 140;
-            setGaugeValue(Math.min(180, Math.round(rawDegree)));
           }
         } else if (type === 'upload' && elapsed >= 18 && elapsed < 24) {
           const up = results.getUploadBandwidth();
@@ -153,10 +148,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
               setUploadSpeedHistory(historyMbps);
             }
-            
-            const dynamicMax = upMbps > 950 ? 2500 : (upMbps > 250 ? 1000 : (upMbps > 90 ? 300 : 100));
-            const rawDegree = (rampedSpeed / dynamicMax) * 140;
-            setGaugeValue(Math.min(180, Math.round(rawDegree)));
           }
         }
       };
@@ -176,7 +167,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         }
         setStatus('idle');
         setCurrentSpeed(0);
-        setGaugeValue(0);
         setDownloadVal(null);
         setUploadVal(null);
         setPingVal(null);
@@ -223,10 +213,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
                 const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
                 setDownloadSpeedHistory(historyMbps);
               }
-              
-              const dynamicMax = dnMbps > 950 ? 2500 : (dnMbps > 250 ? 1000 : (dnMbps > 90 ? 300 : 100));
-              const rawDegree = (rampedSpeed / dynamicMax) * 140;
-              setGaugeValue(Math.min(180, Math.round(rawDegree)));
             }
           }
         } else if (elapsed >= 18 && elapsed < 24) {
@@ -246,10 +232,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
                 const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
                 setUploadSpeedHistory(historyMbps);
               }
-              
-              const dynamicMax = upMbps > 950 ? 2500 : (upMbps > 250 ? 1000 : (upMbps > 90 ? 300 : 100));
-              const rawDegree = (rampedSpeed / dynamicMax) * 140;
-              setGaugeValue(Math.min(180, Math.round(rawDegree)));
             }
           }
         } else if (elapsed >= 24) {
@@ -282,7 +264,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
     // Reset stats
     setCurrentSpeed(0);
-    setGaugeValue(0);
     setDownloadVal(null);
     setUploadVal(null);
     setPingVal(null);
@@ -298,13 +279,13 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       case 'idle':
         return { label: 'Ready to Test', color: 'bg-slate-100 text-slate-700 border-slate-200' };
       case 'pinging':
-        return { label: 'Measuring Idle Latency', color: 'bg-amber-50 text-amber-700 border-amber-200 ring-2 ring-amber-400/20 animate-pulse' };
+        return { label: 'Testing Latency (0-6s)', color: 'bg-amber-50 text-amber-700 border-amber-200 ring-2 ring-amber-400/20 animate-pulse' };
       case 'jittering':
-        return { label: 'Measuring Jitter Variance', color: 'bg-indigo-50 text-indigo-700 border-indigo-200 ring-2 ring-indigo-400/20 animate-pulse' };
+        return { label: 'Testing Jitter (6-12s)', color: 'bg-indigo-50 text-indigo-700 border-indigo-200 ring-2 ring-indigo-400/20 animate-pulse' };
       case 'downloading':
-        return { label: 'Testing Download Bandwidth', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-2 ring-emerald-400/20 animate-pulse' };
+        return { label: 'Testing Download (12-18s)', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-2 ring-emerald-400/20 animate-pulse' };
       case 'uploading':
-        return { label: 'Testing Upload Bandwidth', color: 'bg-violet-50 text-violet-700 border-violet-200 ring-2 ring-violet-400/20 animate-pulse' };
+        return { label: 'Testing Upload (18-24s)', color: 'bg-violet-50 text-violet-700 border-violet-200 ring-2 ring-violet-400/20 animate-pulse' };
       case 'completed':
         return { label: 'Speed Test Complete', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm' };
       default:
@@ -312,7 +293,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     }
   };
 
-  // Generate smooth SVG Path
+  // Sparkline Generator for Small Bento Cards
   const generateGraphPath = (history: number[]) => {
     if (history.length < 2) return null;
     const width = 260;
@@ -332,6 +313,46 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     return { stroke: path, fill: fillPath };
   };
 
+  // Modern Box-like Graph Spline Generator for the Centerpiece Box
+  const generateBoxGraphSpline = (history: number[], width = 360, height = 110) => {
+    if (!history || history.length < 2) {
+      // Return subtle idle grid baseline
+      return {
+        stroke: `M 0,${height - 12} L ${width},${height - 12}`,
+        fill: `M 0,${height - 12} L ${width},${height - 12} L ${width},${height} L 0,${height} Z`,
+        lastX: width,
+        lastY: height - 12,
+        hasData: false
+      };
+    }
+    const padding = 12;
+    const maxVal = Math.max(...history, 1.0);
+    const stepX = width / (history.length - 1);
+    
+    let path = `M 0,${height - ((history[0] / maxVal) * (height - padding * 2)) - padding}`;
+    let lastX = 0;
+    let lastY = height - padding;
+    
+    for (let i = 1; i < history.length; i++) {
+      const prevX = (i - 1) * stepX;
+      const prevY = height - ((history[i - 1] / maxVal) * (height - padding * 2)) - padding;
+      const currX = i * stepX;
+      const currY = height - ((history[i] / maxVal) * (height - padding * 2)) - padding;
+      
+      const cpX1 = prevX + (currX - prevX) / 2;
+      const cpY1 = prevY;
+      const cpX2 = prevX + (currX - prevX) / 2;
+      const cpY2 = currY;
+      
+      path += ` C ${cpX1},${cpY1} ${cpX2},${cpY2} ${currX},${currY}`;
+      lastX = currX;
+      lastY = currY;
+    }
+    
+    const fillPath = `${path} L ${lastX},${height} L 0,${height} Z`;
+    return { stroke: path, fill: fillPath, lastX, lastY, hasData: true };
+  };
+
   const getDisplayHistory = (history: number[], isCurrentPhase: boolean, phaseElapsed: number) => {
     if (!isCurrentPhase) return history;
     const progressRatio = Math.min(1.0, (phaseElapsed + 1) / 6);
@@ -345,32 +366,12 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const downloadGraphPaths = generateGraphPath(displayDownloadHistory);
   const uploadGraphPaths = generateGraphPath(displayUploadHistory);
 
-  // SVG Gauge Calculations
-  // Center 200, 200 | Radius 160
-  // Span from 135 deg to 405 deg (270 deg total)
-  const drawGaugeArcPath = (filledVal: number) => {
-    const center = 200;
-    const radius = 155;
-    const startAngle = 135;
-    const endAngle = 135 + (270 * (filledVal / 180));
-    
-    const degToRad = (deg: number) => (deg * Math.PI) / 180;
-    
-    const startX = center + radius * Math.cos(degToRad(startAngle));
-    const startY = center + radius * Math.sin(degToRad(startAngle));
-    const endX = center + radius * Math.cos(degToRad(endAngle));
-    const endY = center + radius * Math.sin(degToRad(endAngle));
-    
-    const largeArcFlag = (270 * (filledVal / 180)) > 180 ? 1 : 0;
-    
-    return {
-      d: `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`,
-      headX: endX,
-      headY: endY
-    };
-  };
+  // Active History for Center Box Graph
+  const activeHistoryForBox = status === 'uploading' 
+    ? displayUploadHistory 
+    : (status === 'downloading' ? displayDownloadHistory : (downloadSpeedHistory.length > 0 ? downloadSpeedHistory : uploadSpeedHistory));
 
-  const activeGauge = drawGaugeArcPath(Math.max(2, gaugeValue));
+  const centerBoxGraph = generateBoxGraphSpline(activeHistoryForBox, 360, 110);
   const badge = getStatusBadge();
 
   return (
@@ -389,16 +390,15 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         <span className="tracking-wide uppercase text-[11px] font-extrabold">{badge.label}</span>
       </div>
 
-      {/* Main Responsive Grid Arena (Download Card, Speedometer, Upload Card) */}
-      <div className="grid grid-cols-2 xl:grid-cols-3 items-center justify-items-center gap-4 sm:gap-6 w-full max-w-5xl mb-2 sm:mb-4">
+      {/* Main Responsive Grid Arena (Download Bento, Center Box Graph, Upload Bento) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 items-center justify-items-center gap-4 sm:gap-6 w-full max-w-5xl mb-2 sm:mb-4">
         
-        {/* DOWNLOAD BENTO CARD (Modern Emerald Glow) */}
-        <div className={`col-span-1 order-2 xl:order-1 modern-glass-card rounded-3xl p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden w-full max-w-xs h-36 sm:h-44 transition-all duration-300 ${
+        {/* DOWNLOAD BENTO CARD (Emerald) */}
+        <div className={`col-span-1 order-2 xl:order-1 modern-glass-card rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden w-full max-w-xs h-36 sm:h-44 transition-all duration-300 ${
           status === 'downloading' 
             ? 'ring-2 ring-emerald-500/40 border-emerald-500/60 shadow-lg shadow-emerald-500/10' 
             : 'hover:border-emerald-300/80'
         }`}>
-          {/* Top Gradient Edge */}
           <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-transparent"></div>
           
           <div className="flex items-center justify-between">
@@ -447,144 +447,163 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           )}
         </div>
  
-        {/* MODERN CENTRAL SPEEDOMETER GAUGE */}
-        <div className="col-span-2 xl:col-span-1 order-1 xl:order-2 relative w-[260px] xs:w-[300px] sm:w-[360px] h-[260px] xs:h-[300px] sm:h-[360px] flex items-center justify-center" id="dashboard-dial">
+        {/* CENTERPIECE: BOX-LIKE GRAPH STRUCTURE & LIVE SPEED TELEMETRY */}
+        <div className="col-span-1 md:col-span-2 xl:col-span-1 order-1 xl:order-2 w-full max-w-sm modern-glass-card rounded-3xl p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-lg h-[260px] xs:h-[280px] sm:h-[300px] xl:h-[340px]" id="dashboard-dial">
           
-          {/* SVG Circular Radial Gauge */}
-          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 400">
-            <defs>
-              {/* Active Sweeper Gradient for Download */}
-              <linearGradient id="gaugeEmeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#34D399" />
-                <stop offset="100%" stopColor="#059669" />
-              </linearGradient>
-              {/* Active Sweeper Gradient for Upload */}
-              <linearGradient id="gaugeVioletGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#A78BFA" />
-                <stop offset="100%" stopColor="#7C3AED" />
-              </linearGradient>
-              <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-
-            {/* Background Track Arc */}
-            <path 
-              d="M 90.4 309.6 A 155 155 0 1 1 309.6 309.6" 
-              fill="none" 
-              stroke="#E2E8F0" 
-              strokeLinecap="round" 
-              strokeWidth="10"
-            />
-
-            {/* Scale Gauge Indicator Ticks */}
-            <g opacity="0.4" stroke="#94A3B8" strokeWidth="1.5">
-              <line x1="200" x2="200" y1="35" y2="45" />
-              <line x1="45" x2="55" y1="200" y2="200" />
-              <line x1="355" x2="345" y1="200" y2="200" />
-              <line x1="90" x2="98" y1="90" y2="98" />
-              <line x1="310" x2="302" y1="90" y2="98" />
-              <line x1="120" x2="126" y1="280" y2="274" />
-              <line x1="280" x2="274" y1="280" y2="274" />
-            </g>
-
-            {/* Active Sweeper Trail */}
-            {(status === 'downloading' || status === 'uploading') && (
-              <>
-                <path 
-                  className="transition-all duration-100"
-                  d={activeGauge.d}
-                  fill="none" 
-                  stroke={status === 'downloading' ? "url(#gaugeEmeraldGrad)" : "url(#gaugeVioletGrad)"} 
-                  strokeLinecap="round" 
-                  strokeWidth="12"
-                  filter="url(#glowEffect)"
-                />
-                {/* Glowing Leading Head Circle */}
-                <circle 
-                  cx={activeGauge.headX} 
-                  cy={activeGauge.headY} 
-                  r="6" 
-                  fill="#FFFFFF" 
-                  stroke={status === 'downloading' ? "#10B981" : "#8B5CF6"} 
-                  strokeWidth="3"
-                  className="shadow-md"
-                />
-              </>
-            )}
-          </svg>
-  
-          {/* Center Digital Cluster & Floating Trigger Action */}
-          <div className="flex flex-col items-center justify-center relative z-10 text-center w-full h-full pt-4">
-            
-            {/* Speed Readout */}
-            <span id="speed-val" className="text-4xl xs:text-5xl sm:text-6xl font-sans font-black text-slate-900 tracking-tighter transition-all duration-200">
-              {(status === 'downloading' || status === 'uploading') 
-                ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
-                : (status === 'completed' 
-                  ? (unit === 'MB/s' ? ((downloadVal || 0) / 8).toFixed(1) : (downloadVal || 0).toFixed(1)) 
-                  : '0.0')}
-            </span>
-            
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`text-[11px] font-extrabold uppercase tracking-widest ${
-                status === 'downloading' ? 'text-emerald-600' :
-                status === 'uploading' ? 'text-violet-600' :
-                'text-slate-400'
+          {/* Top Header of the Box Graph */}
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                status === 'downloading' ? 'bg-emerald-50 text-emerald-600' :
+                status === 'uploading' ? 'bg-violet-50 text-violet-600' :
+                'bg-blue-50 text-blue-600'
               }`}>
-                {unit}
+                <BarChart2 className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">Bandwidth Telemetry</span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                status === 'downloading' ? 'bg-emerald-100 text-emerald-700' :
+                status === 'uploading' ? 'bg-violet-100 text-violet-700' :
+                status === 'pinging' ? 'bg-amber-100 text-amber-700' :
+                status === 'jittering' ? 'bg-indigo-100 text-indigo-700' :
+                'bg-slate-100 text-slate-600'
+              }`}>
+                {status === 'downloading' ? 'STREAM DOWN' :
+                 status === 'uploading' ? 'STREAM UP' :
+                 status === 'pinging' ? 'PING' :
+                 status === 'jittering' ? 'JITTER' :
+                 'READY'}
               </span>
             </div>
-            
-            {/* Modern Floating Action Button */}
-            <div className="mt-5 sm:mt-7">
-              <button 
-                id="dial-go-button"
-                onClick={handleStartTest}
-                disabled={status !== 'idle' && status !== 'completed'}
-                className={`relative w-20 h-20 xs:w-24 xs:h-24 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center shadow-xl active:scale-95 transition-all duration-300 group cursor-pointer ${
-                  status === 'idle' || status === 'completed'
-                    ? 'bg-slate-900 text-white hover:bg-slate-800 hover:scale-105 shadow-slate-900/20' 
-                    : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                }`}
-              >
-                {/* Pulse Glow when Idle/Finished */}
-                {(status === 'idle' || status === 'completed') && (
-                  <div className="absolute inset-0 rounded-full bg-slate-900 animate-pulse-ring -z-10"></div>
-                )}
-                
-                <span className="font-sans text-sm sm:text-base font-black tracking-widest text-white group-hover:scale-105 transition-transform">
-                  {status === 'idle' ? 'START' : (status === 'completed' ? 'AGAIN' : 'TESTING')}
-                </span>
-                
-                {status === 'pinging' && (
-                  <span className="text-[9px] font-extrabold text-amber-400 mt-0.5 uppercase tracking-wider animate-pulse">PING</span>
-                )}
-                {status === 'jittering' && (
-                  <span className="text-[9px] font-extrabold text-indigo-400 mt-0.5 uppercase tracking-wider animate-pulse">JITTER</span>
-                )}
-                {status === 'downloading' && (
-                  <span className="text-[9px] font-extrabold text-emerald-400 mt-0.5 uppercase tracking-wider animate-pulse">DOWN</span>
-                )}
-                {status === 'uploading' && (
-                  <span className="text-[9px] font-extrabold text-violet-400 mt-0.5 uppercase tracking-wider animate-pulse">UP</span>
-                )}
-              </button>
-            </div>
           </div>
+
+          {/* Large Center Numerical Display */}
+          <div className="flex items-baseline justify-between my-auto pt-2">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Live Transfer Rate</span>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span id="speed-val" className="text-4xl xs:text-5xl font-sans font-black text-slate-900 tracking-tight">
+                  {(status === 'downloading' || status === 'uploading') 
+                    ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
+                    : (status === 'completed' 
+                      ? (unit === 'MB/s' ? ((downloadVal || 0) / 8).toFixed(1) : (downloadVal || 0).toFixed(1)) 
+                      : '0.0')}
+                </span>
+                <span className={`text-xs font-bold uppercase ${
+                  status === 'downloading' ? 'text-emerald-600' :
+                  status === 'uploading' ? 'text-violet-600' :
+                  'text-slate-500'
+                }`}>
+                  {unit}
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Action Button in Box */}
+            <button 
+              id="dial-go-button"
+              onClick={handleStartTest}
+              disabled={status !== 'idle' && status !== 'completed'}
+              className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all duration-200 cursor-pointer ${
+                status === 'idle' || status === 'completed'
+                  ? 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-slate-900/20' 
+                  : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+              }`}
+            >
+              {status === 'completed' ? (
+                <>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Retest</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>{status === 'idle' ? 'Start Test' : 'Running...'}</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* BOX GRAPH MATRIX & WAVEFORM AREA */}
+          <div className="relative w-full h-24 xs:h-28 bg-slate-50/90 rounded-2xl border border-slate-200/80 p-2 overflow-hidden flex flex-col justify-end">
+            
+            {/* Background Grid Lines with threshold markings */}
+            <div className="absolute inset-0 flex flex-col justify-between p-2 pointer-events-none opacity-40">
+              <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
+                <span className="text-[8px] font-mono text-slate-400 -mt-2">100%</span>
+              </div>
+              <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
+                <span className="text-[8px] font-mono text-slate-400 -mt-2">50%</span>
+              </div>
+              <div className="border-b border-slate-300 w-full flex justify-end">
+                <span className="text-[8px] font-mono text-slate-400 -mt-2">0</span>
+              </div>
+            </div>
+
+            {/* SVG Wave Spline */}
+            <svg viewBox="0 0 360 110" className="w-full h-full relative z-10 overflow-visible">
+              <defs>
+                <linearGradient id="boxEmeraldGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+                </linearGradient>
+                <linearGradient id="boxVioletGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.0" />
+                </linearGradient>
+              </defs>
+
+              {/* Area Gradient Fill */}
+              <path 
+                d={centerBoxGraph.fill} 
+                fill={status === 'uploading' ? "url(#boxVioletGrad)" : "url(#boxEmeraldGrad)"} 
+              />
+              
+              {/* Curve Line Stroke */}
+              <path 
+                d={centerBoxGraph.stroke} 
+                fill="none" 
+                stroke={status === 'uploading' ? "#8B5CF6" : (status === 'downloading' ? "#10B981" : "#94A3B8")} 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+              />
+
+              {/* Glowing Leading Head Dot */}
+              {centerBoxGraph.hasData && (status === 'downloading' || status === 'uploading') && (
+                <>
+                  <circle 
+                    cx={centerBoxGraph.lastX} 
+                    cy={centerBoxGraph.lastY} 
+                    r="5" 
+                    fill="#FFFFFF" 
+                    stroke={status === 'uploading' ? "#8B5CF6" : "#10B981"} 
+                    strokeWidth="3" 
+                  />
+                  <circle 
+                    cx={centerBoxGraph.lastX} 
+                    cy={centerBoxGraph.lastY} 
+                    r="8" 
+                    fill="none" 
+                    stroke={status === 'uploading' ? "#8B5CF6" : "#10B981"} 
+                    strokeWidth="1.5" 
+                    className="animate-ping" 
+                  />
+                </>
+              )}
+            </svg>
+          </div>
+
         </div>
  
-        {/* UPLOAD BENTO CARD (Modern Violet Glow) */}
-        <div className={`col-span-1 order-3 xl:order-3 modern-glass-card rounded-3xl p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden w-full max-w-xs h-36 sm:h-44 transition-all duration-300 ${
+        {/* UPLOAD BENTO CARD (Violet) */}
+        <div className={`col-span-1 order-3 xl:order-3 modern-glass-card rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden w-full max-w-xs h-36 sm:h-44 transition-all duration-300 ${
           status === 'uploading' 
             ? 'ring-2 ring-violet-500/40 border-violet-500/60 shadow-lg shadow-violet-500/10' 
             : 'hover:border-violet-300/80'
         }`}>
-          {/* Top Gradient Edge */}
           <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-purple-400 to-transparent"></div>
           
           <div className="flex items-center justify-between">
