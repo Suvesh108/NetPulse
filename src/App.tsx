@@ -95,9 +95,9 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
       
-      {/* Sleek Header aligned to the exact container width */}
-      <header className="w-full shrink-0 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 z-50 sticky top-0 transition-all px-4 sm:px-6">
-        <div className="w-full max-w-7xl 2xl:max-w-[1600px] mx-auto h-12 sm:h-13 flex items-center justify-between">
+      {/* Clean Transparent Header */}
+      <header className="w-full shrink-0 bg-transparent z-50 pt-2 sm:pt-3 px-4 sm:px-6 transition-all">
+        <div className="w-full max-w-7xl 2xl:max-w-[1600px] mx-auto h-11 sm:h-12 flex items-center justify-between">
           
           {/* Brand Logo with Live Status Node */}
           <div className="flex items-center gap-2">
