@@ -9,6 +9,7 @@ import { SpeedTestResult, SimulationSettings } from './types';
 export default function App() {
   const [activeTab, setActiveTab] = useState<'speed' | 'history' | 'settings'>('speed');
   const [unit, setUnit] = useState<'Mbps' | 'MB/s'>('Mbps');
+  const [isTesting, setIsTesting] = useState<boolean>(false);
   
   const [historyResults, setHistoryResults] = useState<SpeedTestResult[]>(() => {
     try {
@@ -76,8 +77,6 @@ export default function App() {
     setHistoryResults([]);
   };
 
-  const [isTesting, setIsTesting] = useState(false);
-
   const navItems = [
     { id: 'speed' as const, label: 'Speed Test', icon: Zap },
     { id: 'history' as const, label: 'History', icon: History, badge: historyResults.length > 0 ? historyResults.length : undefined },
@@ -92,7 +91,7 @@ export default function App() {
             settings={settings} 
             onUpdateSettings={setSettings} 
             onTestComplete={handleTestComplete}
-            onStatusChange={(s) => setIsTesting(s !== 'idle' && s !== 'completed')}
+            onTestingChange={setIsTesting}
             unit={unit}
           />
         );
@@ -100,7 +99,7 @@ export default function App() {
         return (
           <HistoryList 
             results={historyResults} 
-            onDeleteResult={handleDeleteResult} 
+            onDeleteResult={handleDeleteResult}
             onClearAll={handleClearAllHistory}
             unit={unit}
           />
@@ -117,15 +116,15 @@ export default function App() {
       <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-8 sm:px-12 md:px-16 transition-all">
         <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 flex items-center justify-between px-4 sm:px-6">
           
-          {/* Standalone Transparent Infinity Pulse Logo Mark with Active Pulse Animation */}
+          {/* Standalone Transparent Infinity Pulse Logo Mark with Live Pulse Wave */}
           <div 
             onClick={() => setActiveTab('speed')} 
             className="flex items-center group cursor-pointer"
             title="NetPulse Speed Test"
           >
             <InfinityPulseLogo 
-              className="h-6 sm:h-7 md:h-7.5 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
-              active={isTesting}
+              isTesting={isTesting}
+              className="h-6 sm:h-7 md:h-7.5 w-auto text-blue-600 transition-transform duration-300 group-hover:scale-105" 
             />
           </div>
 
