@@ -93,7 +93,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-dvh max-h-dvh w-screen bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative overflow-hidden flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
+    <div className="min-h-screen w-full bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
       
       {/* Modern Desktop Header */}
       <header className="w-full shrink-0 flex items-center justify-between px-6 sm:px-10 h-16 sm:h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/80 z-50 sticky top-0 transition-all">
@@ -115,7 +115,7 @@ export default function App() {
             <span className="text-[10px] text-slate-400 font-medium hidden xs:inline">Edge Speed Diagnostic Engine</span>
           </div>
         </div>
- 
+
         {/* Center Unit Selector Pill */}
         <div className="flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shadow-inner">
           <button
@@ -175,7 +175,7 @@ export default function App() {
       </header>
 
       {/* Main Responsive Content Arena */}
-      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-6 md:px-10 relative z-10 w-full max-w-7xl mx-auto overflow-hidden">
+      <main className="flex-1 flex flex-col items-center justify-start p-4 sm:p-6 md:px-8 relative z-10 w-full max-w-7xl mx-auto pb-24 md:pb-12">
         {renderTabContent()}
       </main>
 
