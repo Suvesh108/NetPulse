@@ -461,25 +461,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   return (
     <div className="w-full flex flex-col items-center gap-5 select-none" id="speed-test-section">
       
-      {/* Top Permanently Fixed Status Container */}
-      <div className="h-10 flex items-center justify-center shrink-0 w-full">
-        <div className={`flex items-center gap-2.5 px-5 py-2 rounded-full transition-all duration-300 border text-xs font-bold shadow-sm min-w-[280px] sm:min-w-[340px] justify-center ${badge.color}`}>
-          {status === 'completed' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          ) : (
-            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-              status === 'idle' ? 'bg-slate-400' :
-              status === 'pinging' ? 'bg-amber-500 animate-ping' :
-              status === 'jittering' ? 'bg-indigo-500 animate-ping' :
-              status === 'downloading' ? 'bg-emerald-500 animate-ping' :
-              status === 'uploading' ? 'bg-violet-500 animate-ping' :
-              'bg-emerald-600'
-            }`} />
-          )}
-          <span className="tracking-wide uppercase text-xs font-black truncate">{badge.label}</span>
-        </div>
-      </div>
-
       {/* CLOUDFLARE SPEEDOMETER HERO CONSOLE ("Your Internet Speed") */}
       <div className="w-full max-w-5xl modern-glass-card rounded-3xl p-6 sm:p-8 flex flex-col border border-slate-200/90 shadow-xl" id="dashboard-dial">
         
