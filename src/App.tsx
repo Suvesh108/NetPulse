@@ -115,8 +115,12 @@ export default function App() {
         <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 flex items-center justify-between px-4 sm:px-6">
           
           {/* Standalone Transparent Infinity Pulse Logo Mark */}
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <InfinityPulseLogo className="w-8 h-4 text-blue-600 group-hover:text-blue-700 transition-all duration-300 group-hover:scale-105" />
+          <div className="flex items-center gap-2.5 group cursor-pointer">
+            <img 
+              src="/logo-mark.png" 
+              alt="NetPulse Infinity Pulse Logo" 
+              className="h-4.5 sm:h-5 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+            />
             <div className="flex items-center gap-1.5">
               <span className="font-sans text-sm sm:text-base font-black tracking-tight text-slate-900">
                 NetPulse
