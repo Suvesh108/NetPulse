@@ -110,6 +110,15 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     setDownloadSpeedHistory(prev => prev.length >= 3 ? prev : [dnMbps * 0.35, dnMbps * 0.6, dnMbps * 0.88, dnMbps * 0.95, dnMbps, dnMbps * 0.92, dnMbps * 0.97, dnMbps]);
     setUploadSpeedHistory(prev => prev.length >= 3 ? prev : [upMbps * 0.38, upMbps * 0.62, upMbps * 0.85, upMbps * 0.94, upMbps, upMbps * 0.91, upMbps * 0.98, upMbps]);
 
+    const serverNameMap: Record<string, string> = {
+      cloudflare: 'Cloudflare Global Edge CDN',
+      fastly: 'Fastly High-Capacity Edge',
+      cloudfront: 'AWS CloudFront Global Backbone',
+      gcp: 'Google Cloud CDN (Premium Tier)',
+      akamai: 'Akamai Connected Edge Network',
+      custom: settings.customServerUrl ? `Custom Node (${settings.customServerUrl})` : 'Custom Dedicated Edge Node'
+    };
+
     const finalResult: SpeedTestResult = {
       id: Math.random().toString(36).substring(2, 9),
       timestamp: new Date().toISOString(),
@@ -117,7 +126,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       uploadMbps: upMbps,
       pingMs: ping,
       jitterMs: jitter,
-      serverName: 'Cloudflare Global Edge CDN'
+      serverName: serverNameMap[settings.engineBackend || 'cloudflare'] || 'Cloudflare Global Edge CDN',
+      routingProtocol: settings.routingProtocol || 'anycast-bgp'
     };
 
     onTestComplete(finalResult);

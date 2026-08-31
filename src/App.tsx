@@ -21,16 +21,30 @@ export default function App() {
   const [settings, setSettings] = useState<SimulationSettings>(() => {
     try {
       const saved = localStorage.getItem('netpulse_app_settings');
-      return saved ? JSON.parse(saved) : {
-        measureDownloadLoadedLatency: false,
-        measureUploadLoadedLatency: false
-      };
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          measureDownloadLoadedLatency: parsed.measureDownloadLoadedLatency ?? false,
+          measureUploadLoadedLatency: parsed.measureUploadLoadedLatency ?? false,
+          engineBackend: parsed.engineBackend ?? 'cloudflare',
+          routingProtocol: parsed.routingProtocol ?? 'anycast-bgp',
+          customServerUrl: parsed.customServerUrl ?? '',
+          packetProbesCount: parsed.packetProbesCount ?? 25,
+          selectedRegion: parsed.selectedRegion ?? 'Auto (Nearest Edge PoP)'
+        };
+      }
     } catch {
-      return {
-        measureDownloadLoadedLatency: false,
-        measureUploadLoadedLatency: false
-      };
+      // fallback
     }
+    return {
+      measureDownloadLoadedLatency: false,
+      measureUploadLoadedLatency: false,
+      engineBackend: 'cloudflare',
+      routingProtocol: 'anycast-bgp',
+      customServerUrl: '',
+      packetProbesCount: 25,
+      selectedRegion: 'Auto (Nearest Edge PoP)'
+    };
   });
 
   useEffect(() => {
