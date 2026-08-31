@@ -560,45 +560,63 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
       </div>
 
-      {/* MODERN TELEMETRY SUMMARY DOCK */}
-      <div className="w-full max-w-4xl modern-glass-card rounded-2xl p-3 sm:py-3.5 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-0 items-center justify-items-stretch shadow-sm mt-3">
+      {/* MODERN 3-COLUMN BENTO TELEMETRY DECK */}
+      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-3">
         
-        {/* PING (Latency) */}
-        <div className="flex items-center gap-3 col-span-1 px-3 py-1 sm:py-0 border-r border-slate-200/80">
-          <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0">
-            <Activity className="w-4 h-4" />
+        {/* CARD 1: PING (Latency) */}
+        <div className="modern-glass-card rounded-2xl p-4 flex items-center gap-3.5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
+            <Activity className="w-5 h-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Ping Latency</span>
-            <span id="ping-val" className="font-mono text-base sm:text-lg font-extrabold text-slate-900">
-              {pingVal !== null ? `${pingVal} ms` : '-- ms'}
-            </span>
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] sm:text-[11px] font-extrabold text-amber-800 uppercase tracking-wider">Ping Latency</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            </div>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span id="ping-val" className="font-mono text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                {pingVal !== null ? `${pingVal} ms` : '-- ms'}
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium">Idle Response Time</span>
           </div>
         </div>
         
-        {/* JITTER (Variance) */}
-        <div className="flex items-center gap-3 col-span-1 px-3 py-1 sm:py-0 md:border-r md:border-slate-200/80">
-          <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0">
-            <Gauge className="w-4 h-4" />
+        {/* CARD 2: JITTER (Variance) */}
+        <div className="modern-glass-card rounded-2xl p-4 flex items-center gap-3.5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20 shrink-0">
+            <Gauge className="w-5 h-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Jitter Variance</span>
-            <span id="jitter-val" className="font-mono text-base sm:text-lg font-extrabold text-slate-900">
-              {jitterVal !== null ? `${jitterVal} ms` : '-- ms'}
-            </span>
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] sm:text-[11px] font-extrabold text-indigo-800 uppercase tracking-wider">Jitter Variance</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+            </div>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span id="jitter-val" className="font-mono text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                {jitterVal !== null ? `${jitterVal} ms` : '-- ms'}
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium">Packet Stability</span>
           </div>
         </div>
 
-        {/* SERVER (Edge Node) */}
-        <div className="flex items-center gap-3 col-span-2 md:col-span-1 px-3 border-t border-slate-200/80 md:border-t-0 pt-2.5 md:pt-0 justify-center md:justify-end">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0">
-            <MapPin className="w-4 h-4" />
+        {/* CARD 3: SERVER NODE */}
+        <div className="modern-glass-card rounded-2xl p-4 flex items-center gap-3.5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+            <MapPin className="w-5 h-5" />
           </div>
-          <div className="flex flex-col text-left md:text-right">
-            <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Server Node</span>
-            <span className="font-sans text-xs sm:text-sm font-bold text-slate-900 truncate max-w-[200px]">
-              Cloudflare Edge CDN
-            </span>
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] sm:text-[11px] font-extrabold text-blue-800 uppercase tracking-wider">Server Node</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+            </div>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="font-sans text-sm sm:text-base font-black text-slate-900 truncate">
+                Cloudflare Edge
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium truncate">Anycast CDN Server</span>
           </div>
         </div>
 
