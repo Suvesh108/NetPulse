@@ -52,6 +52,58 @@
   animation: float-slow 4s ease-in-out infinite;
 }
 
+/* Logo Pulse Animation: Sweeps a luminous beam from left to right within the exact vector pixels */
+@keyframes logo-glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.25));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 14px rgba(37, 99, 235, 0.4));
+  }
+}
+
+@keyframes pulse-beam-slide {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+.logo-pulse-active {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: logo-glow-pulse 1.3s ease-in-out infinite;
+}
+
+.logo-pulse-beam {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(96, 165, 250, 0.9) 35%, #FFFFFF 50%, rgba(96, 165, 250, 0.9) 65%, transparent 100%);
+  -webkit-mask-image: url('/logo-mark.png');
+  mask-image: url('/logo-mark.png');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  animation: pulse-beam-slide 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  mix-blend-mode: color-dodge;
+}
+
 html, body {
   height: 100dvh;
   margin: 0;
