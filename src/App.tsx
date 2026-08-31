@@ -95,32 +95,32 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
       
-      {/* Modern Desktop Header */}
-      <header className="w-full shrink-0 flex items-center justify-between px-6 sm:px-10 h-16 sm:h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/80 z-50 sticky top-0 transition-all">
+      {/* Sleek Compact Desktop Header */}
+      <header className="w-full shrink-0 flex items-center justify-between px-4 sm:px-8 h-14 sm:h-16 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 z-50 sticky top-0 transition-all">
         
         {/* Brand Logo with Live Status Node */}
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 group cursor-pointer transition-transform hover:scale-105 active:scale-95">
-            <Zap className="w-5 h-5 fill-white/20 transition-transform group-hover:rotate-12 duration-300" />
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 group cursor-pointer transition-transform hover:scale-105 active:scale-95">
+            <Zap className="w-4 h-4 fill-white/20 transition-transform group-hover:rotate-12 duration-300" />
           </div>
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="font-sans text-lg sm:text-xl font-black tracking-tight text-slate-900">
+            <div className="flex items-center gap-1.5">
+              <span className="font-sans text-base sm:text-lg font-black tracking-tight text-slate-900">
                 NetPulse
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200/60 uppercase tracking-widest hidden sm:inline-flex">
+              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-blue-600 border border-blue-200/60 uppercase tracking-wider hidden sm:inline-flex">
                 Pro
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 font-medium hidden xs:inline">Edge Speed Diagnostic Engine</span>
+            <span className="text-[9px] text-slate-400 font-medium hidden xs:inline">Edge Speed Telemetry</span>
           </div>
         </div>
 
         {/* Center Unit Selector Pill */}
-        <div className="flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shadow-inner">
+        <div className="flex items-center bg-slate-100/90 p-0.5 rounded-lg border border-slate-200/80 shadow-inner">
           <button
             onClick={() => setUnit('Mbps')}
-            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 ${
+            className={`px-3 py-1 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 ${
               unit === 'Mbps'
                 ? 'bg-white text-slate-900 shadow-sm'
                 : 'text-slate-500 hover:text-slate-900'
@@ -130,7 +130,7 @@ export default function App() {
           </button>
           <button
             onClick={() => setUnit('MB/s')}
-            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 ${
+            className={`px-3 py-1 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 ${
               unit === 'MB/s'
                 ? 'bg-white text-slate-900 shadow-sm'
                 : 'text-slate-500 hover:text-slate-900'
@@ -141,7 +141,7 @@ export default function App() {
         </div>
 
         {/* Desktop Navigation Switcher */}
-        <nav className="hidden md:flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/80">
+        <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/80">
           {navItems.map((item) => {
             const IconComp = item.icon;
             const isActive = activeTab === item.id;
@@ -151,20 +151,20 @@ export default function App() {
                 key={item.id}
                 id={`nav-desktop-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer ${
                   isActive 
                     ? 'bg-white text-slate-900 shadow-sm' 
                     : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
-                <IconComp className={`w-4 h-4 shrink-0 transition-colors ${
+                <IconComp className={`w-3.5 h-3.5 shrink-0 transition-colors ${
                   isActive 
                     ? (item.id === 'speed' ? 'text-blue-600' : item.id === 'history' ? 'text-indigo-600' : 'text-slate-800')
                     : 'text-slate-400'
                 }`} />
                 <span>{item.label}</span>
                 {item.badge !== undefined && (
-                  <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-indigo-50 text-indigo-600 border border-indigo-200">
+                  <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-bold font-mono bg-indigo-50 text-indigo-600 border border-indigo-200">
                     {item.badge}
                   </span>
                 )}
@@ -175,12 +175,12 @@ export default function App() {
       </header>
 
       {/* Main Responsive Content Arena */}
-      <main className="flex-1 flex flex-col items-center justify-start p-4 sm:p-6 md:px-8 relative z-10 w-full max-w-7xl mx-auto pb-24 md:pb-12">
+      <main className="flex-1 flex flex-col items-center justify-start p-2.5 sm:p-4 md:px-6 relative z-10 w-full max-w-6xl mx-auto pb-20 md:pb-6">
         {renderTabContent()}
       </main>
 
       {/* Floating Bottom Navigation Bar for Mobile & Tablet */}
-      <div className="md:hidden fixed bottom-5 inset-x-4 z-50 animate-fade-in">
+      <div className="md:hidden fixed bottom-4 inset-x-4 z-50 animate-fade-in">
         <nav className="mx-auto max-w-sm bg-white/90 border border-slate-200/90 backdrop-blur-2xl rounded-2xl p-1.5 flex items-center justify-around shadow-xl shadow-slate-900/5">
           {navItems.map((item) => {
             const IconComp = item.icon;
@@ -191,7 +191,7 @@ export default function App() {
                 key={item.id}
                 id={`nav-mobile-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl transition-all duration-200 cursor-pointer relative ${
+                className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all duration-200 cursor-pointer relative ${
                   isActive ? 'text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
@@ -200,9 +200,9 @@ export default function App() {
                     ? (item.id === 'speed' ? 'bg-blue-50 text-blue-600' : item.id === 'history' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-800')
                     : 'bg-transparent text-slate-400'
                 }`}>
-                  <IconComp className="w-5 h-5 shrink-0" />
+                  <IconComp className="w-4 h-4 shrink-0" />
                 </div>
-                <span className="text-[10px] uppercase tracking-wider font-semibold">
+                <span className="text-[9px] uppercase tracking-wider font-semibold">
                   {item.label}
                 </span>
                 {item.badge !== undefined && (
