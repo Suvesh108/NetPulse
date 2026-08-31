@@ -13,6 +13,16 @@ interface SpeedTestProps {
 }
 
 export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, onTestingStateChange, unit = 'Mbps' }: SpeedTestProps) {
+  const factor = unit === 'MB/s' ? 8 : 1;
+  const serverNames: Record<string, string> = {
+    cloudflare: 'Cloudflare Global Edge CDN',
+    fastly: 'Fastly High-Capacity Edge',
+    cloudfront: 'AWS CloudFront Global Backbone',
+    gcp: 'Google Cloud CDN (Premium Tier)',
+    akamai: 'Akamai Connected Edge Network',
+    custom: settings.customServerUrl ? `Custom: ${settings.customServerUrl}` : 'Custom / Self-Hosted Node'
+  };
+  const activeServerName = serverNames[settings.engineBackend] || 'Cloudflare Global Edge CDN';
   const [status, setStatus] = useState<TestStatus>('idle');
   const [currentSpeed, setCurrentSpeed] = useState<number>(0);
   const [downloadVal, setDownloadVal] = useState<number | null>(null);
