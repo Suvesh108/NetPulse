@@ -3,6 +3,7 @@ import { Activity, History, Settings, Zap, ArrowUpDown } from 'lucide-react';
 import SpeedTest from './components/SpeedTest';
 import HistoryList from './components/HistoryList';
 import SettingsPanel from './components/SettingsPanel';
+import InfinityPulseLogo from './components/InfinityPulseLogo';
 import { SpeedTestResult, SimulationSettings } from './types';
 
 export default function App() {
@@ -113,11 +114,9 @@ export default function App() {
       <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-8 sm:px-12 md:px-16 transition-all">
         <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 flex items-center justify-between px-4 sm:px-6">
           
-          {/* Brand Logo with Live Status Node */}
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center shadow-sm shadow-blue-500/20 group cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-white border border-slate-200/90">
-              <img src="/logo.jpg" alt="NetPulse Infinity Pulse Logo" className="w-full h-full object-cover" />
-            </div>
+          {/* Standalone Transparent Infinity Pulse Logo Mark */}
+          <div className="flex items-center gap-2 group cursor-pointer">
+            <InfinityPulseLogo className="w-8 h-4 text-blue-600 group-hover:text-blue-700 transition-all duration-300 group-hover:scale-105" />
             <div className="flex items-center gap-1.5">
               <span className="font-sans text-sm sm:text-base font-black tracking-tight text-slate-900">
                 NetPulse

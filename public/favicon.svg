@@ -1,21 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <defs>
-    <linearGradient id="netpulseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2563EB" />
-      <stop offset="100%" stop-color="#4F46E5" />
-    </linearGradient>
-  </defs>
-  <rect width="100" height="100" rx="22" fill="#0F172A" />
-  <!-- Infinity Pulse Wave Track -->
-  <path d="M 12,50 L 22,50 Q 25,30 28,50 Q 32,70 36,50 C 42,32 48,32 50,50 C 52,68 58,68 64,50 C 68,32 74,32 78,50 Q 82,70 85,50 L 88,50" 
-        stroke="url(#netpulseGrad)" 
-        stroke-width="5" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" />
-  <!-- Infinity Center Loop -->
-  <path d="M 50,50 C 44,64 34,64 34,50 C 34,36 44,36 50,50 C 56,64 66,64 66,50 C 66,36 56,36 50,50 Z" 
-        stroke="#3B82F6" 
-        stroke-width="5.5" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" fill="none">
+  <!-- Left pulse wave entering infinity loop -->
+  <path
+    d="M 6,40 L 24,40 L 29,26 L 36,56 L 44,14 L 52,66 L 58,40"
+    stroke="#2563EB"
+    stroke-width="5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Smooth continuous infinity loop -->
+  <path
+    d="M 58,40 C 64,12 94,12 100,40 C 106,68 136,68 142,40 C 136,12 106,12 100,40 C 94,68 64,68 58,40 Z"
+    stroke="#2563EB"
+    stroke-width="5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Inner concentric loop ring -->
+  <path
+    d="M 68,40 C 72,22 93,22 100,40 C 107,58 128,58 132,40 C 128,22 107,22 100,40 C 93,58 72,58 68,40 Z"
+    stroke="#2563EB"
+    stroke-width="4.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- Right pulse wave exiting infinity loop -->
+  <path
+    d="M 142,40 L 148,14 L 156,66 L 164,26 L 171,56 L 176,40 L 194,40"
+    stroke="#2563EB"
+    stroke-width="5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
 </svg>
