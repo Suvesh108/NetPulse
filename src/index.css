@@ -52,50 +52,6 @@
   animation: float-slow 4s ease-in-out infinite;
 }
 
-/* Traveling Glowing Pulse Dot Animation (Left Entry to Right Exit) */
-@keyframes dot-pulse-travel {
-  0% {
-    left: -8%;
-    opacity: 0;
-    transform: translateY(-50%) scale(0.6);
-  }
-  15% {
-    opacity: 1;
-    transform: translateY(-50%) scale(1.1);
-  }
-  85% {
-    opacity: 1;
-    transform: translateY(-50%) scale(1.1);
-  }
-  100% {
-    left: 108%;
-    opacity: 0;
-    transform: translateY(-50%) scale(0.6);
-  }
-}
-
-@keyframes dot-core-glow {
-  0%, 100% {
-    box-shadow: 0 0 6px 2px rgba(37, 99, 235, 0.9), 0 0 12px 4px rgba(59, 130, 246, 0.6);
-  }
-  50% {
-    box-shadow: 0 0 10px 3px rgba(37, 99, 235, 1), 0 0 18px 6px rgba(96, 165, 250, 0.85);
-  }
-}
-
-.traveling-pulse-dot {
-  position: absolute;
-  top: 50%;
-  width: 7px;
-  height: 7px;
-  border-radius: 9999px;
-  background-color: #2563EB;
-  border: 1.5px solid #FFFFFF;
-  pointer-events: none;
-  animation: dot-pulse-travel 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite, dot-core-glow 0.8s ease-in-out infinite;
-  z-index: 20;
-}
-
 html, body {
   height: 100dvh;
   margin: 0;

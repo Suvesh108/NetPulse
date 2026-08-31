@@ -13,6 +13,10 @@ interface SpeedTestProps {
 
 export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, onStatusChange, unit = 'Mbps' }: SpeedTestProps) {
   const [status, setStatus] = useState<TestStatus>('idle');
+
+  useEffect(() => {
+    onStatusChange?.(status);
+  }, [status, onStatusChange]);
   const [currentSpeed, setCurrentSpeed] = useState<number>(0);
   const [downloadVal, setDownloadVal] = useState<number | null>(null);
   const [uploadVal, setUploadVal] = useState<number | null>(null);
@@ -39,12 +43,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const finalResultsRef = useRef<any>(null);
 
   // Safe Cleanup
-  useEffect(() => {
-    if (onStatusChange) {
-      onStatusChange(status);
-    }
-  }, [status, onStatusChange]);
-
   useEffect(() => {
     return () => {
       isTestingRef.current = false;
