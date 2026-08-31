@@ -53,7 +53,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
   });
 
   return (
-    <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-3 flex-1 min-h-0 h-full select-none animate-fade-in" id="history-section">
+    <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-3 pb-24 md:pb-0 flex-1 min-h-0 h-full select-none animate-fade-in" id="history-section">
       
       {/* 1. MODERN ANALYTICS 4-BENTO CARDS (Compact) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 shrink-0">

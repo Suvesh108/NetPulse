@@ -82,15 +82,23 @@
 }
 
 html, body {
-  height: 100dvh;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
-  overflow: hidden;
   background-color: #F8FAFC;
   color: #0F172A;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Locked single window viewport on desktop screens only */
+@media (min-width: 768px) {
+  html, body {
+    height: 100dvh;
+    overflow: hidden;
+  }
 }
 
 /* Remove default button & input black focus boxes/outlines across all browsers */

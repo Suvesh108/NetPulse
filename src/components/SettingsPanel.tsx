@@ -152,7 +152,7 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
   const selectedProtocol = routingProtocols.find(p => p.id === settings.routingProtocol) || routingProtocols[0];
 
   return (
-    <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-3 pb-2 flex-1 min-h-0 select-none animate-fade-in" id="settings-section">
+    <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-3 pb-24 md:pb-2 flex-1 min-h-0 select-none animate-fade-in" id="settings-section">
       
       {/* 2-COLUMN UNIFIED BENTO GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
