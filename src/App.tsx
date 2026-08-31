@@ -9,7 +9,6 @@ import { SpeedTestResult, SimulationSettings } from './types';
 export default function App() {
   const [activeTab, setActiveTab] = useState<'speed' | 'history' | 'settings'>('speed');
   const [unit, setUnit] = useState<'Mbps' | 'MB/s'>('Mbps');
-  const [isTesting, setIsTesting] = useState<boolean>(false);
   
   const [historyResults, setHistoryResults] = useState<SpeedTestResult[]>(() => {
     try {
@@ -91,7 +90,6 @@ export default function App() {
             settings={settings} 
             onUpdateSettings={setSettings} 
             onTestComplete={handleTestComplete}
-            onTestingChange={setIsTesting}
             unit={unit}
           />
         );
@@ -114,22 +112,23 @@ export default function App() {
       
       {/* Clean Transparent Header tucked inward */}
       <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-8 sm:px-12 md:px-16 transition-all">
-        <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 flex items-center justify-between px-4 sm:px-6">
+        <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 relative flex items-center justify-between px-4 sm:px-6">
           
-          {/* Standalone Transparent Infinity Pulse Logo Mark with Live Pulse Wave */}
+          {/* Standalone Transparent Infinity Pulse Logo Mark (Left) */}
           <div 
             onClick={() => setActiveTab('speed')} 
-            className="flex items-center group cursor-pointer"
+            className="flex items-center group cursor-pointer shrink-0 z-10"
             title="NetPulse Speed Test"
           >
-            <InfinityPulseLogo 
-              isTesting={isTesting}
-              className="h-6 sm:h-7 md:h-7.5 w-auto text-blue-600 transition-transform duration-300 group-hover:scale-105" 
+            <img 
+              src="/logo-mark.png" 
+              alt="NetPulse Infinity Pulse Logo" 
+              className="h-6 sm:h-7 md:h-7.5 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </div>
 
-          {/* Center Unit Selector Pill */}
-          <div className="flex items-center bg-slate-100/90 p-0.5 rounded-lg border border-slate-200/80 shadow-inner">
+          {/* Unit Selector Pill (Centered in Navbar) */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center bg-slate-100/90 p-0.5 rounded-lg border border-slate-200/80 shadow-inner z-10">
             <button
               onClick={() => setUnit('Mbps')}
               className={`px-3 py-0.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 outline-none focus:outline-none focus:ring-0 select-none ${
@@ -152,8 +151,8 @@ export default function App() {
             </button>
           </div>
 
-          {/* Desktop Navigation Switcher */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-0.5 rounded-lg border border-slate-200/80">
+          {/* Desktop Navigation Switcher (Right) */}
+          <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-0.5 rounded-lg border border-slate-200/80 z-10">
             {navItems.map((item) => {
               const IconComp = item.icon;
               const isActive = activeTab === item.id;
