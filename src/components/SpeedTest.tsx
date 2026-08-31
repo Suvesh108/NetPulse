@@ -809,25 +809,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       {/* DETAILED MEASUREMENT BREAKDOWNS (3 Columns) */}
       <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-3">
         
-        {/* COLUMN 1: DOWNLOAD MEASUREMENTS */}
-        <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 mb-1.5">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-[#18181B]">Download Measurements</span>
-                <Info className="w-3 h-3 text-slate-400" />
-              </div>
-              <span className="text-[9px] text-slate-400 font-mono">Payloads</span>
-            </div>
-
-            {renderBoxPlotRow("100 kB download test", downloadVal !== null ? downloadVal * 0.45 : null, "10/10", 10, 18, 28, 40, 'orange')}
-            {renderBoxPlotRow("1 MB download test", downloadVal !== null ? downloadVal * 0.72 : null, "8/8", 25, 42, 58, 68, 'orange')}
-            {renderBoxPlotRow("10 MB download test", downloadVal !== null ? downloadVal * 0.88 : null, "6/6", 35, 52, 70, 85, 'orange')}
-            {renderBoxPlotRow("25 MB download test", downloadVal, "4/4", 45, 65, 82, 95, 'orange')}
-          </div>
-        </div>
-
-        {/* COLUMN 2: UPLOAD MEASUREMENTS */}
+        {/* COLUMN 1: UPLOAD MEASUREMENTS */}
         <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 mb-1.5">
@@ -842,6 +824,24 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             {renderBoxPlotRow("1 MB upload test", uploadVal !== null ? uploadVal * 0.68 : null, "6/6", 28, 45, 60, 72, 'purple')}
             {renderBoxPlotRow("10 MB upload test", uploadVal !== null ? uploadVal * 0.85 : null, "4/4", 40, 58, 74, 86, 'purple')}
             {renderBoxPlotRow("25 MB upload test", uploadVal, "4/4", 48, 68, 80, 92, 'purple')}
+          </div>
+        </div>
+
+        {/* COLUMN 2: DOWNLOAD MEASUREMENTS */}
+        <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-[#18181B]">Download Measurements</span>
+                <Info className="w-3 h-3 text-slate-400" />
+              </div>
+              <span className="text-[9px] text-slate-400 font-mono">Payloads</span>
+            </div>
+
+            {renderBoxPlotRow("100 kB download test", downloadVal !== null ? downloadVal * 0.45 : null, "10/10", 10, 18, 28, 40, 'orange')}
+            {renderBoxPlotRow("1 MB download test", downloadVal !== null ? downloadVal * 0.72 : null, "8/8", 25, 42, 58, 68, 'orange')}
+            {renderBoxPlotRow("10 MB download test", downloadVal !== null ? downloadVal * 0.88 : null, "6/6", 35, 52, 70, 85, 'orange')}
+            {renderBoxPlotRow("25 MB download test", downloadVal, "4/4", 45, 65, 82, 95, 'orange')}
           </div>
         </div>
 
