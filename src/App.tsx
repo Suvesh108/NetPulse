@@ -125,9 +125,7 @@ export default function App() {
             <img 
               src="/logo-mark.png" 
               alt="Speed Test Logo" 
-              className={`h-6 sm:h-7 w-auto object-contain transition-all duration-300 group-hover:scale-105 ${
-                isTesting ? 'animate-logo-pulse' : ''
-              }`} 
+              className="h-6 sm:h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
             <span className="font-sans text-sm sm:text-base font-black tracking-tight text-slate-900 select-none">
               Speed Test
