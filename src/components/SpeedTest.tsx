@@ -277,19 +277,19 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const getStatusBadge = () => {
     switch (status) {
       case 'idle':
-        return { label: 'Ready to Test', color: 'bg-slate-100 text-slate-700 border-slate-200' };
+        return { label: 'Ready to Test • Edge Server Standby', color: 'bg-slate-100/90 text-slate-700 border-slate-200' };
       case 'pinging':
-        return { label: 'Testing Latency (0-6s)', color: 'bg-amber-50 text-amber-700 border-amber-200 ring-2 ring-amber-400/20 animate-pulse' };
+        return { label: 'Measuring Ping Latency (Phase 1/4)', color: 'bg-amber-50 text-amber-800 border-amber-300 ring-2 ring-amber-400/20' };
       case 'jittering':
-        return { label: 'Testing Jitter (6-12s)', color: 'bg-indigo-50 text-indigo-700 border-indigo-200 ring-2 ring-indigo-400/20 animate-pulse' };
+        return { label: 'Measuring Jitter Variance (Phase 2/4)', color: 'bg-indigo-50 text-indigo-800 border-indigo-300 ring-2 ring-indigo-400/20' };
       case 'downloading':
-        return { label: 'Testing Download (12-18s)', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-2 ring-emerald-400/20 animate-pulse' };
+        return { label: 'Testing Download Bandwidth (Phase 3/4)', color: 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-400/20' };
       case 'uploading':
-        return { label: 'Testing Upload (18-24s)', color: 'bg-violet-50 text-violet-700 border-violet-200 ring-2 ring-violet-400/20 animate-pulse' };
+        return { label: 'Testing Upload Bandwidth (Phase 4/4)', color: 'bg-violet-50 text-violet-800 border-violet-300 ring-2 ring-violet-400/20' };
       case 'completed':
-        return { label: 'Speed Test Complete', color: 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm' };
+        return { label: 'Speed Test Complete • Results Saved', color: 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-sm' };
       default:
-        return { label: 'Ready', color: 'bg-slate-100 text-slate-700 border-slate-200' };
+        return { label: 'Ready to Test', color: 'bg-slate-100 text-slate-700 border-slate-200' };
     }
   };
 
@@ -351,19 +351,25 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const badge = getStatusBadge();
 
   return (
-    <div className="w-full max-w-4xl flex flex-col items-center justify-between flex-1 py-2 md:py-4 animate-fade-in h-full min-h-0 select-none mx-auto" id="speed-test-section">
+    <div className="w-full max-w-4xl flex flex-col items-center justify-between flex-1 py-1 md:py-3 animate-fade-in h-full min-h-0 select-none mx-auto" id="speed-test-section">
       
-      {/* Top Status Pill */}
-      <div className={`flex items-center gap-2.5 px-5 py-2 rounded-full mb-3 transition-all duration-300 border text-xs font-bold ${badge.color}`}>
-        <div className={`w-2.5 h-2.5 rounded-full ${
-          status === 'idle' ? 'bg-slate-400' :
-          status === 'pinging' ? 'bg-amber-500 animate-ping' :
-          status === 'jittering' ? 'bg-indigo-500 animate-ping' :
-          status === 'downloading' ? 'bg-emerald-500 animate-ping' :
-          status === 'uploading' ? 'bg-violet-500 animate-ping' :
-          'bg-emerald-600'
-        }`} />
-        <span className="tracking-wide uppercase text-xs font-black">{badge.label}</span>
+      {/* Top Permanently Fixed Status Container */}
+      <div className="h-10 flex items-center justify-center shrink-0 w-full mb-2">
+        <div className={`flex items-center gap-2.5 px-5 py-2 rounded-full transition-all duration-300 border text-xs font-bold shadow-sm min-w-[280px] sm:min-w-[340px] justify-center ${badge.color}`}>
+          {status === 'completed' ? (
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          ) : (
+            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+              status === 'idle' ? 'bg-slate-400' :
+              status === 'pinging' ? 'bg-amber-500 animate-ping' :
+              status === 'jittering' ? 'bg-indigo-500 animate-ping' :
+              status === 'downloading' ? 'bg-emerald-500 animate-ping' :
+              status === 'uploading' ? 'bg-violet-500 animate-ping' :
+              'bg-emerald-600'
+            }`} />
+          )}
+          <span className="tracking-wide uppercase text-xs font-black truncate">{badge.label}</span>
+        </div>
       </div>
 
       {/* EXPANSIVE CENTERPIECE: REAL-TIME TELEMETRY GRAPH CONSOLE */}
@@ -561,7 +567,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       </div>
 
       {/* MODERN 3-COLUMN BENTO TELEMETRY DECK */}
-      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-3">
+      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-2">
         
         {/* CARD 1: PING (Latency) */}
         <div className="modern-glass-card rounded-2xl p-4 flex items-center gap-3.5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
@@ -622,13 +628,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
       </div>
 
-      {/* COMPLETED SUCCESS CHIP */}
-      {status === 'completed' && (
-        <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-800 animate-fade-in bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-200 shadow-sm">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span className="font-sans font-bold">Speed test finalized. Results cataloged to history.</span>
-        </div>
-      )}
     </div>
   );
 }
