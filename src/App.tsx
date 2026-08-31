@@ -115,20 +115,16 @@ export default function App() {
         <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 flex items-center justify-between px-4 sm:px-6">
           
           {/* Standalone Transparent Infinity Pulse Logo Mark */}
-          <div className="flex items-center gap-2.5 group cursor-pointer">
+          <div 
+            onClick={() => setActiveTab('speed')} 
+            className="flex items-center group cursor-pointer"
+            title="NetPulse Speed Test"
+          >
             <img 
               src="/logo-mark.png" 
               alt="NetPulse Infinity Pulse Logo" 
-              className="h-4.5 sm:h-5 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              className="h-6 sm:h-7 md:h-7.5 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
-            <div className="flex items-center gap-1.5">
-              <span className="font-sans text-sm sm:text-base font-black tracking-tight text-slate-900">
-                NetPulse
-              </span>
-              <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-blue-600 border border-blue-200/60 uppercase tracking-wider hidden sm:inline-flex">
-                Pro
-              </span>
-            </div>
           </div>
 
           {/* Center Unit Selector Pill */}
