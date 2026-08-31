@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Download, Upload, Cpu, Activity, MapPin, CheckCircle, RotateCcw, Globe } from 'lucide-react';
+import { Download, Upload, MapPin, CheckCircle, Activity } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
 
@@ -23,11 +23,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const [downloadSpeedHistory, setDownloadSpeedHistory] = useState<number[]>([]);
   const [uploadSpeedHistory, setUploadSpeedHistory] = useState<number[]>([]);
   
-  const simulationTimerRef = useRef<number | null>(null);
   const timerIntervalRef = useRef<number | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const oscillatorRef = useRef<OscillatorNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
   const engineRef = useRef<any>(null);
 
   const isTestingRef = useRef(false);
@@ -35,80 +31,9 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const timerFinishedRef = useRef(false);
   const finalResultsRef = useRef<any>(null);
 
-  // Initialize Web Audio Synth for premium hum effect
-  const startAudioSynth = () => {
-    try {
-      if (!audioContextRef.current) {
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-        audioContextRef.current = new AudioCtx();
-      }
-      
-      const ctx = audioContextRef.current;
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
-
-      // Create oscillator and gain node
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(60, ctx.currentTime); // Low baseline hum
-      gain.gain.setValueAtTime(0.01, ctx.currentTime);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-
-      oscillatorRef.current = osc;
-      gainNodeRef.current = gain;
-    } catch (e) {
-      console.warn('Audio synthesis failed to initialize:', e);
-    }
-  };
-
-  const updateAudioFreqAndVolume = (speed: number, maxSpeed: number) => {
-    try {
-      const ctx = audioContextRef.current;
-      const osc = oscillatorRef.current;
-      const gain = gainNodeRef.current;
-      if (ctx && osc && gain) {
-        // Frequency increases up from 60Hz to 380Hz proportional to speed
-        const speedRatio = maxSpeed > 0 ? Math.min(speed / maxSpeed, 1) : 0;
-        const targetFreq = 60 + speedRatio * 320;
-        osc.frequency.setTargetAtTime(targetFreq, ctx.currentTime, 0.1);
-        
-        // Volume grows slightly based on speed
-        const targetVolume = 0.005 + speedRatio * 0.055;
-        gain.gain.setTargetAtTime(targetVolume, ctx.currentTime, 0.08);
-      }
-    } catch (e) {
-      // Ignored
-    }
-  };
-
-  const stopAudioSynth = () => {
-    try {
-      if (oscillatorRef.current) {
-        oscillatorRef.current.stop();
-        oscillatorRef.current.disconnect();
-        oscillatorRef.current = null;
-      }
-      if (gainNodeRef.current) {
-        gainNodeRef.current.disconnect();
-        gainNodeRef.current = null;
-      }
-    } catch (e) {
-      // Ignored
-    }
-  };
-
   // Safe Cleanup
   useEffect(() => {
     return () => {
-      if (simulationTimerRef.current) {
-        window.clearInterval(simulationTimerRef.current);
-      }
       if (timerIntervalRef.current) {
         window.clearInterval(timerIntervalRef.current);
       }
@@ -119,7 +44,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           // Ignored
         }
       }
-      stopAudioSynth();
     };
   }, []);
 
@@ -140,7 +64,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     setPingVal(ping);
     setJitterVal(jitter);
     setStatus('completed');
-    stopAudioSynth();
 
     const finalResult: SpeedTestResult = {
       id: Math.random().toString(36).substring(2, 9),
@@ -158,7 +81,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   };
 
   const runRealSpeedTest = () => {
-    startAudioSynth();
     setStatus('pinging');
     elapsedRef.current = 0;
     timerFinishedRef.current = false;
@@ -216,7 +138,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             const dynamicMax = dnMbps > 950 ? 2500 : (dnMbps > 250 ? 1000 : (dnMbps > 90 ? 300 : 100));
             const rawDegree = (rampedSpeed / dynamicMax) * 140;
             setGaugeValue(Math.min(180, Math.round(rawDegree)));
-            updateAudioFreqAndVolume(rampedSpeed, dynamicMax);
           }
         } else if (type === 'upload' && elapsed >= 18 && elapsed < 24) {
           const up = results.getUploadBandwidth();
@@ -236,7 +157,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             const dynamicMax = upMbps > 950 ? 2500 : (upMbps > 250 ? 1000 : (upMbps > 90 ? 300 : 100));
             const rawDegree = (rampedSpeed / dynamicMax) * 140;
             setGaugeValue(Math.min(180, Math.round(rawDegree)));
-            updateAudioFreqAndVolume(rampedSpeed, dynamicMax);
           }
         }
       };
@@ -255,7 +175,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           timerIntervalRef.current = null;
         }
         setStatus('idle');
-        stopAudioSynth();
         
         setCurrentSpeed(0);
         setGaugeValue(0);
@@ -312,7 +231,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               const dynamicMax = dnMbps > 950 ? 2500 : (dnMbps > 250 ? 1000 : (dnMbps > 90 ? 300 : 100));
               const rawDegree = (rampedSpeed / dynamicMax) * 140;
               setGaugeValue(Math.min(180, Math.round(rawDegree)));
-              updateAudioFreqAndVolume(rampedSpeed, dynamicMax);
             }
           }
         } else if (elapsed >= 18 && elapsed < 24) {
@@ -337,7 +255,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               const dynamicMax = upMbps > 950 ? 2500 : (upMbps > 250 ? 1000 : (upMbps > 90 ? 300 : 100));
               const rawDegree = (rampedSpeed / dynamicMax) * 140;
               setGaugeValue(Math.min(180, Math.round(rawDegree)));
-              updateAudioFreqAndVolume(rampedSpeed, dynamicMax);
             }
           }
         } else if (elapsed >= 24) {
@@ -358,7 +275,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         timerIntervalRef.current = null;
       }
       setStatus('idle');
-      stopAudioSynth();
       isTestingRef.current = false;
     }
   };
@@ -378,7 +294,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     setJitterVal(null);
     setDownloadSpeedHistory([]);
     setUploadSpeedHistory([]);
-
 
     runRealSpeedTest();
   };
@@ -439,8 +354,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const uploadGraphPaths = generateGraphPath(displayUploadHistory);
 
   // Draw Arc representing Speedometer Dial progress
-  // Radius: 180 (center 200, 200)
-  // Complete track goes from roughly angle 135 deg to 405 deg (270 deg span)
   const drawGaugeArcPath = (filledVal: number) => {
     const center = 200;
     const radius = 170;
@@ -465,59 +378,73 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   return (
     <div className="w-full flex flex-col items-center justify-between flex-1 py-1 md:py-3 animate-fade-in h-full min-h-0" id="speed-test-section">
       
-      {/* Connectivity Status Chip */}
-      <div className="flex items-center gap-3 bg-[#070c17]/60 border border-[#00f0ff]/25 backdrop-blur-md px-5 py-2 rounded-full mb-2 md:mb-4 transition-all duration-300 shadow-[0_0_15px_rgba(0,240,255,0.05)]">
-        <div className={`w-3 h-3 rounded-full shadow-[0_0_12px_rgba(0,240,255,0.8)] ${
-          status === 'idle' ? 'bg-primary animate-pulse' :
-          status === 'pinging' ? 'bg-amber-400 animate-ping' :
-          status === 'jittering' ? 'bg-blue-400 animate-ping' :
-          status === 'completed' ? 'bg-emerald-500' : 'bg-primary animate-pulse'
+      {/* Connectivity Status Chip with distinct phase colors */}
+      <div className={`flex items-center gap-3 px-5 py-2 rounded-full mb-2 md:mb-4 transition-all duration-300 shadow-sm border ${
+        status === 'idle' ? 'bg-white border-[#E4E4E7] text-zinc-700' :
+        status === 'pinging' ? 'bg-amber-50 border-amber-300 text-amber-800 ring-2 ring-amber-400/20' :
+        status === 'jittering' ? 'bg-indigo-50 border-indigo-300 text-indigo-800 ring-2 ring-indigo-400/20' :
+        status === 'downloading' ? 'bg-emerald-50 border-emerald-300 text-emerald-800 ring-2 ring-emerald-400/20' :
+        status === 'uploading' ? 'bg-violet-50 border-violet-300 text-violet-800 ring-2 ring-violet-400/20' :
+        'bg-emerald-50 border-emerald-300 text-emerald-800'
+      }`}>
+        <div className={`w-2.5 h-2.5 rounded-full ${
+          status === 'idle' ? 'bg-zinc-400' :
+          status === 'pinging' ? 'bg-amber-500 animate-ping' :
+          status === 'jittering' ? 'bg-indigo-500 animate-ping' :
+          status === 'downloading' ? 'bg-emerald-500 animate-ping' :
+          status === 'uploading' ? 'bg-violet-500 animate-ping' :
+          'bg-emerald-600'
         }`}></div>
-        <span className="font-sans font-bold text-xs tracking-[0.3em] text-[#94A3B8] uppercase text-center">
+        <span className="font-sans font-bold text-xs tracking-[0.25em] uppercase text-center">
           {getStatusText()}
         </span>
       </div>
 
-
       <div className="grid grid-cols-2 xl:grid-cols-3 items-center justify-items-center gap-3 sm:gap-4 md:gap-6 w-full max-w-5xl mb-3 sm:mb-4">
         
-        {/* DOWNLOAD CARD */}
-        <div className={`col-span-1 order-2 xl:order-1 bg-[#080d1a]/85 backdrop-blur-xl border border-[#1e293b] rounded-2xl p-4 sm:p-6 flex flex-col relative overflow-hidden w-full max-w-xs h-32 sm:h-40 xl:h-44 shadow-2xl transition-all duration-500 hover:border-[#00F0FF]/40 ${
-          status === 'downloading' ? 'ring-2 ring-primary/40 border-[#00F0FF]/50' : ''
+        {/* DOWNLOAD CARD (Vibrant Emerald) */}
+        <div className={`col-span-1 order-2 xl:order-1 bg-white border rounded-2xl p-4 sm:p-6 flex flex-col relative overflow-hidden w-full max-w-xs h-32 sm:h-40 xl:h-44 shadow-sm hover:shadow-md transition-all duration-500 ${
+          status === 'downloading' 
+            ? 'ring-2 ring-emerald-500/30 border-emerald-500 shadow-emerald-500/10' 
+            : 'border-[#E4E4E7] hover:border-emerald-300'
         }`}>
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-transparent opacity-80"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-transparent"></div>
           
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
-            <div className={`p-1.5 sm:p-2 rounded-full transition-colors ${status === 'downloading' ? 'bg-primary/20 text-primary' : 'bg-[#00F0FF]/10 text-[#94A3B8]'}`}>
+            <div className={`p-1.5 sm:p-2 rounded-xl transition-colors ${
+              status === 'downloading' 
+                ? 'bg-emerald-500 text-white shadow-sm' 
+                : 'bg-emerald-50 text-emerald-600 border border-emerald-200/80'
+            }`}>
               <Download className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <span className="font-sans font-extrabold text-[10px] sm:text-xs tracking-[0.1em] sm:tracking-[0.15em] text-[#94A3B8] uppercase">Download</span>
+            <span className="font-sans font-extrabold text-[10px] sm:text-xs tracking-[0.15em] text-emerald-700 uppercase">Download</span>
             {status === 'downloading' && (
-              <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+              <span className="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
             )}
           </div>
  
           <div className="flex items-baseline gap-1 sm:gap-2 mt-auto z-10">
-            <span id="download-val" className="font-sans text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-black text-white tracking-tighter">
+            <span id="download-val" className="font-sans text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-black text-emerald-950 tracking-tighter">
               {downloadVal !== null 
                 ? (unit === 'MB/s' ? (downloadVal / 8).toFixed(1) : downloadVal.toFixed(1)) 
                 : (status === 'downloading' 
                   ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
                   : '--')}
             </span>
-            <span className="font-sans text-xs sm:text-sm font-bold text-[#94A3B8]">{unit}</span>
+            <span className="font-sans text-xs sm:text-sm font-bold text-emerald-600">{unit}</span>
           </div>
  
           {/* Sparkline for download speed progression */}
           {(status === 'downloading' || status === 'uploading' || status === 'completed') && downloadGraphPaths && (
-            <div className="absolute bottom-1 sm:bottom-2 left-4 sm:left-6 right-4 sm:right-6 h-8 sm:h-10 opacity-60">
+            <div className="absolute bottom-1 sm:bottom-2 left-4 sm:left-6 right-4 sm:right-6 h-8 sm:h-10 opacity-75">
               <svg id="download-sparkline" viewBox="0 0 280 40" className="w-full h-full overflow-visible">
-                <path d={downloadGraphPaths.fill} fill="url(#dnGrad)" opacity="0.15" />
-                <path d={downloadGraphPaths.stroke} fill="none" stroke="var(--color-primary)" strokeWidth="1.5" />
+                <path d={downloadGraphPaths.fill} fill="url(#dnGrad)" opacity="0.18" />
+                <path d={downloadGraphPaths.stroke} fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
                 <defs>
                   <linearGradient id="dnGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00F0FF" />
-                    <stop offset="100%" stopColor="#00F0FF" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#10B981" />
+                    <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -533,58 +460,61 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             <path 
               d="M 79.8 320.2 A 170 170 0 1 1 320.2 320.2" 
               fill="none" 
-              stroke="#111827" 
+              stroke="#E4E4E7" 
               strokeLinecap="round" 
-              strokeWidth="4"
+              strokeWidth="5"
             />
             {/* Active Needle Trail */}
             {(status === 'downloading' || status === 'uploading') && (
               <path 
-                className="drop-shadow-[0_0_12px_rgba(0,240,255,0.7)] transition-all duration-100"
+                className="transition-all duration-100"
                 d={gaugeActivePath}
                 fill="none" 
-                stroke={status === 'downloading' ? "var(--color-primary)" : "var(--color-secondary)"} 
+                stroke={status === 'downloading' ? "#10B981" : "#8B5CF6"} 
                 strokeLinecap="round" 
-                strokeWidth="5"
+                strokeWidth="6"
               />
             )}
             
             {/* Tick Marks around gauge */}
-            <g opacity="0.25" stroke="#94A3B8" strokeWidth="1">
+            <g opacity="0.4" stroke="#A1A1AA" strokeWidth="1.5">
               <line x1="200" x2="200" y1="30" y2="40" />
               <line x1="30" x2="40" y1="200" y2="200" />
               <line x1="370" x2="360" y1="200" y2="200" />
               <line x1="80" x2="87" y1="80" y2="87" />
               <line x1="320" x2="313" y1="80" y2="87" />
-              
               <line x1="110" x2="116" y1="290" y2="284" />
               <line x1="290" x2="284" y1="290" y2="284" />
             </g>
           </svg>
- 
+  
           {/* Digital Readout Center & GO Button */}
           <div className="flex flex-col items-center justify-center relative z-10 text-center w-full h-full pt-4 sm:pt-6">
-            <span id="speed-val" className={`text-4xl xs:text-5xl sm:text-6xl xl:text-7xl font-sans font-black text-white tracking-tighter transition-all duration-300 ${
-              status !== 'idle' ? 'animate-subtle-glow' : ''
-            }`}>
+            <span id="speed-val" className="text-4xl xs:text-5xl sm:text-6xl xl:text-7xl font-sans font-black text-[#09090B] tracking-tighter transition-all duration-300">
               {(status === 'downloading' || status === 'uploading') 
                 ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
                 : (status === 'completed' 
                   ? (unit === 'MB/s' ? ((downloadVal || 0) / 8).toFixed(1) : (downloadVal || 0).toFixed(1)) 
                   : '0.0')}
             </span>
-            <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#00f0ff] font-extrabold mt-1">{unit}</span>
+            <span className={`font-sans text-[10px] sm:text-xs uppercase tracking-[0.25em] font-extrabold mt-1 transition-colors ${
+              status === 'downloading' ? 'text-emerald-600' :
+              status === 'uploading' ? 'text-violet-600' :
+              'text-zinc-500'
+            }`}>
+              {unit}
+            </span>
             
-            {/* GO Trigger Button inside layout or below */}
+            {/* GO Trigger Button */}
             <div className="mt-4 sm:mt-8">
               <button 
                 id="dial-go-button"
                 onClick={handleStartTest}
                 disabled={status !== 'idle' && status !== 'completed'}
-                className={`relative w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center shadow-2xl active:scale-95 transition-all duration-300 group ${
+                className={`relative w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center shadow-md active:scale-95 transition-all duration-300 group ${
                   status === 'idle' || status === 'completed'
-                    ? 'bg-[#05070D]/90 border border-[#00f0ff]/30 cursor-pointer hover:border-[#00f0ff]/60 hover:scale-105 hover:shadow-[#00f0ff]/15' 
-                    : 'bg-[#111827] border border-[#1e293b] cursor-not-allowed opacity-40'
+                    ? 'bg-[#09090B] border border-[#09090B] cursor-pointer hover:bg-zinc-800 hover:scale-105 hover:shadow-xl' 
+                    : 'bg-[#E4E4E7] border border-[#D4D4D8] cursor-not-allowed opacity-50'
                 }`}
               >
                 {/* Rippling effects around button */}
@@ -592,64 +522,70 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
                   <div className="absolute inset-0 rounded-full animate-ripple-wave opacity-30"></div>
                 )}
                 
-                <span className="font-sans text-sm sm:text-base xl:text-lg font-extrabold tracking-widest text-primary group-hover:text-white transition-all duration-300">
+                <span className="font-sans text-sm sm:text-base xl:text-lg font-extrabold tracking-widest text-white group-hover:text-zinc-100 transition-all duration-300">
                   {status === 'idle' ? 'GO' : (status === 'completed' ? 'RETRY' : 'RUNNING')}
                 </span>
                 
                 {status === 'pinging' && (
-                  <span className="text-[9px] sm:text-[10px] font-bold text-white/70 mt-0.5 sm:mt-1 uppercase tracking-widest z-10 animate-pulse font-sans">PING</span>
+                  <span className="text-[9px] sm:text-[10px] font-bold text-amber-400 mt-0.5 sm:mt-1 uppercase tracking-widest z-10 animate-pulse font-sans">PING</span>
                 )}
                 {status === 'jittering' && (
-                  <span className="text-[9px] sm:text-[10px] font-bold text-white/70 mt-0.5 sm:mt-1 uppercase tracking-widest z-10 animate-pulse font-sans">JITTER</span>
+                  <span className="text-[9px] sm:text-[10px] font-bold text-indigo-400 mt-0.5 sm:mt-1 uppercase tracking-widest z-10 animate-pulse font-sans">JITTER</span>
                 )}
                 {status === 'downloading' && (
-                  <span className="text-[9px] sm:text-[10px] font-bold text-white/70 mt-0.5 sm:mt-1 uppercase tracking-widest z-10 animate-pulse font-sans">DOWN</span>
+                  <span className="text-[9px] sm:text-[10px] font-bold text-emerald-400 mt-0.5 sm:mt-1 uppercase tracking-widest z-10 animate-pulse font-sans">DOWN</span>
                 )}
                 {status === 'uploading' && (
-                  <span className="text-[9px] sm:text-[10px] font-bold text-white/70 mt-0.5 sm:mt-1 uppercase tracking-widest z-10 animate-pulse font-sans">UP</span>
+                  <span className="text-[9px] sm:text-[10px] font-bold text-violet-400 mt-0.5 sm:mt-1 uppercase tracking-widest z-10 animate-pulse font-sans">UP</span>
                 )}
               </button>
             </div>
           </div>
         </div>
  
-        {/* UPLOAD CARD */}
-        <div className={`col-span-1 order-3 xl:order-3 bg-[#080d1a]/85 backdrop-blur-xl border border-[#1e293b] rounded-2xl p-4 sm:p-6 flex flex-col relative overflow-hidden w-full max-w-xs h-32 sm:h-40 xl:h-44 shadow-2xl transition-all duration-500 hover:border-secondary/50 ${
-          status === 'uploading' ? 'ring-2 ring-secondary/40 border-secondary/50' : ''
+        {/* UPLOAD CARD (Vibrant Violet) */}
+        <div className={`col-span-1 order-3 xl:order-3 bg-white border rounded-2xl p-4 sm:p-6 flex flex-col relative overflow-hidden w-full max-w-xs h-32 sm:h-40 xl:h-44 shadow-sm hover:shadow-md transition-all duration-500 ${
+          status === 'uploading' 
+            ? 'ring-2 ring-violet-500/30 border-violet-500 shadow-violet-500/10' 
+            : 'border-[#E4E4E7] hover:border-violet-300'
         }`}>
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary to-transparent opacity-80"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 via-purple-400 to-transparent"></div>
           
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-4">
-            <div className={`p-1.5 sm:p-2 rounded-full transition-colors ${status === 'uploading' ? 'bg-secondary/20 text-secondary' : 'bg-secondary/10 text-[#94A3B8]'}`}>
+            <div className={`p-1.5 sm:p-2 rounded-xl transition-colors ${
+              status === 'uploading' 
+                ? 'bg-violet-500 text-white shadow-sm' 
+                : 'bg-violet-50 text-violet-600 border border-violet-200/80'
+            }`}>
               <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <span className="font-sans font-extrabold text-[10px] sm:text-xs tracking-[0.1em] sm:tracking-[0.15em] text-[#94A3B8] uppercase">Upload</span>
+            <span className="font-sans font-extrabold text-[10px] sm:text-xs tracking-[0.15em] text-violet-700 uppercase">Upload</span>
             {status === 'uploading' && (
-              <span className="ml-auto w-1.5 h-1.5 rounded-full bg-secondary animate-ping"></span>
+              <span className="ml-auto w-2 h-2 rounded-full bg-violet-500 animate-ping"></span>
             )}
           </div>
  
           <div className="flex items-baseline gap-1 sm:gap-2 mt-auto z-10">
-            <span id="upload-val" className="font-sans text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-black text-white tracking-tighter">
+            <span id="upload-val" className="font-sans text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-black text-violet-950 tracking-tighter">
               {uploadVal !== null 
                 ? (unit === 'MB/s' ? (uploadVal / 8).toFixed(1) : uploadVal.toFixed(1)) 
                 : (status === 'uploading' 
                   ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
                   : '--')}
             </span>
-            <span className="font-sans text-xs sm:text-sm font-bold text-[#94A3B8]">{unit}</span>
+            <span className="font-sans text-xs sm:text-sm font-bold text-violet-600">{unit}</span>
           </div>
  
           {/* Sparkline for upload speed progression */}
           {(status === 'uploading' || status === 'completed') && uploadGraphPaths && (
-            <div className="absolute bottom-1 sm:bottom-2 left-4 sm:left-6 right-4 sm:right-6 h-8 sm:h-10 opacity-60">
+            <div className="absolute bottom-1 sm:bottom-2 left-4 sm:left-6 right-4 sm:right-6 h-8 sm:h-10 opacity-75">
               <svg id="upload-sparkline" viewBox="0 0 280 40" className="w-full h-full overflow-visible">
-                <path d={uploadGraphPaths.fill} fill="url(#upGrad)" opacity="0.15" />
-                <path d={uploadGraphPaths.stroke} fill="none" stroke="var(--color-secondary)" strokeWidth="1.5" />
+                <path d={uploadGraphPaths.fill} fill="url(#upGrad)" opacity="0.18" />
+                <path d={uploadGraphPaths.stroke} fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" />
                 <defs>
                   <linearGradient id="upGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3B82F6" />
-                    <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#8B5CF6" />
+                    <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -659,32 +595,41 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
  
       </div>
 
-      {/* METRICS & TELEMETRY SUMMARY BAR */}
-      <div className="w-full max-w-4xl bg-gradient-to-b from-[#080d19]/80 to-[#04060b]/90 backdrop-blur-xl border border-[#1e293b] rounded-2xl p-3 sm:py-3 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-0 items-center justify-items-stretch shadow-2xl mt-auto md:mt-2">
+      {/* METRICS & TELEMETRY SUMMARY BAR (Distinct element colors: Amber Ping, Indigo Jitter, Blue Server) */}
+      <div className="w-full max-w-4xl bg-white border border-[#E4E4E7] rounded-2xl p-3 sm:py-3 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-0 items-center justify-items-stretch shadow-sm mt-auto md:mt-2">
         
-        {/* PING */}
-        <div className="flex flex-col items-center md:items-start col-span-1 px-3 py-1 sm:py-0 border-r border-[#1e293b]/40">
-          <span className="font-sans font-bold text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-[#94A3B8] uppercase">Ping</span>
-          <span id="ping-val" className="font-mono text-base sm:text-lg md:text-xl font-bold text-white mt-1">
+        {/* PING (Amber) */}
+        <div className="flex flex-col items-center md:items-start col-span-1 px-3 py-1 sm:py-0 border-r border-[#E4E4E7]">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+            <span className="font-sans font-bold text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-amber-700 uppercase">Ping</span>
+          </div>
+          <span id="ping-val" className="font-mono text-base sm:text-lg md:text-xl font-bold text-amber-950 mt-1">
             {pingVal !== null ? `${pingVal} ms` : '-- ms'}
           </span>
         </div>
         
-        {/* JITTER */}
-        <div className="flex flex-col items-center md:items-start col-span-1 px-3 py-1 sm:py-0 md:border-r md:border-[#1e293b]/40">
-          <span className="font-sans font-bold text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-[#94A3B8] uppercase">Jitter</span>
-          <span id="jitter-val" className="font-mono text-base sm:text-lg md:text-xl font-bold text-white mt-1">
+        {/* JITTER (Indigo) */}
+        <div className="flex flex-col items-center md:items-start col-span-1 px-3 py-1 sm:py-0 md:border-r md:border-[#E4E4E7]">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+            <span className="font-sans font-bold text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-indigo-700 uppercase">Jitter</span>
+          </div>
+          <span id="jitter-val" className="font-mono text-base sm:text-lg md:text-xl font-bold text-indigo-950 mt-1">
             {jitterVal !== null ? `${jitterVal} ms` : '-- ms'}
           </span>
         </div>
 
-        {/* SERVER */}
-        <div className="flex flex-col items-center md:items-end col-span-2 md:col-span-1 px-3 border-t border-[#1e293b]/50 md:border-t-0 pt-3.5 md:pt-0">
-          <span className="font-sans font-bold text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-[#94A3B8] uppercase text-center md:text-right">Test Host Server</span>
-          <div className="flex items-center gap-1.5 mt-1.5 max-w-full justify-center md:justify-end">
-            <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-            <span className="font-sans text-xs sm:text-sm font-bold text-white truncate max-w-[200px] xs:max-w-xs md:max-w-[180px] lg:max-w-[240px]">
-              Cloudflare CDN
+        {/* SERVER (Royal Blue) */}
+        <div className="flex flex-col items-center md:items-end col-span-2 md:col-span-1 px-3 border-t border-[#E4E4E7] md:border-t-0 pt-3.5 md:pt-0">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+            <span className="font-sans font-bold text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-blue-700 uppercase text-center md:text-right">Test Host Server</span>
+          </div>
+          <div className="flex items-center gap-1.5 mt-1 max-w-full justify-center md:justify-end">
+            <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <span className="font-sans text-xs sm:text-sm font-bold text-blue-950 truncate max-w-[200px] xs:max-w-xs md:max-w-[180px] lg:max-w-[240px]">
+              Cloudflare Edge CDN
             </span>
           </div>
         </div>
@@ -693,8 +638,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
       {/* FOOTER TIPS CHIP */}
       {status === 'completed' && (
-        <div className="mt-2 flex items-center gap-2 text-xs text-[#00F0FF] animate-fade-in bg-[#00F0FF]/10 px-4 py-1 rounded-full border border-[#00F0FF]/25 shadow-[0_0_10px_rgba(0,240,255,0.05)]">
-          <CheckCircle className="w-3.5 h-3.5 text-[#00F0FF]" />
+        <div className="mt-2 flex items-center gap-2 text-xs text-emerald-800 animate-fade-in bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-200 shadow-sm">
+          <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
           <span className="font-sans font-semibold">Test finished. Telemetry results safely tracked.</span>
         </div>
       )}

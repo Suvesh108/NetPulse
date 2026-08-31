@@ -1,48 +1,43 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #030508;
-  --color-on-background: #FFFFFF;
+  --color-background: #F4F4F5;
+  --color-on-background: #09090B;
   
-  --color-surface: #030508;
-  --color-on-surface: #FFFFFF;
-  --color-surface-dim: #05070D;
-  --color-surface-bright: #0E1220;
-  --color-surface-container-lowest: #010103;
-  --color-surface-container-low: #070912;
-  --color-surface-container: #0C101F;
-  --color-surface-container-high: #12182E;
-  --color-surface-container-highest: #1A2242;
+  --color-surface: #FFFFFF;
+  --color-on-surface: #09090B;
+  --color-surface-dim: #E4E4E7;
+  --color-surface-bright: #FFFFFF;
+  --color-surface-container-lowest: #FFFFFF;
+  --color-surface-container-low: #FAFAFA;
+  --color-surface-container: #F4F4F5;
+  --color-surface-container-high: #E4E4E7;
+  --color-surface-container-highest: #D4D4D8;
   
-  --color-primary: #00F0FF;
-  --color-on-primary: #030508;
-  --color-primary-container: #022330;
-  --color-on-primary-container: #00F0FF;
-  --color-primary-fixed-dim: #38BDF8;
+  --color-primary: #09090B;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #E4E4E7;
+  --color-on-primary-container: #09090B;
+  --color-primary-fixed-dim: #52525B;
   
-  --color-secondary: #3B82F6;
+  --color-secondary: #52525B;
   --color-on-secondary: #FFFFFF;
-  --color-secondary-container: #1E3A8A;
-  --color-on-secondary-container: #93C5FD;
+  --color-secondary-container: #F4F4F5;
+  --color-on-secondary-container: #09090B;
   
-  --color-on-surface-variant: #94A3B8;
-  --color-outline: #00F0FF;
-  --color-outline-variant: #1E293B;
+  --color-on-surface-variant: #71717A;
+  --color-outline: #E4E4E7;
+  --color-outline-variant: #D4D4D8;
   
-  --color-on-secondary-fixed: #FFFFFF;
+  --color-on-secondary-fixed: #09090B;
 
   --font-sans: "Inter", "Geist", system-ui, sans-serif;
   --font-serif: "Geist", "Inter", system-ui, sans-serif;
   --font-display: "Geist", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   
-  --animate-subtle-glow: subtle-glow 3s infinite ease-in-out;
+  --animate-subtle-glow: none;
   --animate-sweep: sweep 2s infinite alternate ease-in-out;
-}
-
-@keyframes subtle-glow {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.15)); }
-  50% { filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4)); }
 }
 
 @keyframes sweep {
@@ -51,7 +46,7 @@
 }
 
 @keyframes ripple {
-  0% { transform: scale(1); opacity: 0.3; }
+  0% { transform: scale(1); opacity: 0.25; }
   100% { transform: scale(1.4); opacity: 0; }
 }
 
@@ -60,7 +55,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(to right, #00F0FF, #3B82F6);
+  background: #A1A1AA;
   z-index: -1;
   pointer-events: none;
 }
@@ -72,8 +67,8 @@
   animation-delay: 1.25s;
 }
 
-.ambient-bg {
-  background: radial-gradient(circle at 50% 35%, rgba(0, 240, 255, 0.05) 0%, transparent 60%);
+.monochrome-bg {
+  background-color: #F4F4F5;
 }
 
 html, body {
@@ -81,6 +76,25 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #030508;
-  color: #FFFFFF;
+  background-color: #F4F4F5;
+  color: #09090B;
+}
+
+/* Styled clean scrollbar for monochrome theme container scrollability */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4F4F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4D4D8;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A1A1AA;
 }

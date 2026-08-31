@@ -113,27 +113,27 @@ export default function App() {
   };
 
   return (
-    <div className="h-dvh max-h-dvh w-screen bg-background text-on-background ambient-bg relative overflow-hidden flex flex-col font-sans">
+    <div className="h-dvh max-h-dvh w-screen bg-[#F4F4F5] text-on-background monochrome-bg relative overflow-hidden flex flex-col font-sans">
       
       {/* Main Desktop Header */}
-      <header className="w-full shrink-0 flex items-center justify-between px-6 sm:px-12 h-20 bg-[#030508]/80 backdrop-blur-md border-b border-[#1e293b] z-50">
+      <header className="w-full shrink-0 flex items-center justify-between px-6 sm:px-12 h-20 bg-white border-b border-[#E4E4E7] z-50 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-[#00F0FF]/10 rounded-xl relative group border border-[#00F0FF]/25">
-            <Bolt className="w-6 h-6 text-primary fill-primary/10 transition-transform group-hover:rotate-12 duration-300" />
+          <div className="p-2 bg-blue-50 text-blue-600 rounded-xl relative group border border-blue-200/80 shadow-sm">
+            <Bolt className="w-6 h-6 fill-blue-600/10 transition-transform group-hover:rotate-12 duration-300" />
           </div>
-          <h1 className="font-sans text-xl sm:text-2xl font-black tracking-[0.25em] text-white">
+          <h1 className="font-sans text-xl sm:text-2xl font-black tracking-[0.25em] text-[#09090B]">
             NETPULSE
           </h1>
         </div>
  
         {/* Center Unit Converter Toggle */}
-        <div className="flex items-center bg-[#070c17]/65 border border-[#1e293b] p-0.5 rounded-xl shadow-2xl relative">
+        <div className="flex items-center bg-[#E4E4E7] border border-[#D4D4D8] p-0.5 rounded-xl shadow-sm relative">
           <button
             onClick={() => setUnit('Mbps')}
             className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
               unit === 'Mbps'
-                ? 'bg-primary text-[#030508] shadow-[0_0_8px_rgba(0,240,255,0.25)] font-bold'
-                : 'text-[#94A3B8] hover:text-white'
+                ? 'bg-[#09090B] text-white shadow-sm font-bold'
+                : 'text-[#71717A] hover:text-[#09090B]'
             }`}
           >
             Mbps
@@ -142,8 +142,8 @@ export default function App() {
             onClick={() => setUnit('MB/s')}
             className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
               unit === 'MB/s'
-                ? 'bg-primary text-[#030508] shadow-[0_0_8px_rgba(0,240,255,0.25)] font-bold'
-                : 'text-[#94A3B8] hover:text-white'
+                ? 'bg-[#09090B] text-white shadow-sm font-bold'
+                : 'text-[#71717A] hover:text-[#09090B]'
             }`}
           >
             MB/s
@@ -163,18 +163,20 @@ export default function App() {
                 onClick={() => setActiveTab(item.id)}
                 className={`flex items-center gap-2.5 px-4 py-2 rounded-xl transition-all duration-300 relative border cursor-pointer ${
                   isActive 
-                    ? 'text-[#030508] bg-primary font-bold border-[#00F0FF]/40 shadow-[0_0_15px_rgba(0,240,255,0.25)]' 
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/5 border-transparent'
+                    ? 'text-white bg-[#09090B] font-bold border-transparent shadow-sm' 
+                    : 'text-[#71717A] hover:text-[#09090B] hover:bg-[#E4E4E7] border-transparent'
                 }`}
               >
-                <IconComp className="w-4 h-4 shrink-0" />
+                <IconComp className={`w-4 h-4 shrink-0 ${
+                  item.id === 'speed' ? (isActive ? 'text-blue-400' : 'text-blue-600') :
+                  item.id === 'history' ? (isActive ? 'text-indigo-400' : 'text-indigo-600') :
+                  (isActive ? 'text-zinc-300' : 'text-zinc-600')
+                }`} />
                 <span className="font-sans text-xs font-bold uppercase tracking-wider hidden sm:inline">
                   {item.label}
                 </span>
                 {item.badge !== undefined && (
-                  <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold font-mono ${
-                    isActive ? 'bg-[#030508] text-primary' : 'bg-primary text-[#030508]'
-                  }`}>
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-indigo-500 text-white shadow-sm">
                     {item.badge}
                   </span>
                 )}
@@ -191,7 +193,7 @@ export default function App() {
 
       {/* Sticky Floating Bottom Navigation Bar for Mobile & Tablet Viewports */}
       <div className="md:hidden fixed bottom-6 inset-x-4 z-50 animate-fade-in">
-        <nav className="mx-auto max-w-md bg-[#04060c]/90 border border-[#1e293b]/80 backdrop-blur-xl rounded-2xl py-2 px-4 flex items-center justify-around shadow-[0_15px_35px_rgba(0,0,0,0.65)] border-[#00f0ff]/20">
+        <nav className="mx-auto max-w-md bg-white/95 border border-[#E4E4E7] backdrop-blur-xl rounded-2xl py-2 px-4 flex items-center justify-around shadow-lg">
           {navItems.map((item) => {
             const IconComp = item.icon;
             const isActive = activeTab === item.id;
@@ -202,19 +204,23 @@ export default function App() {
                 id={`nav-mobile-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
                 className={`flex flex-col items-center gap-1.5 relative py-1 px-3 rounded-xl transition-all duration-300 relative cursor-pointer ${
-                  isActive ? 'text-primary' : 'text-[#94A3B8] hover:text-white'
+                  isActive ? 'text-[#09090B]' : 'text-[#71717A] hover:text-[#09090B]'
                 }`}
               >
                 <div className={`p-2 rounded-xl transition-all duration-300 ${
-                  isActive ? 'bg-[#00f0ff]/15 text-primary shadow-[0_0_12px_rgba(0,240,255,0.25)]' : 'bg-transparent'
+                  isActive ? 'bg-[#09090B]/10 shadow-sm' : 'bg-transparent'
                 }`}>
-                  <IconComp className="w-5 h-5 shrink-0" />
+                  <IconComp className={`w-5 h-5 shrink-0 ${
+                    item.id === 'speed' ? 'text-blue-600' :
+                    item.id === 'history' ? 'text-indigo-600' :
+                    'text-zinc-700'
+                  }`} />
                 </div>
                 <span className="font-sans text-[10px] font-black uppercase tracking-widest scale-95">
                   {item.label}
                 </span>
                 {item.badge !== undefined && (
-                  <span className="absolute top-1 right-2.5 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold font-mono bg-primary text-[#030508] shadow-[0_0_8px_rgba(0,240,255,0.4)]">
+                  <span className="absolute top-1 right-2.5 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold font-mono bg-indigo-500 text-white shadow-sm">
                     {item.badge}
                   </span>
                 )}
