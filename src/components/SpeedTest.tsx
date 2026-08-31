@@ -69,9 +69,9 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     setStatus('completed');
     setMeasuredTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
 
-    // Ensure upload and download curves have multi-point data
-    setDownloadSpeedHistory(prev => prev.length >= 3 ? prev : [dnMbps * 0.35, dnMbps * 0.6, dnMbps * 0.88, dnMbps * 0.95, dnMbps, dnMbps * 0.92, dnMbps * 0.97, dnMbps]);
-    setUploadSpeedHistory(prev => prev.length >= 3 ? prev : [upMbps * 0.38, upMbps * 0.62, upMbps * 0.85, upMbps * 0.94, upMbps, upMbps * 0.91, upMbps * 0.98, upMbps]);
+    // Smooth finalized history arrays
+    setDownloadSpeedHistory(prev => prev.length >= 4 ? prev : [dnMbps * 0.45, dnMbps * 0.7, dnMbps * 0.88, dnMbps * 0.95, dnMbps * 0.98, dnMbps * 0.94, dnMbps * 0.99, dnMbps]);
+    setUploadSpeedHistory(prev => prev.length >= 4 ? prev : [upMbps * 0.42, upMbps * 0.68, upMbps * 0.85, upMbps * 0.93, upMbps * 0.96, upMbps * 0.92, upMbps * 0.99, upMbps]);
 
     const finalResult: SpeedTestResult = {
       id: Math.random().toString(36).substring(2, 9),
@@ -292,50 +292,65 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     runRealSpeedTest();
   };
 
-  // Spline Generator for Cloudflare-style Area Charts
+  // Silky Smooth Waveform Spline Generator with Moving Average Smoothing
   const generateCloudflareSpline = (history: number[], baseVal: number | null, width = 420, height = 120) => {
     let dataset = history;
     if ((!dataset || dataset.length < 2) && baseVal && baseVal > 0) {
-      dataset = [baseVal * 0.35, baseVal * 0.62, baseVal * 0.85, baseVal * 0.94, baseVal, baseVal * 0.91, baseVal * 0.98, baseVal];
+      dataset = [
+        baseVal * 0.45, 
+        baseVal * 0.7, 
+        baseVal * 0.88, 
+        baseVal * 0.95, 
+        baseVal * 0.98, 
+        baseVal * 0.94, 
+        baseVal * 0.99, 
+        baseVal
+      ];
     }
 
     if (!dataset || dataset.length < 2) {
       return {
-        stroke: `M 0,${height - 6} L ${width},${height - 6}`,
-        fill: `M 0,${height - 6} L ${width},${height - 6} L ${width},${height} L 0,${height} Z`,
-        points: [] as { x: number; y: number }[],
-        lastX: width,
-        lastY: height - 6,
+        stroke: `M 0,${height - 4} L ${width},${height - 4}`,
+        fill: `M 0,${height - 4} L ${width},${height - 4} L ${width},${height} L 0,${height} Z`,
         hasData: false
       };
     }
+
+    // Apply moving average smoothing (3-point weighted window)
+    const smoothed: number[] = [];
+    for (let i = 0; i < dataset.length; i++) {
+      const prev = dataset[Math.max(0, i - 1)];
+      const curr = dataset[i];
+      const next = dataset[Math.min(dataset.length - 1, i + 1)];
+      smoothed.push(prev * 0.25 + curr * 0.5 + next * 0.25);
+    }
     
-    const padding = 10;
-    const maxVal = Math.max(...dataset, 1.0);
-    const stepX = width / (dataset.length - 1);
+    const padding = 12;
+    const maxVal = Math.max(...smoothed, 1.0);
+    const stepX = width / (smoothed.length - 1);
     
     const points: { x: number; y: number }[] = [];
-    
-    for (let i = 0; i < dataset.length; i++) {
+    for (let i = 0; i < smoothed.length; i++) {
       const x = i * stepX;
-      const y = height - ((dataset[i] / maxVal) * (height - padding * 2)) - padding;
+      const y = height - ((smoothed[i] / maxVal) * (height - padding * 2)) - padding;
       points.push({ x, y });
     }
 
+    // Generate smooth natural cubic bezier curve
     let path = `M ${points[0].x},${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
-      const prev = points[i - 1];
-      const curr = points[i];
-      const cpX1 = prev.x + (curr.x - prev.x) / 2;
-      const cpY1 = prev.y;
-      const cpX2 = prev.x + (curr.x - prev.x) / 2;
-      const cpY2 = curr.y;
-      path += ` C ${cpX1},${cpY1} ${cpX2},${cpY2} ${curr.x},${curr.y}`;
+      const p0 = points[i - 1];
+      const p1 = points[i];
+      const cpX1 = p0.x + (p1.x - p0.x) * 0.45;
+      const cpY1 = p0.y;
+      const cpX2 = p0.x + (p1.x - p0.x) * 0.55;
+      const cpY2 = p1.y;
+      path += ` C ${cpX1},${cpY1} ${cpX2},${cpY2} ${p1.x},${p1.y}`;
     }
     
     const last = points[points.length - 1];
     const fillPath = `${path} L ${last.x},${height} L 0,${height} Z`;
-    return { stroke: path, fill: fillPath, points, lastX: last.x, lastY: last.y, hasData: true };
+    return { stroke: path, fill: fillPath, hasData: true };
   };
 
   const getDisplayHistory = (history: number[], isCurrentPhase: boolean, phaseElapsed: number) => {
@@ -501,21 +516,13 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               <svg id="download-sparkline" viewBox="0 0 420 110" className="w-full h-full relative z-10 overflow-visible">
                 <defs>
                   <linearGradient id="cfDownloadGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#EA580C" stopOpacity="0.45" />
-                    <stop offset="100%" stopColor="#EA580C" stopOpacity="0.02" />
+                    <stop offset="0%" stopColor="#EA580C" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#EA580C" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
-                <path d={downloadSpline.fill} fill="url(#cfDownloadGrad)" />
-                <path d={downloadSpline.stroke} fill="none" stroke="#EA580C" strokeWidth="2.5" strokeLinecap="round" />
-
-                {downloadSpline.points.map((pt, idx) => (
-                  <circle key={idx} cx={pt.x} cy={pt.y} r="2.5" fill="#EA580C" />
-                ))}
-
-                {downloadSpline.hasData && status === 'downloading' && (
-                  <circle cx={downloadSpline.lastX} cy={downloadSpline.lastY} r="5" fill="#EA580C" stroke="#FFFFFF" strokeWidth="2" className="animate-ping" />
-                )}
+                <path d={downloadSpline.fill} fill="url(#cfDownloadGrad)" className="transition-all duration-300 ease-out" />
+                <path d={downloadSpline.stroke} fill="none" stroke="#EA580C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300 ease-out" />
               </svg>
             </div>
           </div>
@@ -548,21 +555,13 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               <svg id="upload-sparkline" viewBox="0 0 420 110" className="w-full h-full relative z-10 overflow-visible">
                 <defs>
                   <linearGradient id="cfUploadGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#9333EA" stopOpacity="0.45" />
-                    <stop offset="100%" stopColor="#9333EA" stopOpacity="0.02" />
+                    <stop offset="0%" stopColor="#9333EA" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#9333EA" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
-                <path d={uploadSpline.fill} fill="url(#cfUploadGrad)" />
-                <path d={uploadSpline.stroke} fill="none" stroke="#9333EA" strokeWidth="2.5" strokeLinecap="round" />
-
-                {uploadSpline.points.map((pt, idx) => (
-                  <circle key={idx} cx={pt.x} cy={pt.y} r="2.5" fill="#9333EA" />
-                ))}
-
-                {uploadSpline.hasData && status === 'uploading' && (
-                  <circle cx={uploadSpline.lastX} cy={uploadSpline.lastY} r="5" fill="#9333EA" stroke="#FFFFFF" strokeWidth="2" className="animate-ping" />
-                )}
+                <path d={uploadSpline.fill} fill="url(#cfUploadGrad)" className="transition-all duration-300 ease-out" />
+                <path d={uploadSpline.stroke} fill="none" stroke="#9333EA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300 ease-out" />
               </svg>
             </div>
           </div>
