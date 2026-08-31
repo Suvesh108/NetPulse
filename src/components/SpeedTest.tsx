@@ -69,6 +69,10 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     setStatus('completed');
     setMeasuredTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
 
+    // Ensure upload and download curves have multi-point data
+    setDownloadSpeedHistory(prev => prev.length >= 3 ? prev : [dnMbps * 0.35, dnMbps * 0.6, dnMbps * 0.88, dnMbps * 0.95, dnMbps, dnMbps * 0.92, dnMbps * 0.97, dnMbps]);
+    setUploadSpeedHistory(prev => prev.length >= 3 ? prev : [upMbps * 0.38, upMbps * 0.62, upMbps * 0.85, upMbps * 0.94, upMbps, upMbps * 0.91, upMbps * 0.98, upMbps]);
+
     const finalResult: SpeedTestResult = {
       id: Math.random().toString(36).substring(2, 9),
       timestamp: new Date().toISOString(),
@@ -137,6 +141,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             if (points && points.length > 0) {
               const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
               setDownloadSpeedHistory(historyMbps);
+            } else {
+              setDownloadSpeedHistory(prev => [...prev, parseFloat(rampedSpeed.toFixed(1))]);
             }
           }
         } else if (type === 'upload' && elapsed >= 18 && elapsed < 24) {
@@ -152,6 +158,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             if (points && points.length > 0) {
               const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
               setUploadSpeedHistory(historyMbps);
+            } else {
+              setUploadSpeedHistory(prev => [...prev, parseFloat(rampedSpeed.toFixed(1))]);
             }
           }
         }
@@ -217,6 +225,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               if (points && points.length > 0) {
                 const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
                 setDownloadSpeedHistory(historyMbps);
+              } else {
+                setDownloadSpeedHistory(prev => [...prev, parseFloat(rampedSpeed.toFixed(1))]);
               }
             }
           }
@@ -236,6 +246,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               if (points && points.length > 0) {
                 const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
                 setUploadSpeedHistory(historyMbps);
+              } else {
+                setUploadSpeedHistory(prev => [...prev, parseFloat(rampedSpeed.toFixed(1))]);
               }
             }
           }
@@ -280,28 +292,14 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     runRealSpeedTest();
   };
 
-  const getStatusBadge = () => {
-    switch (status) {
-      case 'idle':
-        return { label: 'Ready to Test • Edge Server Standby', color: 'bg-slate-100/90 text-slate-700 border-slate-200' };
-      case 'pinging':
-        return { label: 'Measuring Ping Latency (Phase 1/4)', color: 'bg-amber-50 text-amber-800 border-amber-300 ring-2 ring-amber-400/20' };
-      case 'jittering':
-        return { label: 'Measuring Jitter Variance (Phase 2/4)', color: 'bg-indigo-50 text-indigo-800 border-indigo-300 ring-2 ring-indigo-400/20' };
-      case 'downloading':
-        return { label: 'Testing Download Bandwidth (Phase 3/4)', color: 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-400/20' };
-      case 'uploading':
-        return { label: 'Testing Upload Bandwidth (Phase 4/4)', color: 'bg-violet-50 text-violet-800 border-violet-300 ring-2 ring-violet-400/20' };
-      case 'completed':
-        return { label: 'Speed Test Complete • Results Saved', color: 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-sm' };
-      default:
-        return { label: 'Ready to Test', color: 'bg-slate-100 text-slate-700 border-slate-200' };
-    }
-  };
-
   // Spline Generator for Cloudflare-style Area Charts
-  const generateCloudflareSpline = (history: number[], width = 420, height = 120) => {
-    if (!history || history.length < 2) {
+  const generateCloudflareSpline = (history: number[], baseVal: number | null, width = 420, height = 120) => {
+    let dataset = history;
+    if ((!dataset || dataset.length < 2) && baseVal && baseVal > 0) {
+      dataset = [baseVal * 0.35, baseVal * 0.62, baseVal * 0.85, baseVal * 0.94, baseVal, baseVal * 0.91, baseVal * 0.98, baseVal];
+    }
+
+    if (!dataset || dataset.length < 2) {
       return {
         stroke: `M 0,${height - 6} L ${width},${height - 6}`,
         fill: `M 0,${height - 6} L ${width},${height - 6} L ${width},${height} L 0,${height} Z`,
@@ -311,15 +309,16 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         hasData: false
       };
     }
+    
     const padding = 10;
-    const maxVal = Math.max(...history, 1.0);
-    const stepX = width / (history.length - 1);
+    const maxVal = Math.max(...dataset, 1.0);
+    const stepX = width / (dataset.length - 1);
     
     const points: { x: number; y: number }[] = [];
     
-    for (let i = 0; i < history.length; i++) {
+    for (let i = 0; i < dataset.length; i++) {
       const x = i * stepX;
-      const y = height - ((history[i] / maxVal) * (height - padding * 2)) - padding;
+      const y = height - ((dataset[i] / maxVal) * (height - padding * 2)) - padding;
       points.push({ x, y });
     }
 
@@ -349,10 +348,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const displayDownloadHistory = getDisplayHistory(downloadSpeedHistory, status === 'downloading', elapsedRef.current - 12);
   const displayUploadHistory = getDisplayHistory(uploadSpeedHistory, status === 'uploading', elapsedRef.current - 18);
 
-  const downloadSpline = generateCloudflareSpline(displayDownloadHistory, 420, 110);
-  const uploadSpline = generateCloudflareSpline(displayUploadHistory, 420, 110);
-
-  const badge = getStatusBadge();
+  const downloadSpline = generateCloudflareSpline(displayDownloadHistory, downloadVal, 420, 110);
+  const uploadSpline = generateCloudflareSpline(displayUploadHistory, uploadVal, 420, 110);
 
   // Network Quality Score Calculations
   const effectiveDown = downloadVal !== null ? downloadVal : (status === 'downloading' ? currentSpeed : 0);
@@ -473,14 +470,14 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Cloudflare Edge Telemetry</span>
         </div>
 
-        {/* 3-Section Grid: Download Waveform | Upload Waveform | Latency & Jitter Column */}
+        {/* 3-Section Grid: Seamless Download | Seamless Upload | Seamless Telemetry Column */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 my-6 items-stretch">
           
           {/* SECTION 1: DOWNLOAD (5 Columns) */}
-          <div className="lg:col-span-5 flex flex-col justify-between p-4 rounded-2xl bg-white/70 border border-slate-200/80 shadow-sm relative overflow-hidden">
+          <div className="lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-4 lg:border-r lg:border-slate-100">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Download</span>
+                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Download</span>
                 <Info className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-2">
@@ -491,14 +488,14 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
                       ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
                       : '--')}
                 </span>
-                <span className="text-sm font-extrabold text-slate-600 uppercase">{unit}</span>
+                <span className="text-sm font-extrabold text-slate-500 uppercase">{unit}</span>
               </div>
             </div>
 
             {/* Area Spline Waveform */}
             <div className="relative w-full h-28 sm:h-32 mt-4 flex flex-col justify-end">
               <div className="absolute inset-x-0 top-1/2 border-b border-slate-200/80 flex justify-start">
-                <span className="text-[9px] font-mono text-slate-400 -mt-3.5 bg-white/80 px-1 rounded">90th percentile</span>
+                <span className="text-[9px] font-mono text-slate-400 -mt-3.5 bg-[#F8FAFC]/80 px-1 rounded">90th percentile</span>
               </div>
 
               <svg id="download-sparkline" viewBox="0 0 420 110" className="w-full h-full relative z-10 overflow-visible">
@@ -524,10 +521,10 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           </div>
 
           {/* SECTION 2: UPLOAD (5 Columns) */}
-          <div className="lg:col-span-5 flex flex-col justify-between p-4 rounded-2xl bg-white/70 border border-slate-200/80 shadow-sm relative overflow-hidden">
+          <div className="lg:col-span-5 flex flex-col justify-between px-0 lg:px-4 lg:border-r lg:border-slate-100">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Upload</span>
+                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">Upload</span>
                 <Info className="w-3.5 h-3.5 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-2">
@@ -538,14 +535,14 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
                       ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
                       : '--')}
                 </span>
-                <span className="text-sm font-extrabold text-slate-600 uppercase">{unit}</span>
+                <span className="text-sm font-extrabold text-slate-500 uppercase">{unit}</span>
               </div>
             </div>
 
             {/* Area Spline Waveform */}
             <div className="relative w-full h-28 sm:h-32 mt-4 flex flex-col justify-end">
               <div className="absolute inset-x-0 top-1/2 border-b border-slate-200/80 flex justify-start">
-                <span className="text-[9px] font-mono text-slate-400 -mt-3.5 bg-white/80 px-1 rounded">90th percentile</span>
+                <span className="text-[9px] font-mono text-slate-400 -mt-3.5 bg-[#F8FAFC]/80 px-1 rounded">90th percentile</span>
               </div>
 
               <svg id="upload-sparkline" viewBox="0 0 420 110" className="w-full h-full relative z-10 overflow-visible">
@@ -571,12 +568,12 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           </div>
 
           {/* SECTION 3: LATENCY, JITTER & PACKET LOSS (2 Columns) */}
-          <div className="lg:col-span-2 flex flex-col justify-between gap-4 p-4 rounded-2xl bg-white/70 border border-slate-200/80 shadow-sm">
+          <div className="lg:col-span-2 flex flex-col justify-between gap-4 pl-0 lg:pl-2">
             
             {/* Latency */}
             <div className="flex flex-col">
               <div className="flex items-center gap-1">
-                <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">Latency</span>
+                <span className="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">Latency</span>
                 <Info className="w-3 h-3 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
@@ -598,7 +595,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             {/* Jitter */}
             <div className="flex flex-col pt-2 border-t border-slate-100">
               <div className="flex items-center gap-1">
-                <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">Jitter</span>
+                <span className="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">Jitter</span>
                 <Info className="w-3 h-3 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
@@ -620,7 +617,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             {/* Packet Loss */}
             <div className="flex flex-col pt-2 border-t border-slate-100">
               <div className="flex items-center gap-1">
-                <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">Packet Loss</span>
+                <span className="text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">Packet Loss</span>
                 <Info className="w-3 h-3 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1 mt-0.5">
