@@ -114,17 +114,20 @@ export default function App() {
       <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-8 sm:px-12 md:px-16 transition-all">
         <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 relative flex items-center justify-between px-4 sm:px-6">
           
-          {/* Standalone Transparent Infinity Pulse Logo Mark (Left) */}
+          {/* Standalone Transparent Infinity Pulse Logo Mark + Text (Left) */}
           <div 
             onClick={() => setActiveTab('speed')} 
-            className="flex items-center group cursor-pointer shrink-0 z-10"
-            title="NetPulse Speed Test"
+            className="flex items-center gap-2 group cursor-pointer shrink-0 z-10"
+            title="Speed Test"
           >
             <img 
               src="/logo-mark.png" 
-              alt="NetPulse Infinity Pulse Logo" 
-              className="h-6 sm:h-7 md:h-7.5 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              alt="Speed Test Logo" 
+              className="h-6 sm:h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
+            <span className="font-sans text-sm sm:text-base font-black tracking-tight text-slate-900 select-none">
+              Speed Test
+            </span>
           </div>
 
           {/* Unit Selector Pill (Centered in Navbar) */}
