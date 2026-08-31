@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Download, Search, Calendar, Zap, AlertTriangle, ArrowUpRight, ArrowDownRight, Activity, TrendingUp, Layers } from 'lucide-react';
+import { Trash2, Download, Search, Calendar, Zap, AlertTriangle, ArrowUpRight, ArrowDownRight, Activity, TrendingUp, Layers, HardDrive } from 'lucide-react';
 import { SpeedTestResult } from '../types';
 
 interface HistoryListProps {
@@ -55,71 +55,92 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-4 flex-1 min-h-0 overflow-hidden h-full select-none" id="history-section">
       
-      {/* MODERN ANALYTICS BENTO CARDS */}
+      {/* MODERN ANALYTICS 4-BENTO CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 animate-fade-in">
         
-        {/* CARD 1: Total Runs */}
-        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden transition-all duration-200">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider">Total Tests</span>
-            <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center">
-              <Layers className="w-3.5 h-3.5" />
+        {/* CARD 1: Total Runs (Blue / Slate) */}
+        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-transparent"></div>
+          
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex flex-col">
+              <span className="text-[10px] sm:text-[11px] font-extrabold text-slate-800 uppercase tracking-wider">Total Tests</span>
+              <span className="text-[9px] text-slate-400 font-medium">All Logged Runs</span>
+            </div>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+              <Layers className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-1.5 mt-3">
-            <span className="font-sans text-2xl sm:text-3xl font-black text-slate-900">{totalTests}</span>
-            <span className="text-xs text-slate-400 font-bold uppercase">Runs</span>
+
+          <div className="flex items-baseline gap-1.5 mt-3 pt-1">
+            <span className="font-sans text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{totalTests}</span>
+            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Runs</span>
           </div>
         </div>
 
-        {/* CARD 2: Peak Download */}
-        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden transition-all duration-200">
-          <div className="absolute top-0 inset-x-0 h-1 bg-emerald-500"></div>
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-xs font-bold text-emerald-800 uppercase tracking-wider">Peak Download</span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <TrendingUp className="w-3.5 h-3.5" />
+        {/* CARD 2: Peak Download (Emerald) */}
+        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-transparent"></div>
+          
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex flex-col">
+              <span className="text-[10px] sm:text-[11px] font-extrabold text-emerald-800 uppercase tracking-wider">Peak Download</span>
+              <span className="text-[9px] text-slate-400 font-medium">Fastest Inbound</span>
+            </div>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
+              <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-1.5 mt-3">
-            <span className="font-sans text-2xl sm:text-3xl font-black text-emerald-700">{bestDownload}</span>
-            <span className="text-xs text-emerald-600 font-bold uppercase">{unit}</span>
+
+          <div className="flex items-baseline gap-1.5 mt-3 pt-1">
+            <span className="font-sans text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{bestDownload}</span>
+            <span className="text-xs text-emerald-600 font-bold uppercase tracking-wider">{unit}</span>
           </div>
         </div>
 
-        {/* CARD 3: Avg Download */}
-        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden transition-all duration-200">
-          <div className="absolute top-0 inset-x-0 h-1 bg-teal-500"></div>
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-xs font-bold text-teal-800 uppercase tracking-wider">Avg Download</span>
-            <div className="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
-              <ArrowDownRight className="w-3.5 h-3.5" />
+        {/* CARD 3: Avg Download (Teal / Cyan) */}
+        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-400 to-transparent"></div>
+          
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex flex-col">
+              <span className="text-[10px] sm:text-[11px] font-extrabold text-teal-800 uppercase tracking-wider">Avg Download</span>
+              <span className="text-[9px] text-slate-400 font-medium">Overall Average</span>
+            </div>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white flex items-center justify-center shadow-md shadow-teal-500/20 shrink-0">
+              <ArrowDownRight className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-1.5 mt-3">
-            <span className="font-sans text-2xl sm:text-3xl font-black text-teal-700">{avgDownload}</span>
-            <span className="text-xs text-teal-600 font-bold uppercase">{unit}</span>
+
+          <div className="flex items-baseline gap-1.5 mt-3 pt-1">
+            <span className="font-sans text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{avgDownload}</span>
+            <span className="text-xs text-teal-600 font-bold uppercase tracking-wider">{unit}</span>
           </div>
         </div>
 
-        {/* CARD 4: Avg Ping */}
-        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden transition-all duration-200">
-          <div className="absolute top-0 inset-x-0 h-1 bg-amber-500"></div>
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-xs font-bold text-amber-800 uppercase tracking-wider">Avg Latency</span>
-            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Activity className="w-3.5 h-3.5" />
+        {/* CARD 4: Avg Latency (Amber) */}
+        <div className="modern-glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200">
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-500 via-orange-400 to-transparent"></div>
+          
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div className="flex flex-col">
+              <span className="text-[10px] sm:text-[11px] font-extrabold text-amber-800 uppercase tracking-wider">Avg Latency</span>
+              <span className="text-[9px] text-slate-400 font-medium">Network Response</span>
+            </div>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
+              <Activity className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-1.5 mt-3">
-            <span className="font-sans text-2xl sm:text-3xl font-black text-amber-700">{avgPing}</span>
-            <span className="text-xs text-amber-600 font-bold uppercase">ms</span>
+
+          <div className="flex items-baseline gap-1.5 mt-3 pt-1">
+            <span className="font-sans text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{avgPing}</span>
+            <span className="text-xs text-amber-600 font-bold uppercase tracking-wider">ms</span>
           </div>
         </div>
       </div>
 
       {/* SEARCH & CONTROL TOOLBAR */}
-      <div className="flex flex-col md:flex-row gap-3 items-center justify-between modern-glass-card p-3 rounded-2xl">
+      <div className="flex flex-col md:flex-row gap-3 items-center justify-between modern-glass-card p-3 rounded-2xl border border-slate-200/90 shadow-sm">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -180,7 +201,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
       </div>
 
       {/* MODERN DATA TABLE & MOBILE CARD STACK */}
-      <div className="modern-glass-card rounded-2xl overflow-hidden shadow-sm flex-1 min-h-0 flex flex-col" id="history-list-container">
+      <div className="modern-glass-card rounded-2xl overflow-hidden shadow-sm flex-1 min-h-0 flex flex-col border border-slate-200/90" id="history-list-container">
         {filteredResults.length === 0 ? (
           <div className="px-6 py-16 flex flex-col items-center justify-center text-center gap-3 text-slate-400">
             <div className="p-4 bg-slate-100 rounded-2xl border border-slate-200/80 text-blue-600 shadow-inner">
