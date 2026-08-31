@@ -95,8 +95,8 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
       
-      {/* Sleek Compact Desktop Header */}
-      <header className="w-full shrink-0 flex items-center justify-between px-4 sm:px-8 h-14 sm:h-16 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 z-50 sticky top-0 transition-all">
+      {/* Sleek Header */}
+      <header className="w-full shrink-0 flex items-center justify-between px-4 sm:px-8 md:px-12 h-14 sm:h-16 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 z-50 sticky top-0 transition-all">
         
         {/* Brand Logo with Live Status Node */}
         <div className="flex items-center gap-2.5">
@@ -174,8 +174,8 @@ export default function App() {
         </nav>
       </header>
 
-      {/* Main Responsive Content Arena */}
-      <main className="flex-1 flex flex-col items-center justify-start p-2.5 sm:p-4 md:px-6 relative z-10 w-full max-w-6xl mx-auto pb-20 md:pb-6">
+      {/* Main Responsive Full-Width Content Arena */}
+      <main className="flex-1 flex flex-col items-center justify-start p-3 sm:p-5 md:px-8 relative z-10 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto pb-20 md:pb-6">
         {renderTabContent()}
       </main>
 

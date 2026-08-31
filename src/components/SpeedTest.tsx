@@ -336,7 +336,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   };
 
   // Spline Generator for Cloudflare-style Area Charts
-  const generateCloudflareSpline = (history: number[], baseVal: number | null, width = 360, height = 90) => {
+  const generateCloudflareSpline = (history: number[], baseVal: number | null, width = 460, height = 90) => {
     let dataset = history;
     if ((!dataset || dataset.length < 2) && baseVal && baseVal > 0) {
       dataset = [baseVal * 0.35, baseVal * 0.62, baseVal * 0.85, baseVal * 0.94, baseVal, baseVal * 0.91, baseVal * 0.98, baseVal];
@@ -395,8 +395,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const displayDownloadHistory = getDisplayHistory(downloadSpeedHistory, status === 'downloading', elapsedRef.current - 12);
   const displayUploadHistory = getDisplayHistory(uploadSpeedHistory, status === 'uploading', elapsedRef.current - 18);
 
-  const downloadSpline = generateCloudflareSpline(displayDownloadHistory, downloadVal, 360, 90);
-  const uploadSpline = generateCloudflareSpline(displayUploadHistory, uploadVal, 360, 90);
+  const downloadSpline = generateCloudflareSpline(displayDownloadHistory, downloadVal, 460, 90);
+  const uploadSpline = generateCloudflareSpline(displayUploadHistory, uploadVal, 460, 90);
 
   // Network Quality Score Calculations
   const effectiveDown = downloadVal !== null ? downloadVal : (status === 'downloading' ? currentSpeed : 0);
@@ -506,7 +506,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     <div className="w-full flex flex-col items-center gap-3.5 select-none" id="speed-test-section">
       
       {/* CLOUDFLARE SPEEDOMETER HERO CONSOLE ("Your Internet Speed") */}
-      <div className="w-full max-w-5xl bg-white rounded-xl p-4 sm:p-5 flex flex-col border border-slate-200 shadow-sm" id="dashboard-dial">
+      <div className="w-full max-w-7xl 2xl:max-w-[1600px] bg-white rounded-xl p-4 sm:p-6 flex flex-col border border-slate-200 shadow-sm" id="dashboard-dial">
         
         {/* Header Title */}
         <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
@@ -519,10 +519,10 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         </div>
 
         {/* 3-Section Grid: Download | Upload | Telemetry Column */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 my-3 sm:my-4 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 my-3 sm:my-4 items-stretch">
           
           {/* SECTION 1: DOWNLOAD (5 Columns) */}
-          <div className="lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-5 lg:border-r lg:border-slate-100">
+          <div className="lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-6 lg:border-r lg:border-slate-100">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
                 <span className="text-xs sm:text-sm font-bold text-slate-800">Download</span>
@@ -546,7 +546,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
                 <span className="text-[8px] font-mono text-slate-400 -mt-3 bg-white px-1">90th percentile</span>
               </div>
 
-              <svg id="download-sparkline" viewBox="0 0 360 90" preserveAspectRatio="none" className="w-full h-full relative z-10 overflow-visible">
+              <svg id="download-sparkline" viewBox="0 0 460 90" preserveAspectRatio="none" className="w-full h-full relative z-10 overflow-visible">
                 <defs>
                   <linearGradient id="cfDownloadGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#F6821F" stopOpacity="0.45" />
@@ -569,7 +569,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           </div>
 
           {/* SECTION 2: UPLOAD (5 Columns) */}
-          <div className="lg:col-span-5 flex flex-col justify-between px-0 lg:px-5 lg:border-r lg:border-slate-100">
+          <div className="lg:col-span-5 flex flex-col justify-between px-0 lg:px-6 lg:border-r lg:border-slate-100">
             <div>
               <div className="flex items-center gap-1.5 mb-1">
                 <span className="text-xs sm:text-sm font-bold text-slate-800">Upload</span>
@@ -593,7 +593,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
                 <span className="text-[8px] font-mono text-slate-400 -mt-3 bg-white px-1">90th percentile</span>
               </div>
 
-              <svg id="upload-sparkline" viewBox="0 0 360 90" preserveAspectRatio="none" className="w-full h-full relative z-10 overflow-visible">
+              <svg id="upload-sparkline" viewBox="0 0 460 90" preserveAspectRatio="none" className="w-full h-full relative z-10 overflow-visible">
                 <defs>
                   <linearGradient id="cfUploadGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#8D1EB1" stopOpacity="0.45" />
@@ -746,7 +746,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       </div>
 
       {/* NETWORK QUALITY SCORE STRIP */}
-      <div className="w-full max-w-5xl bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200 shadow-sm">
+      <div className="w-full max-w-7xl 2xl:max-w-[1600px] bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200 shadow-sm">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2.5">
           <div className="flex items-center gap-1.5">
             <h3 className="text-xs sm:text-sm font-bold text-[#18181B]">Network Quality Score</h3>
@@ -807,7 +807,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       </div>
 
       {/* DETAILED MEASUREMENT BREAKDOWNS (3 Columns) */}
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="w-full max-w-7xl 2xl:max-w-[1600px] grid grid-cols-1 md:grid-cols-3 gap-3">
         
         {/* COLUMN 1: UPLOAD MEASUREMENTS */}
         <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm flex flex-col justify-between">
