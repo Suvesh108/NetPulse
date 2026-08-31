@@ -1,92 +1,72 @@
 import React, { useState, useEffect } from 'react';
-import { Bolt, History, Settings } from 'lucide-react';
-import { SpeedTestResult, SimulationSettings } from './types';
-import { DEFAULT_SETTINGS } from './constants';
+import { Activity, History, Settings, Zap, ArrowUpDown } from 'lucide-react';
 import SpeedTest from './components/SpeedTest';
 import HistoryList from './components/HistoryList';
 import SettingsPanel from './components/SettingsPanel';
-
-// Populate initial beautiful telemetry history results so the app isn't blank on launch
-const INITIAL_MOCK_RESULTS: SpeedTestResult[] = [
-  {
-    id: 'mock-1',
-    timestamp: '2026-05-26T18:40:00.000Z',
-    downloadMbps: 915.4,
-    uploadMbps: 840.1,
-    pingMs: 4,
-    jitterMs: 0.9,
-    serverName: 'New York, NY (USA) - NetPulse Edge-1'
-  },
-  {
-    id: 'mock-2',
-    timestamp: '2026-05-26T21:15:30.000Z',
-    downloadMbps: 298.6,
-    uploadMbps: 41.5,
-    pingMs: 19,
-    jitterMs: 2.8,
-    serverName: 'New York, NY (USA) - NetPulse Edge-1'
-  },
-  {
-    id: 'mock-3',
-    timestamp: '2026-05-27T02:05:10.000Z',
-    downloadMbps: 98.2,
-    uploadMbps: 16.4,
-    pingMs: 45,
-    jitterMs: 7.1,
-    serverName: 'London, UK - NetPulse Edge-3'
-  }
-];
+import { SpeedTestResult, SimulationSettings } from './types';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'speed' | 'history' | 'settings'>('speed');
   const [unit, setUnit] = useState<'Mbps' | 'MB/s'>('Mbps');
   
-  // Load settings and results from localStorage or defaults
+  const [historyResults, setHistoryResults] = useState<SpeedTestResult[]>(() => {
+    try {
+      const saved = localStorage.getItem('netpulse_results_history');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [settings, setSettings] = useState<SimulationSettings>(() => {
-    const saved = localStorage.getItem('netpulse_settings');
-    return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+    try {
+      const saved = localStorage.getItem('netpulse_app_settings');
+      return saved ? JSON.parse(saved) : {
+        measureDownloadLoadedLatency: false,
+        measureUploadLoadedLatency: false
+      };
+    } catch {
+      return {
+        measureDownloadLoadedLatency: false,
+        measureUploadLoadedLatency: false
+      };
+    }
   });
 
-  const [results, setResults] = useState<SpeedTestResult[]>(() => {
-    const saved = localStorage.getItem('netpulse_results');
-    return saved ? JSON.parse(saved) : INITIAL_MOCK_RESULTS;
-  });
-
-  // Sync to database triggers (local persistence fallback)
   useEffect(() => {
-    localStorage.setItem('netpulse_settings', JSON.stringify(settings));
+    try {
+      localStorage.setItem('netpulse_results_history', JSON.stringify(historyResults));
+    } catch (e) {
+      console.warn('Failed to persist history results:', e);
+    }
+  }, [historyResults]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('netpulse_app_settings', JSON.stringify(settings));
+    } catch (e) {
+      console.warn('Failed to persist settings:', e);
+    }
   }, [settings]);
 
-  useEffect(() => {
-    localStorage.setItem('netpulse_results', JSON.stringify(results));
-  }, [results]);
-
-  const handleTestComplete = (newResult: SpeedTestResult) => {
-    setResults(prev => [newResult, ...prev]);
+  const handleTestComplete = (result: SpeedTestResult) => {
+    setHistoryResults((prev) => [result, ...prev]);
   };
 
   const handleDeleteResult = (id: string) => {
-    setResults(prev => prev.filter(r => r.id !== id));
+    setHistoryResults((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleClearAllResults = () => {
-    setResults([]);
+  const handleClearAllHistory = () => {
+    setHistoryResults([]);
   };
 
-  interface NavItem {
-    id: 'speed' | 'history' | 'settings';
-    label: string;
-    icon: React.ComponentType<any>;
-    badge?: number;
-  }
-
-  const navItems: NavItem[] = [
-    { id: 'speed', label: 'Speed', icon: Bolt },
-    { id: 'history', label: 'History', icon: History, badge: results.length > 0 ? results.length : undefined },
-    { id: 'settings', label: 'Settings', icon: Settings }
+  const navItems = [
+    { id: 'speed' as const, label: 'Speed Test', icon: Zap },
+    { id: 'history' as const, label: 'History', icon: History, badge: historyResults.length > 0 ? historyResults.length : undefined },
+    { id: 'settings' as const, label: 'Settings', icon: Settings },
   ];
 
-  // Render correct nested viewport based on activeTab selection
   const renderTabContent = () => {
     switch (activeTab) {
       case 'speed':
@@ -94,16 +74,16 @@ export default function App() {
           <SpeedTest 
             settings={settings} 
             onUpdateSettings={setSettings} 
-            onTestComplete={handleTestComplete} 
+            onTestComplete={handleTestComplete}
             unit={unit}
           />
         );
       case 'history':
         return (
           <HistoryList 
-            results={results} 
-            onDeleteResult={handleDeleteResult} 
-            onClearAll={handleClearAllResults} 
+            results={historyResults} 
+            onDeleteResult={handleDeleteResult}
+            onClearAll={handleClearAllHistory}
             unit={unit}
           />
         );
@@ -113,45 +93,55 @@ export default function App() {
   };
 
   return (
-    <div className="h-dvh max-h-dvh w-screen bg-[#F4F4F5] text-on-background monochrome-bg relative overflow-hidden flex flex-col font-sans">
+    <div className="h-dvh max-h-dvh w-screen bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative overflow-hidden flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
       
-      {/* Main Desktop Header */}
-      <header className="w-full shrink-0 flex items-center justify-between px-6 sm:px-12 h-20 bg-white border-b border-[#E4E4E7] z-50 shadow-sm">
+      {/* Modern Desktop Header */}
+      <header className="w-full shrink-0 flex items-center justify-between px-6 sm:px-10 h-16 sm:h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/80 z-50 sticky top-0 transition-all">
+        
+        {/* Brand Logo with Live Status Node */}
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-50 text-blue-600 rounded-xl relative group border border-blue-200/80 shadow-sm">
-            <Bolt className="w-6 h-6 fill-blue-600/10 transition-transform group-hover:rotate-12 duration-300" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 group cursor-pointer transition-transform hover:scale-105 active:scale-95">
+            <Zap className="w-5 h-5 fill-white/20 transition-transform group-hover:rotate-12 duration-300" />
           </div>
-          <h1 className="font-sans text-xl sm:text-2xl font-black tracking-[0.25em] text-[#09090B]">
-            NETPULSE
-          </h1>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="font-sans text-lg sm:text-xl font-black tracking-tight text-slate-900">
+                NetPulse
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200/60 uppercase tracking-widest hidden sm:inline-flex">
+                Pro
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-medium hidden xs:inline">Edge Speed Diagnostic Engine</span>
+          </div>
         </div>
  
-        {/* Center Unit Converter Toggle */}
-        <div className="flex items-center bg-[#E4E4E7] border border-[#D4D4D8] p-0.5 rounded-xl shadow-sm relative">
+        {/* Center Unit Selector Pill */}
+        <div className="flex items-center bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shadow-inner">
           <button
             onClick={() => setUnit('Mbps')}
-            className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 ${
               unit === 'Mbps'
-                ? 'bg-[#09090B] text-white shadow-sm font-bold'
-                : 'text-[#71717A] hover:text-[#09090B]'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            Mbps
+            <span>Mbps</span>
           </button>
           <button
             onClick={() => setUnit('MB/s')}
-            className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+            className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 ${
               unit === 'MB/s'
-                ? 'bg-[#09090B] text-white shadow-sm font-bold'
-                : 'text-[#71717A] hover:text-[#09090B]'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            MB/s
+            <span>MB/s</span>
           </button>
         </div>
 
-        {/* Desktop Navigation Header */}
-        <nav className="hidden md:flex items-center gap-1 sm:gap-3">
+        {/* Desktop Navigation Switcher */}
+        <nav className="hidden md:flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-2xl border border-slate-200/80">
           {navItems.map((item) => {
             const IconComp = item.icon;
             const isActive = activeTab === item.id;
@@ -161,22 +151,20 @@ export default function App() {
                 key={item.id}
                 id={`nav-desktop-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-2.5 px-4 py-2 rounded-xl transition-all duration-300 relative border cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
                   isActive 
-                    ? 'text-white bg-[#09090B] font-bold border-transparent shadow-sm' 
-                    : 'text-[#71717A] hover:text-[#09090B] hover:bg-[#E4E4E7] border-transparent'
+                    ? 'bg-white text-slate-900 shadow-sm' 
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
-                <IconComp className={`w-4 h-4 shrink-0 ${
-                  item.id === 'speed' ? (isActive ? 'text-blue-400' : 'text-blue-600') :
-                  item.id === 'history' ? (isActive ? 'text-indigo-400' : 'text-indigo-600') :
-                  (isActive ? 'text-zinc-300' : 'text-zinc-600')
+                <IconComp className={`w-4 h-4 shrink-0 transition-colors ${
+                  isActive 
+                    ? (item.id === 'speed' ? 'text-blue-600' : item.id === 'history' ? 'text-indigo-600' : 'text-slate-800')
+                    : 'text-slate-400'
                 }`} />
-                <span className="font-sans text-xs font-bold uppercase tracking-wider hidden sm:inline">
-                  {item.label}
-                </span>
+                <span>{item.label}</span>
                 {item.badge !== undefined && (
-                  <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-indigo-500 text-white shadow-sm">
+                  <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-indigo-50 text-indigo-600 border border-indigo-200">
                     {item.badge}
                   </span>
                 )}
@@ -186,14 +174,14 @@ export default function App() {
         </nav>
       </header>
 
-      {/* Main Responsive Content Window */}
-      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-4 pb-28 md:p-6 md:px-12 relative z-10 w-full max-w-7xl mx-auto overflow-hidden">
+      {/* Main Responsive Content Arena */}
+      <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 sm:p-6 md:px-10 relative z-10 w-full max-w-7xl mx-auto overflow-hidden">
         {renderTabContent()}
       </main>
 
-      {/* Sticky Floating Bottom Navigation Bar for Mobile & Tablet Viewports */}
-      <div className="md:hidden fixed bottom-6 inset-x-4 z-50 animate-fade-in">
-        <nav className="mx-auto max-w-md bg-white/95 border border-[#E4E4E7] backdrop-blur-xl rounded-2xl py-2 px-4 flex items-center justify-around shadow-lg">
+      {/* Floating Bottom Navigation Bar for Mobile & Tablet */}
+      <div className="md:hidden fixed bottom-5 inset-x-4 z-50 animate-fade-in">
+        <nav className="mx-auto max-w-sm bg-white/90 border border-slate-200/90 backdrop-blur-2xl rounded-2xl p-1.5 flex items-center justify-around shadow-xl shadow-slate-900/5">
           {navItems.map((item) => {
             const IconComp = item.icon;
             const isActive = activeTab === item.id;
@@ -203,26 +191,22 @@ export default function App() {
                 key={item.id}
                 id={`nav-mobile-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center gap-1.5 relative py-1 px-3 rounded-xl transition-all duration-300 relative cursor-pointer ${
-                  isActive ? 'text-[#09090B]' : 'text-[#71717A] hover:text-[#09090B]'
+                className={`flex flex-col items-center gap-1 py-1.5 px-4 rounded-xl transition-all duration-200 cursor-pointer relative ${
+                  isActive ? 'text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
-                <div className={`p-2 rounded-xl transition-all duration-300 ${
-                  isActive ? 'bg-[#09090B]/10 shadow-sm' : 'bg-transparent'
+                <div className={`p-1.5 rounded-lg transition-all ${
+                  isActive 
+                    ? (item.id === 'speed' ? 'bg-blue-50 text-blue-600' : item.id === 'history' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-800')
+                    : 'bg-transparent text-slate-400'
                 }`}>
-                  <IconComp className={`w-5 h-5 shrink-0 ${
-                    item.id === 'speed' ? 'text-blue-600' :
-                    item.id === 'history' ? 'text-indigo-600' :
-                    'text-zinc-700'
-                  }`} />
+                  <IconComp className="w-5 h-5 shrink-0" />
                 </div>
-                <span className="font-sans text-[10px] font-black uppercase tracking-widest scale-95">
+                <span className="text-[10px] uppercase tracking-wider font-semibold">
                   {item.label}
                 </span>
                 {item.badge !== undefined && (
-                  <span className="absolute top-1 right-2.5 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold font-mono bg-indigo-500 text-white shadow-sm">
-                    {item.badge}
-                  </span>
+                  <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-indigo-500"></span>
                 )}
               </button>
             );
