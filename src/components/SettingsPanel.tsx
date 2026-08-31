@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   ToggleLeft, ToggleRight, Globe, Download, Upload, Server, ShieldCheck, 
-  Cpu, RefreshCw, Network, Radio, Zap, Check, ChevronDown, ChevronUp, Layers, Sparkles 
+  Cpu, Network, Radio, Zap, Check, ChevronDown, ChevronUp, Sliders, Activity, Sparkles
 } from 'lucide-react';
 import { SimulationSettings, EngineBackend, RoutingProtocol } from '../types';
 
@@ -114,35 +114,35 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
     {
       id: 'anycast-bgp',
       name: 'Anycast BGP Smart Routing',
-      description: 'Autonomous System (AS) routes packets to the topologically closest edge node automatically.',
+      description: 'Autonomous System (AS) routes packets to closest edge node automatically.',
       speedTag: 'Optimal Latency',
       icon: '🌐'
     },
     {
       id: 'http3-quic',
       name: 'HTTP/3 over QUIC (UDP 0-RTT)',
-      description: 'Next-generation UDP transport with zero head-of-line blocking and instant encrypted connections.',
+      description: 'UDP transport with zero head-of-line blocking and instant encryption.',
       speedTag: 'Fastest Handshake',
       icon: '⚡'
     },
     {
       id: 'http2-tcp',
       name: 'HTTP/2 Multiplexed (TCP TLS 1.3)',
-      description: 'Parallel multiplexed streaming over persistent TCP connection with TLS 1.3 crypto.',
-      speedTag: 'Broad Compatibility',
+      description: 'Parallel streaming over persistent TCP connection with TLS 1.3 crypto.',
+      speedTag: 'Broad Support',
       icon: '🔒'
     },
     {
       id: 'geodns-unicast',
       name: 'GeoDNS Direct Unicast Routing',
-      description: 'Resolves IP directly to regional server clusters without Anycast routing hops.',
+      description: 'Direct IP resolution to regional server clusters without Anycast hops.',
       speedTag: 'Predictable Path',
       icon: '📍'
     },
     {
       id: 'multipath-adaptive',
       name: 'Multi-Path Adaptive Fallback',
-      description: 'Dynamically shifts between UDP QUIC and TCP streams based on corporate firewall conditions.',
+      description: 'Dynamically shifts between UDP QUIC and TCP streams on firewalls.',
       speedTag: 'Resilient',
       icon: '🛡️'
     }
@@ -152,340 +152,262 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
   const selectedProtocol = routingProtocols.find(p => p.id === settings.routingProtocol) || routingProtocols[0];
 
   return (
-    <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-3.5 pb-6 flex-1 min-h-0 overflow-y-auto h-full pr-1 animate-fade-in select-none" id="settings-section">
+    <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-3 pb-2 flex-1 min-h-0 select-none animate-fade-in" id="settings-section">
       
-      {/* SECTION 1: SERVER ENGINE BACKEND (Dropdown System) */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm flex flex-col gap-3 relative z-30" ref={backendRef}>
+      {/* 2-COLUMN UNIFIED BENTO GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
         
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-sm shadow-blue-500/20 shrink-0">
-              <Server className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="font-sans font-bold text-sm sm:text-base text-slate-900 tracking-tight">
-                Server Engine Backend
-              </h3>
-              <p className="text-[11px] text-slate-500 font-medium">
-                Choose the target CDN infrastructure and global edge points of presence.
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200/60 font-bold uppercase tracking-wider hidden sm:inline-flex">
-            {engineBackends.length} Available
-          </span>
-        </div>
-
-        {/* Custom Interactive Dropdown Button */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => {
-              setBackendDropdownOpen(!backendDropdownOpen);
-              setProtocolDropdownOpen(false);
-            }}
-            className={`w-full p-3.5 rounded-xl border bg-slate-50/70 hover:bg-slate-50 flex items-center justify-between transition-all duration-200 cursor-pointer focus:outline-none ${
-              backendDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm bg-white' : 'border-slate-200'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className={`px-2 py-1 rounded-md text-[11px] font-bold font-mono border ${selectedBackend.color}`}>
-                {selectedBackend.badge}
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="font-sans font-bold text-xs sm:text-sm text-slate-900">
-                  {selectedBackend.name}
-                </span>
-                <span className="text-[11px] text-slate-500">
-                  {selectedBackend.pops} • {selectedBackend.protocolSupport}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-slate-400">
-              <span className="text-xs font-mono font-medium hidden md:inline">Change Server</span>
-              {backendDropdownOpen ? <ChevronUp className="w-4 h-4 text-blue-600" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
-            </div>
-          </button>
-
-          {/* Expanded Dropdown Menu */}
-          {backendDropdownOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col p-1.5 gap-1 animate-fade-in max-h-80 overflow-y-auto">
-              {engineBackends.map((engine) => {
-                const isSelected = settings.engineBackend === engine.id;
-
-                return (
-                  <div
-                    key={engine.id}
-                    onClick={() => {
-                      handleUpdateField('engineBackend', engine.id);
-                      setBackendDropdownOpen(false);
-                    }}
-                    className={`p-2.5 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer ${
-                      isSelected 
-                        ? 'bg-blue-50/80 border border-blue-200/80 text-blue-900' 
-                        : 'hover:bg-slate-50 text-slate-800 border border-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono border shrink-0 ${engine.color}`}>
-                        {engine.badge}
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className="font-sans font-bold text-xs">{engine.name}</span>
-                          <span className="text-[10px] text-slate-400 font-mono">({engine.pops})</span>
-                        </div>
-                        <span className="text-[10px] text-slate-500 leading-tight">{engine.description}</span>
-                      </div>
-                    </div>
-
-                    <div className="shrink-0 pl-2">
-                      {isSelected ? (
-                        <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center">
-                          <Check className="w-3 h-3 stroke-[3]" />
-                        </div>
-                      ) : (
-                        <span className="text-[10px] font-mono text-slate-400">{engine.protocolSupport}</span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Custom Server Endpoint Input (Shows when Custom is selected) */}
-        {settings.engineBackend === 'custom' && (
-          <div className="p-3 bg-purple-50/60 border border-purple-200 rounded-xl flex flex-col gap-1.5 mt-0.5">
-            <label className="text-xs font-bold text-purple-900">Custom Backend Speedtest Endpoint URL</label>
-            <input
-              type="text"
-              value={settings.customServerUrl || ''}
-              onChange={(e) => handleUpdateField('customServerUrl', e.target.value)}
-              placeholder="https://speed.yourdomain.com/__down"
-              className="w-full px-3 py-1.5 bg-white rounded-lg border border-purple-200 text-xs text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <span className="text-[10px] text-purple-600">Ensure the custom server accepts payload download and upload POST requests with CORS enabled.</span>
-          </div>
-        )}
-
-      </div>
-
-      {/* SECTION 2: ROUTING PROTOCOL & TRANSPORT (Dropdown System) */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm flex flex-col gap-3 relative z-20" ref={protocolRef}>
-        
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-sm shadow-indigo-500/20 shrink-0">
-              <Network className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="font-sans font-bold text-sm sm:text-base text-slate-900 tracking-tight">
-                Routing Protocol & Transport
-              </h3>
-              <p className="text-[11px] text-slate-500 font-medium">
-                Configure network packet topology, cryptographic handshake, and transport protocols.
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-50 text-indigo-600 border border-indigo-200/60 font-bold uppercase tracking-wider hidden sm:inline-flex">
-            {routingProtocols.length} Protocols
-          </span>
-        </div>
-
-        {/* Custom Interactive Dropdown Button */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => {
-              setProtocolDropdownOpen(!protocolDropdownOpen);
-              setBackendDropdownOpen(false);
-            }}
-            className={`w-full p-3.5 rounded-xl border bg-slate-50/70 hover:bg-slate-50 flex items-center justify-between transition-all duration-200 cursor-pointer focus:outline-none ${
-              protocolDropdownOpen ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-sm bg-white' : 'border-slate-200'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xl shrink-0">{selectedProtocol.icon}</span>
-              <div className="flex flex-col text-left">
-                <span className="font-sans font-bold text-xs sm:text-sm text-slate-900">
-                  {selectedProtocol.name}
-                </span>
-                <span className="text-[11px] text-slate-500">
-                  {selectedProtocol.speedTag} • <span className="font-mono text-[10px] text-indigo-600 font-bold">{selectedProtocol.id}</span>
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-slate-400">
-              <span className="text-xs font-mono font-medium hidden md:inline">Change Protocol</span>
-              {protocolDropdownOpen ? <ChevronUp className="w-4 h-4 text-indigo-600" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
-            </div>
-          </button>
-
-          {/* Expanded Dropdown Menu */}
-          {protocolDropdownOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col p-1.5 gap-1 animate-fade-in max-h-80 overflow-y-auto">
-              {routingProtocols.map((proto) => {
-                const isSelected = settings.routingProtocol === proto.id;
-
-                return (
-                  <div
-                    key={proto.id}
-                    onClick={() => {
-                      handleUpdateField('routingProtocol', proto.id);
-                      setProtocolDropdownOpen(false);
-                    }}
-                    className={`p-2.5 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer ${
-                      isSelected 
-                        ? 'bg-indigo-50/80 border border-indigo-200/80 text-indigo-900' 
-                        : 'hover:bg-slate-50 text-slate-800 border border-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-lg shrink-0">{proto.icon}</span>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className="font-sans font-bold text-xs">{proto.name}</span>
-                          <span className="text-[10px] font-bold text-indigo-600 font-mono bg-indigo-50 px-1 rounded">{proto.speedTag}</span>
-                        </div>
-                        <span className="text-[10px] text-slate-500 leading-tight">{proto.description}</span>
-                      </div>
-                    </div>
-
-                    <div className="shrink-0 pl-2">
-                      {isSelected ? (
-                        <div className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center">
-                          <Check className="w-3 h-3 stroke-[3]" />
-                        </div>
-                      ) : (
-                        <span className="text-[10px] font-mono text-slate-400">{proto.id}</span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-      </div>
-
-      {/* SECTION 3: LOADED LATENCY & BUFFERBLOAT TELEMETRY */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm flex flex-col gap-3 relative z-10">
-        
-        <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white flex items-center justify-center shadow-sm shadow-emerald-500/20 shrink-0">
-            <Globe className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="font-sans font-bold text-sm sm:text-base text-slate-900 tracking-tight">
-              Bufferbloat & Loaded Latency Probing
-            </h3>
-            <p className="text-[11px] text-slate-500 font-medium">
-              Sample response latency concurrently during peak bandwidth saturation.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* LEFT COLUMN: CORE ENGINE & ROUTING DROPDOWNS (7 Cols) */}
+        <div className="lg:col-span-7 bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-sm flex flex-col justify-between gap-4">
           
-          {/* Download Loaded Latency */}
-          <div className="flex items-center justify-between p-3 bg-slate-50/80 border border-slate-200/80 rounded-xl hover:border-emerald-300 transition-all duration-200">
-            <div className="flex items-start gap-2.5 pr-2">
-              <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
-                <Download className="w-3.5 h-3.5" />
+          <div>
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 mb-3.5">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-sm">
+                  <Server className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h3 className="font-sans font-bold text-sm text-slate-900">Network & Engine Topology</h3>
+                  <span className="text-[10px] text-slate-400">Target server backbone and transport mechanism</span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="font-sans font-bold text-xs text-slate-900">Download Loaded Latency</span>
-                <span className="font-sans text-[11px] text-slate-500 leading-snug">
-                  Measure latency under heavy inbound saturation.
-                </span>
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200/60 font-bold uppercase tracking-wider">
+                Active Edge
+              </span>
+            </div>
+
+            {/* 1. Backend Selector Dropdown */}
+            <div className="flex flex-col gap-1.5 mb-3 relative z-30" ref={backendRef}>
+              <label className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
+                <span>Server Engine Backend</span>
+                <span className="text-[9px] text-slate-400 font-mono">{engineBackends.length} nodes</span>
+              </label>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBackendDropdownOpen(!backendDropdownOpen);
+                    setProtocolDropdownOpen(false);
+                  }}
+                  className={`w-full p-2.5 sm:p-3 rounded-lg border bg-slate-50/80 hover:bg-slate-50 flex items-center justify-between transition-all duration-150 cursor-pointer focus:outline-none ${
+                    backendDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm bg-white' : 'border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono border ${selectedBackend.color}`}>
+                      {selectedBackend.badge}
+                    </span>
+                    <div className="flex flex-col text-left">
+                      <span className="font-sans font-bold text-xs text-slate-900">{selectedBackend.name}</span>
+                      <span className="text-[10px] text-slate-400 font-mono">{selectedBackend.pops}</span>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${backendDropdownOpen ? 'rotate-180 text-blue-600' : ''}`} />
+                </button>
+
+                {backendDropdownOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col p-1 gap-1 animate-fade-in max-h-56 overflow-y-auto">
+                    {engineBackends.map((engine) => {
+                      const isSelected = settings.engineBackend === engine.id;
+                      return (
+                        <div
+                          key={engine.id}
+                          onClick={() => {
+                            handleUpdateField('engineBackend', engine.id);
+                            setBackendDropdownOpen(false);
+                          }}
+                          className={`p-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer ${
+                            isSelected ? 'bg-blue-50/80 border border-blue-200 text-blue-900' : 'hover:bg-slate-50 text-slate-800'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className={`px-1.5 py-0.2 rounded text-[8px] font-bold font-mono border shrink-0 ${engine.color}`}>
+                              {engine.badge}
+                            </span>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-xs">{engine.name}</span>
+                              <span className="text-[9px] text-slate-400">{engine.description}</span>
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0 ml-2" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {settings.engineBackend === 'custom' && (
+                <div className="mt-1 p-2 bg-purple-50/60 border border-purple-200 rounded-lg flex flex-col gap-1">
+                  <label className="text-[10px] font-bold text-purple-900">Custom Speedtest Endpoint URL</label>
+                  <input
+                    type="text"
+                    value={settings.customServerUrl || ''}
+                    onChange={(e) => handleUpdateField('customServerUrl', e.target.value)}
+                    placeholder="https://speed.yourdomain.com/__down"
+                    className="w-full px-2.5 py-1 bg-white rounded border border-purple-200 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* 2. Routing Protocol Selector Dropdown */}
+            <div className="flex flex-col gap-1.5 relative z-20" ref={protocolRef}>
+              <label className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
+                <span>Routing Protocol & Transport</span>
+                <span className="text-[9px] text-slate-400 font-mono">{routingProtocols.length} protocols</span>
+              </label>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProtocolDropdownOpen(!protocolDropdownOpen);
+                    setBackendDropdownOpen(false);
+                  }}
+                  className={`w-full p-2.5 sm:p-3 rounded-lg border bg-slate-50/80 hover:bg-slate-50 flex items-center justify-between transition-all duration-150 cursor-pointer focus:outline-none ${
+                    protocolDropdownOpen ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-sm bg-white' : 'border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-base">{selectedProtocol.icon}</span>
+                    <div className="flex flex-col text-left">
+                      <span className="font-sans font-bold text-xs text-slate-900">{selectedProtocol.name}</span>
+                      <span className="text-[10px] text-indigo-600 font-mono font-bold">{selectedProtocol.speedTag}</span>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${protocolDropdownOpen ? 'rotate-180 text-indigo-600' : ''}`} />
+                </button>
+
+                {protocolDropdownOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col p-1 gap-1 animate-fade-in max-h-56 overflow-y-auto">
+                    {routingProtocols.map((proto) => {
+                      const isSelected = settings.routingProtocol === proto.id;
+                      return (
+                        <div
+                          key={proto.id}
+                          onClick={() => {
+                            handleUpdateField('routingProtocol', proto.id);
+                            setProtocolDropdownOpen(false);
+                          }}
+                          className={`p-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer ${
+                            isSelected ? 'bg-indigo-50/80 border border-indigo-200 text-indigo-900' : 'hover:bg-slate-50 text-slate-800'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-base shrink-0">{proto.icon}</span>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-xs">{proto.name}</span>
+                              <span className="text-[9px] text-slate-400">{proto.description}</span>
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0 ml-2" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
-            
-            <button
-              onClick={() => handleUpdateField('measureDownloadLoadedLatency', !settings.measureDownloadLoadedLatency)}
-              className="flex items-center hover:opacity-90 focus:outline-none shrink-0 cursor-pointer active:scale-95 transition-transform"
-            >
-              {settings.measureDownloadLoadedLatency ? (
-                <ToggleRight className="w-9 h-9 text-emerald-600" />
-              ) : (
-                <ToggleLeft className="w-9 h-9 text-slate-300" />
-              )}
-            </button>
+
           </div>
 
-          {/* Upload Loaded Latency */}
-          <div className="flex items-center justify-between p-3 bg-slate-50/80 border border-slate-200/80 rounded-xl hover:border-violet-300 transition-all duration-200">
-            <div className="flex items-start gap-2.5 pr-2">
-              <div className="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0 mt-0.5">
-                <Upload className="w-3.5 h-3.5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-sans font-bold text-xs text-slate-900">Upload Loaded Latency</span>
-                <span className="font-sans text-[11px] text-slate-500 leading-snug">
-                  Measure latency under heavy outbound saturation.
-                </span>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => handleUpdateField('measureUploadLoadedLatency', !settings.measureUploadLoadedLatency)}
-              className="flex items-center hover:opacity-90 focus:outline-none shrink-0 cursor-pointer active:scale-95 transition-transform"
-            >
-              {settings.measureUploadLoadedLatency ? (
-                <ToggleRight className="w-9 h-9 text-violet-600" />
-              ) : (
-                <ToggleLeft className="w-9 h-9 text-slate-300" />
-              )}
-            </button>
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[10px] text-slate-400 font-mono">
+            <span>TLS 1.3 / QUIC 0-RTT Support</span>
+            <span className="text-emerald-600 font-bold">Auto-Negotiated</span>
           </div>
 
         </div>
 
-      </div>
+        {/* RIGHT COLUMN: BUFFERBLOAT & LIVE STATS (5 Cols) */}
+        <div className="lg:col-span-5 flex flex-col gap-3 justify-between">
+          
+          {/* Bufferbloat / Loaded Latency Toggles */}
+          <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-sm flex flex-col gap-2.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+                  <Activity className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h3 className="font-sans font-bold text-xs sm:text-sm text-slate-900">Bufferbloat Probing</h3>
+                  <span className="text-[9px] text-slate-400">Sample latency under heavy bandwidth load</span>
+                </div>
+              </div>
+            </div>
 
-      {/* SECTION 4: ENGINE DIAGNOSTIC OUTPUT */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm flex flex-col gap-2.5 relative z-0">
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Active Engine Diagnostics</span>
-          </div>
-          <span className="text-[10px] font-mono text-slate-400">NetPulse v2.5.0-edge</span>
-        </div>
+            {/* Download Toggle */}
+            <div className="flex items-center justify-between p-2.5 bg-slate-50/80 rounded-lg border border-slate-200/80">
+              <div className="flex items-center gap-2">
+                <Download className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-xs font-bold text-slate-800">Download Loaded Latency</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleUpdateField('measureDownloadLoadedLatency', !settings.measureDownloadLoadedLatency)}
+                className="cursor-pointer focus:outline-none"
+              >
+                {settings.measureDownloadLoadedLatency ? (
+                  <ToggleRight className="w-8 h-8 text-emerald-600" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-slate-300" />
+                )}
+              </button>
+            </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono text-xs text-slate-600 bg-slate-50/90 p-3 rounded-xl border border-slate-200/60">
-          <div className="flex flex-col p-2 rounded-lg bg-white border border-slate-200/60">
-            <span className="text-[10px] text-slate-400">Engine Backend</span>
-            <span className="font-bold text-slate-900 text-xs truncate">
-              {selectedBackend.name}
-            </span>
+            {/* Upload Toggle */}
+            <div className="flex items-center justify-between p-2.5 bg-slate-50/80 rounded-lg border border-slate-200/80">
+              <div className="flex items-center gap-2">
+                <Upload className="w-3.5 h-3.5 text-violet-600" />
+                <span className="text-xs font-bold text-slate-800">Upload Loaded Latency</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleUpdateField('measureUploadLoadedLatency', !settings.measureUploadLoadedLatency)}
+                className="cursor-pointer focus:outline-none"
+              >
+                {settings.measureUploadLoadedLatency ? (
+                  <ToggleRight className="w-8 h-8 text-violet-600" />
+                ) : (
+                  <ToggleLeft className="w-8 h-8 text-slate-300" />
+                )}
+              </button>
+            </div>
           </div>
-          <div className="flex flex-col p-2 rounded-lg bg-white border border-slate-200/60">
-            <span className="text-[10px] text-slate-400">Routing Protocol</span>
-            <span className="font-bold text-indigo-600 text-xs truncate">
-              {selectedProtocol.name}
-            </span>
+
+          {/* Engine Diagnostic Output Matrix */}
+          <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col gap-2">
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">Active Configuration</span>
+              </div>
+              <span className="text-[9px] font-mono text-slate-400">v2.5.0-edge</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+              <div className="p-2 bg-slate-50 rounded-lg border border-slate-200/60 flex flex-col">
+                <span className="text-slate-400 text-[9px]">Target Backend</span>
+                <span className="font-bold text-slate-900 truncate">{selectedBackend.name}</span>
+              </div>
+              <div className="p-2 bg-slate-50 rounded-lg border border-slate-200/60 flex flex-col">
+                <span className="text-slate-400 text-[9px]">Routing Mode</span>
+                <span className="font-bold text-indigo-600 truncate">{selectedProtocol.speedTag}</span>
+              </div>
+              <div className="p-2 bg-slate-50 rounded-lg border border-slate-200/60 flex flex-col">
+                <span className="text-slate-400 text-[9px]">Bufferbloat</span>
+                <span className={`font-bold ${settings.measureDownloadLoadedLatency || settings.measureUploadLoadedLatency ? 'text-emerald-700' : 'text-slate-500'}`}>
+                  {settings.measureDownloadLoadedLatency || settings.measureUploadLoadedLatency ? 'Active' : 'Standard'}
+                </span>
+              </div>
+              <div className="p-2 bg-slate-50 rounded-lg border border-slate-200/60 flex flex-col">
+                <span className="text-slate-400 text-[9px]">Encryption</span>
+                <span className="font-bold text-slate-800">TLS 1.3 / AES</span>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col p-2 rounded-lg bg-white border border-slate-200/60">
-            <span className="text-[10px] text-slate-400">Bufferbloat Sampling</span>
-            <span className={`text-[10px] font-bold mt-0.5 ${
-              settings.measureDownloadLoadedLatency || settings.measureUploadLoadedLatency ? 'text-emerald-700 font-black' : 'text-slate-500'
-            }`}>
-              {settings.measureDownloadLoadedLatency || settings.measureUploadLoadedLatency ? 'Active Multi-Stage' : 'Standard'}
-            </span>
-          </div>
-          <div className="flex flex-col p-2 rounded-lg bg-white border border-slate-200/60">
-            <span className="text-[10px] text-slate-400">Routing Mode</span>
-            <span className="font-bold text-slate-800 text-xs">
-              {settings.routingProtocol === 'anycast-bgp' ? 'Anycast Edge' : 'Direct Multiplex'}
-            </span>
-          </div>
+
         </div>
 
       </div>
