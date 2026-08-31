@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw } from 'lucide-react';
+import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw, ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
 
@@ -293,18 +293,18 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     }
   };
 
-  // Modern Box-like Graph Spline Generator for all 3 Bento Boxes
-  const generateBoxGraphSpline = (history: number[], width = 360, height = 110) => {
+  // Modern Box Graph Spline Generator for the Full-Width Centerpiece Box
+  const generateBoxGraphSpline = (history: number[], width = 600, height = 150) => {
     if (!history || history.length < 2) {
       return {
-        stroke: `M 0,${height - 10} L ${width},${height - 10}`,
-        fill: `M 0,${height - 10} L ${width},${height - 10} L ${width},${height} L 0,${height} Z`,
+        stroke: `M 0,${height - 12} L ${width},${height - 12}`,
+        fill: `M 0,${height - 12} L ${width},${height - 12} L ${width},${height} L 0,${height} Z`,
         lastX: width,
-        lastY: height - 10,
+        lastY: height - 12,
         hasData: false
       };
     }
-    const padding = 10;
+    const padding = 15;
     const maxVal = Math.max(...history, 1.0);
     const stepX = width / (history.length - 1);
     
@@ -342,23 +342,20 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const displayDownloadHistory = getDisplayHistory(downloadSpeedHistory, status === 'downloading', elapsedRef.current - 12);
   const displayUploadHistory = getDisplayHistory(uploadSpeedHistory, status === 'uploading', elapsedRef.current - 18);
 
-  const downloadBoxGraph = generateBoxGraphSpline(displayDownloadHistory, 360, 100);
-  const uploadBoxGraph = generateBoxGraphSpline(displayUploadHistory, 360, 100);
-
   // Active History for Center Box Graph
   const activeHistoryForBox = status === 'uploading' 
     ? displayUploadHistory 
     : (status === 'downloading' ? displayDownloadHistory : (downloadSpeedHistory.length > 0 ? downloadSpeedHistory : uploadSpeedHistory));
 
-  const centerBoxGraph = generateBoxGraphSpline(activeHistoryForBox, 360, 100);
+  const centerBoxGraph = generateBoxGraphSpline(activeHistoryForBox, 600, 150);
   const badge = getStatusBadge();
 
   return (
-    <div className="w-full flex flex-col items-center justify-between flex-1 py-1 md:py-2 animate-fade-in h-full min-h-0 select-none" id="speed-test-section">
+    <div className="w-full max-w-4xl flex flex-col items-center justify-between flex-1 py-2 md:py-4 animate-fade-in h-full min-h-0 select-none mx-auto" id="speed-test-section">
       
-      {/* Modern Status Pill */}
-      <div className={`flex items-center gap-2.5 px-4 py-1.5 rounded-full mb-2 transition-all duration-300 border text-xs font-bold ${badge.color}`}>
-        <div className={`w-2 h-2 rounded-full ${
+      {/* Top Status Pill */}
+      <div className={`flex items-center gap-2.5 px-5 py-2 rounded-full mb-3 transition-all duration-300 border text-xs font-bold ${badge.color}`}>
+        <div className={`w-2.5 h-2.5 rounded-full ${
           status === 'idle' ? 'bg-slate-400' :
           status === 'pinging' ? 'bg-amber-500 animate-ping' :
           status === 'jittering' ? 'bg-indigo-500 animate-ping' :
@@ -366,396 +363,205 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           status === 'uploading' ? 'bg-violet-500 animate-ping' :
           'bg-emerald-600'
         }`} />
-        <span className="tracking-wide uppercase text-[11px] font-extrabold">{badge.label}</span>
+        <span className="tracking-wide uppercase text-xs font-black">{badge.label}</span>
       </div>
 
-      {/* Main Responsive Grid Arena (Download Box, Center Console Box, Upload Box) with Matching Heights & Balanced Alignment */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 items-stretch justify-items-center gap-4 sm:gap-6 w-full max-w-5xl mb-2 sm:mb-4">
+      {/* EXPANSIVE CENTERPIECE: REAL-TIME TELEMETRY GRAPH CONSOLE */}
+      <div className="w-full modern-glass-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-xl my-auto min-h-[360px] sm:min-h-[420px]" id="dashboard-dial">
         
-        {/* DOWNLOAD TELEMETRY BENTO BOX (Emerald) */}
-        <div className={`col-span-1 order-2 xl:order-1 w-full max-w-sm modern-glass-card rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-md h-[270px] xs:h-[290px] sm:h-[310px] xl:h-[330px] transition-all duration-300 ${
-          status === 'downloading' 
-            ? 'ring-2 ring-emerald-500/40 border-emerald-500/60 shadow-lg shadow-emerald-500/10' 
-            : 'hover:border-emerald-300/80'
-        }`}>
-          {/* Top Gradient Edge */}
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-transparent"></div>
+        {/* Top Header & Dual Telemetry Badges */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
           
-          {/* Box Header */}
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
-                <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-              </div>
-              <div>
-                <span className="text-[11px] font-extrabold text-emerald-800 tracking-wider uppercase block">Download Stream</span>
-                <span className="text-[10px] text-slate-400 font-medium">Inbound Bandwidth</span>
-              </div>
+          {/* Header Title */}
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-md shrink-0 transition-colors ${
+              status === 'downloading' ? 'bg-emerald-500 text-white shadow-emerald-500/20' :
+              status === 'uploading' ? 'bg-violet-500 text-white shadow-violet-500/20' :
+              'bg-blue-600 text-white shadow-blue-500/20'
+            }`}>
+              <BarChart2 className="w-5 h-5" />
             </div>
-
-            <div className="flex items-center gap-1.5">
-              {status === 'downloading' ? (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 animate-pulse flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ACTIVE
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm sm:text-base font-black tracking-tight text-slate-900">Real-Time Bandwidth Matrix</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase tracking-widest hidden xs:inline">
+                  Live
                 </span>
-              ) : (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
-                  {downloadVal !== null ? 'LOGGED' : 'IDLE'}
-                </span>
-              )}
+              </div>
+              <span className="text-xs text-slate-400 font-medium">Continuous Edge Inbound / Outbound Stream</span>
             </div>
           </div>
- 
-          {/* Clean Metric Readout */}
-          <div className="flex items-baseline justify-between my-auto pt-2">
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Inbound Transfer Rate</span>
-              <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span id="download-val" className="font-sans text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                  {downloadVal !== null 
-                    ? (unit === 'MB/s' ? (downloadVal / 8).toFixed(1) : downloadVal.toFixed(1)) 
-                    : (status === 'downloading' 
-                      ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
-                      : '--')}
-                </span>
-                <span className="text-xs font-bold text-emerald-600 uppercase">{unit}</span>
-              </div>
-            </div>
-          </div>
- 
-          {/* Dedicated Mini Graph Matrix Structure */}
-          <div className="relative w-full h-24 sm:h-28 bg-slate-50/90 rounded-2xl border border-slate-200/80 p-2 overflow-hidden flex flex-col justify-end">
-            <div className="absolute inset-0 flex flex-col justify-between p-2 pointer-events-none opacity-40">
-              <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">Max</span>
-              </div>
-              <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">50%</span>
-              </div>
-              <div className="border-b border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">0</span>
+
+          {/* Integrated Download & Upload Telemetry Summary Pills */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Download Pill */}
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all ${
+              status === 'downloading' 
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 ring-1 ring-emerald-400/30' 
+                : 'bg-slate-50 border-slate-200/80 text-slate-700'
+            }`}>
+              <Download className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <div className="flex flex-col text-left">
+                <span className="text-[9px] font-bold uppercase text-slate-400">Download</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span id="download-val" className="font-sans text-xs font-black text-slate-900">
+                    {downloadVal !== null 
+                      ? (unit === 'MB/s' ? (downloadVal / 8).toFixed(1) : downloadVal.toFixed(1)) 
+                      : (status === 'downloading' 
+                        ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
+                        : '--')}
+                  </span>
+                  <span className="text-[8px] font-bold text-slate-500">{unit}</span>
+                </div>
               </div>
             </div>
 
-            <svg id="download-sparkline" viewBox="0 0 360 100" className="w-full h-full relative z-10 overflow-visible">
-              <defs>
-                <linearGradient id="boxDnGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
-                </linearGradient>
-              </defs>
-
-              <path 
-                d={downloadBoxGraph.fill} 
-                fill="url(#boxDnGrad)" 
-              />
-              
-              <path 
-                d={downloadBoxGraph.stroke} 
-                fill="none" 
-                stroke={downloadBoxGraph.hasData ? "#10B981" : "#CBD5E1"} 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
-              />
-
-              {downloadBoxGraph.hasData && (status === 'downloading' || status === 'uploading' || status === 'completed') && (
-                <>
-                  <circle 
-                    cx={downloadBoxGraph.lastX} 
-                    cy={downloadBoxGraph.lastY} 
-                    r="4.5" 
-                    fill="#FFFFFF" 
-                    stroke="#10B981" 
-                    strokeWidth="2.5" 
-                  />
-                  {status === 'downloading' && (
-                    <circle 
-                      cx={downloadBoxGraph.lastX} 
-                      cy={downloadBoxGraph.lastY} 
-                      r="8" 
-                      fill="none" 
-                      stroke="#10B981" 
-                      strokeWidth="1.5" 
-                      className="animate-ping" 
-                    />
-                  )}
-                </>
-              )}
-            </svg>
+            {/* Upload Pill */}
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all ${
+              status === 'uploading' 
+                ? 'bg-violet-50 border-violet-300 text-violet-800 ring-1 ring-violet-400/30' 
+                : 'bg-slate-50 border-slate-200/80 text-slate-700'
+            }`}>
+              <Upload className="w-3.5 h-3.5 text-violet-600 shrink-0" />
+              <div className="flex flex-col text-left">
+                <span className="text-[9px] font-bold uppercase text-slate-400">Upload</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span id="upload-val" className="font-sans text-xs font-black text-slate-900">
+                    {uploadVal !== null 
+                      ? (unit === 'MB/s' ? (uploadVal / 8).toFixed(1) : uploadVal.toFixed(1)) 
+                      : (status === 'uploading' 
+                        ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
+                        : '--')}
+                  </span>
+                  <span className="text-[8px] font-bold text-slate-500">{unit}</span>
+                </div>
+              </div>
+            </div>
           </div>
+
         </div>
- 
-        {/* CENTERPIECE: MASTER BANDWIDTH TELEMETRY CONSOLE */}
-        <div className="col-span-1 md:col-span-2 xl:col-span-1 order-1 xl:order-2 w-full max-w-sm modern-glass-card rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-lg h-[270px] xs:h-[290px] sm:h-[310px] xl:h-[330px]" id="dashboard-dial">
-          
-          {/* Top Header of the Box Graph */}
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                status === 'downloading' ? 'bg-emerald-50 text-emerald-600' :
-                status === 'uploading' ? 'bg-violet-50 text-violet-600' :
-                'bg-blue-50 text-blue-600'
-              }`}>
-                <BarChart2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              </div>
-              <div>
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-800 block">Bandwidth Telemetry</span>
-                <span className="text-[10px] text-slate-400 font-medium">Real-time Stream</span>
-              </div>
-            </div>
 
-            <div className="flex items-center gap-1.5">
-              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg ${
-                status === 'downloading' ? 'bg-emerald-100 text-emerald-700 animate-pulse' :
-                status === 'uploading' ? 'bg-violet-100 text-violet-700 animate-pulse' :
-                status === 'pinging' ? 'bg-amber-100 text-amber-700 animate-pulse' :
-                status === 'jittering' ? 'bg-indigo-100 text-indigo-700 animate-pulse' :
-                'bg-slate-100 text-slate-600'
+        {/* Big Digital Speed Cluster & Primary Action */}
+        <div className="flex items-center justify-between my-4 sm:my-6">
+          
+          <div className="flex flex-col">
+            <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Active Bandwidth Transfer</span>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span id="speed-val" className="text-5xl sm:text-6xl md:text-7xl font-sans font-black text-slate-900 tracking-tight">
+                {(status === 'downloading' || status === 'uploading') 
+                  ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
+                  : (status === 'completed' 
+                    ? (unit === 'MB/s' ? ((downloadVal || 0) / 8).toFixed(1) : (downloadVal || 0).toFixed(1)) 
+                    : '0.0')}
+              </span>
+              <span className={`text-sm sm:text-base font-extrabold uppercase tracking-widest ${
+                status === 'downloading' ? 'text-emerald-600' :
+                status === 'uploading' ? 'text-violet-600' :
+                'text-slate-400'
               }`}>
-                {status === 'downloading' ? 'STREAM DOWN' :
-                 status === 'uploading' ? 'STREAM UP' :
-                 status === 'pinging' ? 'PING' :
-                 status === 'jittering' ? 'JITTER' :
-                 'READY'}
+                {unit}
               </span>
             </div>
           </div>
 
-          {/* Large Center Numerical Display */}
-          <div className="flex items-baseline justify-between my-auto pt-2">
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Live Speed</span>
-              <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span id="speed-val" className="font-sans text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                  {(status === 'downloading' || status === 'uploading') 
-                    ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
-                    : (status === 'completed' 
-                      ? (unit === 'MB/s' ? ((downloadVal || 0) / 8).toFixed(1) : (downloadVal || 0).toFixed(1)) 
-                      : '0.0')}
-                </span>
-                <span className={`text-xs font-bold uppercase ${
-                  status === 'downloading' ? 'text-emerald-600' :
-                  status === 'uploading' ? 'text-violet-600' :
-                  'text-slate-500'
-                }`}>
-                  {unit}
-                </span>
-              </div>
-            </div>
-
-            {/* Quick Action Button in Box */}
-            <button 
-              id="dial-go-button"
-              onClick={handleStartTest}
-              disabled={status !== 'idle' && status !== 'completed'}
-              className={`px-3.5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all duration-200 cursor-pointer ${
-                status === 'idle' || status === 'completed'
-                  ? 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-slate-900/20' 
-                  : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-              }`}
-            >
-              {status === 'completed' ? (
-                <>
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Retest</span>
-                </>
-              ) : (
-                <>
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>{status === 'idle' ? 'Start Test' : 'Running...'}</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* BOX GRAPH MATRIX & WAVEFORM AREA */}
-          <div className="relative w-full h-24 sm:h-28 bg-slate-50/90 rounded-2xl border border-slate-200/80 p-2 overflow-hidden flex flex-col justify-end">
-            
-            {/* Background Grid Lines with threshold markings */}
-            <div className="absolute inset-0 flex flex-col justify-between p-2 pointer-events-none opacity-40">
-              <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">100%</span>
-              </div>
-              <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">50%</span>
-              </div>
-              <div className="border-b border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">0</span>
-              </div>
-            </div>
-
-            {/* SVG Wave Spline */}
-            <svg viewBox="0 0 360 100" className="w-full h-full relative z-10 overflow-visible">
-              <defs>
-                <linearGradient id="boxEmeraldGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
-                </linearGradient>
-                <linearGradient id="boxVioletGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.0" />
-                </linearGradient>
-              </defs>
-
-              {/* Area Gradient Fill */}
-              <path 
-                d={centerBoxGraph.fill} 
-                fill={status === 'uploading' ? "url(#boxVioletGrad)" : "url(#boxEmeraldGrad)"} 
-              />
-              
-              {/* Curve Line Stroke */}
-              <path 
-                d={centerBoxGraph.stroke} 
-                fill="none" 
-                stroke={status === 'uploading' ? "#8B5CF6" : (status === 'downloading' ? "#10B981" : "#94A3B8")} 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
-              />
-
-              {/* Glowing Leading Head Dot */}
-              {centerBoxGraph.hasData && (status === 'downloading' || status === 'uploading') && (
-                <>
-                  <circle 
-                    cx={centerBoxGraph.lastX} 
-                    cy={centerBoxGraph.lastY} 
-                    r="4.5" 
-                    fill="#FFFFFF" 
-                    stroke={status === 'uploading' ? "#8B5CF6" : "#10B981"} 
-                    strokeWidth="2.5" 
-                  />
-                  <circle 
-                    cx={centerBoxGraph.lastX} 
-                    cy={centerBoxGraph.lastY} 
-                    r="8" 
-                    fill="none" 
-                    stroke={status === 'uploading' ? "#8B5CF6" : "#10B981"} 
-                    strokeWidth="1.5" 
-                    className="animate-ping" 
-                  />
-                </>
-              )}
-            </svg>
-          </div>
-
+          {/* Primary Action Button */}
+          <button 
+            id="dial-go-button"
+            onClick={handleStartTest}
+            disabled={status !== 'idle' && status !== 'completed'}
+            className={`px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl active:scale-95 transition-all duration-200 cursor-pointer ${
+              status === 'idle' || status === 'completed'
+                ? 'bg-slate-900 text-white hover:bg-slate-800 hover:scale-105 shadow-slate-900/20' 
+                : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+            }`}
+          >
+            {status === 'completed' ? (
+              <>
+                <RotateCcw className="w-4 h-4" />
+                <span>Run Test Again</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 fill-current" />
+                <span>{status === 'idle' ? 'Start Speed Test' : 'Testing Network...'}</span>
+              </>
+            )}
+          </button>
         </div>
- 
-        {/* UPLOAD TELEMETRY BENTO BOX (Violet) */}
-        <div className={`col-span-1 order-3 xl:order-3 w-full max-w-sm modern-glass-card rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden border border-slate-200/90 shadow-md h-[270px] xs:h-[290px] sm:h-[310px] xl:h-[330px] transition-all duration-300 ${
-          status === 'uploading' 
-            ? 'ring-2 ring-violet-500/40 border-violet-500/60 shadow-lg shadow-violet-500/10' 
-            : 'hover:border-violet-300/80'
-        }`}>
-          {/* Top Gradient Edge */}
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-purple-400 to-transparent"></div>
+
+        {/* EXPANSIVE GRAPH WAVEFORM CANVAS */}
+        <div className="relative w-full h-32 sm:h-44 bg-slate-50/90 rounded-2xl border border-slate-200/80 p-3 sm:p-4 overflow-hidden flex flex-col justify-end">
           
-          {/* Box Header */}
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-violet-500/20 shrink-0">
-                <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
-              </div>
-              <div>
-                <span className="text-[11px] font-extrabold text-violet-800 tracking-wider uppercase block">Upload Stream</span>
-                <span className="text-[10px] text-slate-400 font-medium">Outbound Bandwidth</span>
-              </div>
+          {/* Background Grid Lines with threshold markings */}
+          <div className="absolute inset-0 flex flex-col justify-between p-3 sm:p-4 pointer-events-none opacity-40">
+            <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
+              <span className="text-[9px] font-mono text-slate-400 -mt-2">Peak Capacity</span>
             </div>
-
-            <div className="flex items-center gap-1.5">
-              {status === 'uploading' ? (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-violet-100 text-violet-700 animate-pulse flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500"></span> ACTIVE
-                </span>
-              ) : (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">
-                  {uploadVal !== null ? 'LOGGED' : 'IDLE'}
-                </span>
-              )}
+            <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
+              <span className="text-[9px] font-mono text-slate-400 -mt-2">50% Threshold</span>
+            </div>
+            <div className="border-b border-slate-300 w-full flex justify-end">
+              <span className="text-[9px] font-mono text-slate-400 -mt-2">Baseline 0</span>
             </div>
           </div>
- 
-          {/* Clean Metric Readout */}
-          <div className="flex items-baseline justify-between my-auto pt-2">
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Outbound Transfer Rate</span>
-              <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span id="upload-val" className="font-sans text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                  {uploadVal !== null 
-                    ? (unit === 'MB/s' ? (uploadVal / 8).toFixed(1) : uploadVal.toFixed(1)) 
-                    : (status === 'uploading' 
-                      ? (unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1)) 
-                      : '--')}
-                </span>
-                <span className="text-xs font-bold text-violet-600 uppercase">{unit}</span>
-              </div>
-            </div>
-          </div>
- 
-          {/* Dedicated Mini Graph Matrix Structure */}
-          <div className="relative w-full h-24 sm:h-28 bg-slate-50/90 rounded-2xl border border-slate-200/80 p-2 overflow-hidden flex flex-col justify-end">
-            <div className="absolute inset-0 flex flex-col justify-between p-2 pointer-events-none opacity-40">
-              <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">Max</span>
-              </div>
-              <div className="border-b border-dashed border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">50%</span>
-              </div>
-              <div className="border-b border-slate-300 w-full flex justify-end">
-                <span className="text-[8px] font-mono text-slate-400 -mt-2">0</span>
-              </div>
-            </div>
 
-            <svg id="upload-sparkline" viewBox="0 0 360 100" className="w-full h-full relative z-10 overflow-visible">
-              <defs>
-                <linearGradient id="boxUpGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.0" />
-                </linearGradient>
-              </defs>
+          {/* SVG Wave Spline */}
+          <svg id="download-sparkline" viewBox="0 0 600 150" className="w-full h-full relative z-10 overflow-visible">
+            <defs>
+              <linearGradient id="mainEmeraldGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10B981" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+              </linearGradient>
+              <linearGradient id="mainVioletGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
 
-              <path 
-                d={uploadBoxGraph.fill} 
-                fill="url(#boxUpGrad)" 
-              />
-              
-              <path 
-                d={uploadBoxGraph.stroke} 
-                fill="none" 
-                stroke={uploadBoxGraph.hasData ? "#8B5CF6" : "#CBD5E1"} 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
-              />
+            {/* Area Gradient Fill */}
+            <path 
+              d={centerBoxGraph.fill} 
+              fill={status === 'uploading' ? "url(#mainVioletGrad)" : "url(#mainEmeraldGrad)"} 
+            />
+            
+            {/* Curve Line Stroke */}
+            <path 
+              d={centerBoxGraph.stroke} 
+              fill="none" 
+              stroke={status === 'uploading' ? "#8B5CF6" : (status === 'downloading' ? "#10B981" : "#94A3B8")} 
+              strokeWidth="3" 
+              strokeLinecap="round" 
+            />
 
-              {uploadBoxGraph.hasData && (status === 'uploading' || status === 'completed') && (
-                <>
-                  <circle 
-                    cx={uploadBoxGraph.lastX} 
-                    cy={uploadBoxGraph.lastY} 
-                    r="4.5" 
-                    fill="#FFFFFF" 
-                    stroke="#8B5CF6" 
-                    strokeWidth="2.5" 
-                  />
-                  {status === 'uploading' && (
-                    <circle 
-                      cx={uploadBoxGraph.lastX} 
-                      cy={uploadBoxGraph.lastY} 
-                      r="8" 
-                      fill="none" 
-                      stroke="#8B5CF6" 
-                      strokeWidth="1.5" 
-                      className="animate-ping" 
-                    />
-                  )}
-                </>
-              )}
-            </svg>
-          </div>
+            {/* Glowing Leading Head Dot */}
+            {centerBoxGraph.hasData && (status === 'downloading' || status === 'uploading') && (
+              <>
+                <circle 
+                  cx={centerBoxGraph.lastX} 
+                  cy={centerBoxGraph.lastY} 
+                  r="5" 
+                  fill="#FFFFFF" 
+                  stroke={status === 'uploading' ? "#8B5CF6" : "#10B981"} 
+                  strokeWidth="3" 
+                />
+                <circle 
+                  cx={centerBoxGraph.lastX} 
+                  cy={centerBoxGraph.lastY} 
+                  r="9" 
+                  fill="none" 
+                  stroke={status === 'uploading' ? "#8B5CF6" : "#10B981"} 
+                  strokeWidth="1.5" 
+                  className="animate-ping" 
+                />
+              </>
+            )}
+          </svg>
         </div>
- 
+
       </div>
 
       {/* MODERN TELEMETRY SUMMARY DOCK */}
-      <div className="w-full max-w-5xl modern-glass-card rounded-2xl p-3 sm:py-3.5 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-0 items-center justify-items-stretch shadow-sm mt-auto md:mt-2">
+      <div className="w-full max-w-4xl modern-glass-card rounded-2xl p-3 sm:py-3.5 sm:px-6 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-0 items-center justify-items-stretch shadow-sm mt-3">
         
         {/* PING (Latency) */}
         <div className="flex items-center gap-3 col-span-1 px-3 py-1 sm:py-0 border-r border-slate-200/80">
@@ -800,7 +606,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
       {/* COMPLETED SUCCESS CHIP */}
       {status === 'completed' && (
-        <div className="mt-2 flex items-center gap-2 text-xs text-emerald-800 animate-fade-in bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-200 shadow-sm">
+        <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-800 animate-fade-in bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-200 shadow-sm">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span className="font-sans font-bold">Speed test finalized. Results cataloged to history.</span>
         </div>
