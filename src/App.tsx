@@ -132,7 +132,7 @@ export default function App() {
           <div className="flex items-center bg-slate-100/90 p-0.5 rounded-lg border border-slate-200/80 shadow-inner">
             <button
               onClick={() => setUnit('Mbps')}
-              className={`px-3 py-0.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 ${
+              className={`px-3 py-0.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 outline-none focus:outline-none focus:ring-0 select-none ${
                 unit === 'Mbps'
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900'
@@ -142,7 +142,7 @@ export default function App() {
             </button>
             <button
               onClick={() => setUnit('MB/s')}
-              className={`px-3 py-0.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 ${
+              className={`px-3 py-0.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 outline-none focus:outline-none focus:ring-0 select-none ${
                 unit === 'MB/s'
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900'
@@ -163,7 +163,7 @@ export default function App() {
                   key={item.id}
                   id={`nav-desktop-${item.id}`}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
                     isActive 
                       ? 'bg-white text-slate-900 shadow-sm' 
                       : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'

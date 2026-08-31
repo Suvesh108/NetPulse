@@ -64,6 +64,18 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Remove default button & input black focus boxes/outlines across all browsers */
+button, input, select, textarea {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus, button:focus-visible,
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none;
+}
+
 /* Modern Minimal Scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
