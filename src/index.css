@@ -52,56 +52,48 @@
   animation: float-slow 4s ease-in-out infinite;
 }
 
-/* Logo Pulse Animation: Sweeps a luminous beam from left to right within the exact vector pixels */
-@keyframes logo-glow-pulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.25));
-  }
-  50% {
-    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 14px rgba(37, 99, 235, 0.4));
-  }
-}
-
-@keyframes pulse-beam-slide {
+/* Traveling Glowing Pulse Dot Animation (Left Entry to Right Exit) */
+@keyframes dot-pulse-travel {
   0% {
-    transform: translateX(-120%);
+    left: -8%;
     opacity: 0;
+    transform: translateY(-50%) scale(0.6);
   }
-  25% {
+  15% {
     opacity: 1;
+    transform: translateY(-50%) scale(1.1);
   }
-  75% {
+  85% {
     opacity: 1;
+    transform: translateY(-50%) scale(1.1);
   }
   100% {
-    transform: translateX(120%);
+    left: 108%;
     opacity: 0;
+    transform: translateY(-50%) scale(0.6);
   }
 }
 
-.logo-pulse-active {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  animation: logo-glow-pulse 1.3s ease-in-out infinite;
+@keyframes dot-core-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px 2px rgba(37, 99, 235, 0.9), 0 0 12px 4px rgba(59, 130, 246, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 10px 3px rgba(37, 99, 235, 1), 0 0 18px 6px rgba(96, 165, 250, 0.85);
+  }
 }
 
-.logo-pulse-beam {
+.traveling-pulse-dot {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background-color: #2563EB;
+  border: 1.5px solid #FFFFFF;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent 0%, rgba(96, 165, 250, 0.9) 35%, #FFFFFF 50%, rgba(96, 165, 250, 0.9) 65%, transparent 100%);
-  -webkit-mask-image: url('/logo-mark.png');
-  mask-image: url('/logo-mark.png');
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  animation: pulse-beam-slide 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  mix-blend-mode: color-dodge;
+  animation: dot-pulse-travel 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite, dot-core-glow 0.8s ease-in-out infinite;
+  z-index: 20;
 }
 
 html, body {
