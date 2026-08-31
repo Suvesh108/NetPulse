@@ -398,14 +398,14 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const downloadSpline = generateCloudflareSpline(displayDownloadHistory, downloadVal, 460, 64);
   const uploadSpline = generateCloudflareSpline(displayUploadHistory, uploadVal, 460, 64);
 
-  // Network Quality Score Calculations
-  const effectiveDown = downloadVal !== null ? downloadVal : (status === 'downloading' ? currentSpeed : 0);
-  const effectiveUp = uploadVal !== null ? uploadVal : (status === 'uploading' ? currentSpeed : 0);
+  // Network Quality Score Calculations (Only displayed when status === 'completed')
+  const effectiveDown = downloadVal !== null ? downloadVal : 0;
+  const effectiveUp = uploadVal !== null ? uploadVal : 0;
   const effectivePing = pingVal !== null ? pingVal : 0;
   const effectiveJitter = jitterVal !== null ? jitterVal : 0;
 
   const getVideoStreamingScore = () => {
-    if (status === 'idle') return { label: 'Ready', color: 'text-slate-500 bg-slate-100', detail: '4K / 1080p' };
+    if (status !== 'completed') return { label: '-', color: 'text-slate-400 bg-slate-100', detail: status === 'idle' ? 'Pending test' : 'Calculating...' };
     if (effectiveDown >= 25) return { label: 'Great', color: 'text-emerald-700 bg-emerald-100/90', detail: '4K Ultra HD' };
     if (effectiveDown >= 10) return { label: 'Good', color: 'text-teal-700 bg-teal-100/90', detail: '1080p Full HD' };
     if (effectiveDown >= 4) return { label: 'Average', color: 'text-amber-700 bg-amber-100/90', detail: '720p HD' };
@@ -413,7 +413,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   };
 
   const getOnlineGamingScore = () => {
-    if (status === 'idle') return { label: 'Ready', color: 'text-slate-500 bg-slate-100', detail: 'Low Latency' };
+    if (status !== 'completed') return { label: '-', color: 'text-slate-400 bg-slate-100', detail: status === 'idle' ? 'Pending test' : 'Calculating...' };
     if (effectivePing > 0 && effectivePing <= 30 && effectiveJitter <= 5) return { label: 'Great', color: 'text-emerald-700 bg-emerald-100/90', detail: 'Ultra-low ping' };
     if (effectivePing > 0 && effectivePing <= 60 && effectiveJitter <= 15) return { label: 'Good', color: 'text-teal-700 bg-teal-100/90', detail: 'Smooth gaming' };
     if (effectivePing > 0 && effectivePing <= 110) return { label: 'Average', color: 'text-amber-700 bg-amber-100/90', detail: 'Casual multiplayer' };
@@ -421,7 +421,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   };
 
   const getVideoChattingScore = () => {
-    if (status === 'idle') return { label: 'Ready', color: 'text-slate-500 bg-slate-100', detail: 'Conference calls' };
+    if (status !== 'completed') return { label: '-', color: 'text-slate-400 bg-slate-100', detail: status === 'idle' ? 'Pending test' : 'Calculating...' };
     if (effectiveUp >= 5 && effectivePing > 0 && effectivePing <= 50) return { label: 'Great', color: 'text-emerald-700 bg-emerald-100/90', detail: 'HD multi-person' };
     if (effectiveUp >= 2 && effectivePing > 0 && effectivePing <= 90) return { label: 'Good', color: 'text-teal-700 bg-teal-100/90', detail: 'Clear 720p' };
     if (effectiveUp >= 0.8) return { label: 'Average', color: 'text-amber-700 bg-amber-100/90', detail: 'Standard calls' };
@@ -505,7 +505,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   return (
     <div className="w-full flex flex-col items-center gap-2.5 select-none" id="speed-test-section">
       
-      {/* CLOUDFLARE SPEEDOMETER HERO CONSOLE ("Your Internet Speed") */}
+      {/* 1. CLOUDFLARE SPEEDOMETER HERO CONSOLE ("Your Internet Speed") */}
       <div className="w-full max-w-7xl 2xl:max-w-[1600px] bg-white rounded-xl p-3 sm:p-4 flex flex-col border border-slate-200 shadow-sm" id="dashboard-dial">
         
         {/* Header Title */}
@@ -745,68 +745,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
       </div>
 
-      {/* NETWORK QUALITY SCORE STRIP */}
-      <div className="w-full max-w-7xl 2xl:max-w-[1600px] bg-white rounded-xl p-2.5 sm:p-3 border border-slate-200 shadow-sm">
-        <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 mb-1.5">
-          <div className="flex items-center gap-1.5">
-            <h3 className="text-xs font-bold text-[#18181B]">Network Quality Score</h3>
-            <Info className="w-3 h-3 text-slate-400" />
-          </div>
-          <span className="text-[10px] text-blue-600 font-medium">AIM Assessment</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {/* Streaming */}
-          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200/70">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                <Tv className="w-3.5 h-3.5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-800">Video Streaming</span>
-                <span className="text-[8px] text-slate-400">{streamScore.detail}</span>
-              </div>
-            </div>
-            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shrink-0 ${streamScore.color}`}>
-              {streamScore.label}
-            </span>
-          </div>
-
-          {/* Gaming */}
-          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200/70">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                <Gamepad2 className="w-3.5 h-3.5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-800">Online Gaming</span>
-                <span className="text-[8px] text-slate-400">{gameScore.detail}</span>
-              </div>
-            </div>
-            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shrink-0 ${gameScore.color}`}>
-              {gameScore.label}
-            </span>
-          </div>
-
-          {/* Video Chat */}
-          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200/70">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
-                <Video className="w-3.5 h-3.5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-800">Video Chatting</span>
-                <span className="text-[8px] text-slate-400">{chatScore.detail}</span>
-              </div>
-            </div>
-            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shrink-0 ${chatScore.color}`}>
-              {chatScore.label}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* DETAILED MEASUREMENT BREAKDOWNS (3 Columns) */}
+      {/* 2. DETAILED MEASUREMENT BREAKDOWNS (3 Columns) */}
       <div className="w-full max-w-7xl 2xl:max-w-[1600px] grid grid-cols-1 md:grid-cols-3 gap-2.5">
         
         {/* COLUMN 1: UPLOAD MEASUREMENTS */}
@@ -900,7 +839,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               <div className="flex items-center justify-between text-[10px]">
                 <span className="font-bold text-slate-800">Packet Delivery</span>
                 <span className="font-mono text-[9px] font-bold text-emerald-700">
-                  {packetLossVal !== null ? `${(100 - packetLossVal).toFixed(1)}% (${packetLossVal.toFixed(1)}% drop)` : 'Probing...'}
+                  {packetLossVal !== null ? `${(100 - packetLossVal).toFixed(1)}% (${packetLossVal.toFixed(1)}% loss)` : 'Probing...'}
                 </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -915,6 +854,67 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           </div>
         </div>
 
+      </div>
+
+      {/* 3. NETWORK QUALITY SCORE STRIP (At Bottom) */}
+      <div className="w-full max-w-7xl 2xl:max-w-[1600px] bg-white rounded-xl p-2.5 sm:p-3 border border-slate-200 shadow-sm">
+        <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 mb-1.5">
+          <div className="flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-[#18181B]">Network Quality Score</h3>
+            <Info className="w-3 h-3 text-slate-400" />
+          </div>
+          <span className="text-[10px] text-blue-600 font-medium">AIM Assessment</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {/* Streaming */}
+          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200/70">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <Tv className="w-3.5 h-3.5" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-slate-800">Video Streaming</span>
+                <span className="text-[8px] text-slate-400">{streamScore.detail}</span>
+              </div>
+            </div>
+            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shrink-0 ${streamScore.color}`}>
+              {streamScore.label}
+            </span>
+          </div>
+
+          {/* Gaming */}
+          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200/70">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                <Gamepad2 className="w-3.5 h-3.5" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-slate-800">Online Gaming</span>
+                <span className="text-[8px] text-slate-400">{gameScore.detail}</span>
+              </div>
+            </div>
+            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shrink-0 ${gameScore.color}`}>
+              {gameScore.label}
+            </span>
+          </div>
+
+          {/* Video Chat */}
+          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200/70">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+                <Video className="w-3.5 h-3.5" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-slate-800">Video Chatting</span>
+                <span className="text-[8px] text-slate-400">{chatScore.detail}</span>
+              </div>
+            </div>
+            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shrink-0 ${chatScore.color}`}>
+              {chatScore.label}
+            </span>
+          </div>
+        </div>
       </div>
 
     </div>
