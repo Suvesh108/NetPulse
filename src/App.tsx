@@ -95,9 +95,9 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
       
-      {/* Clean Transparent Header */}
-      <header className="w-full shrink-0 bg-transparent z-50 pt-2 sm:pt-3 px-4 sm:px-6 transition-all">
-        <div className="w-full max-w-7xl 2xl:max-w-[1600px] mx-auto h-11 sm:h-12 flex items-center justify-between">
+      {/* Clean Transparent Header tucked inward */}
+      <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-6 sm:px-10 md:px-14 transition-all">
+        <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 flex items-center justify-between px-2 sm:px-4">
           
           {/* Brand Logo with Live Status Node */}
           <div className="flex items-center gap-2">
@@ -175,7 +175,7 @@ export default function App() {
       </header>
 
       {/* Main Responsive Content Arena */}
-      <main className="flex-1 flex flex-col items-center justify-start p-3 sm:p-4 md:px-6 relative z-10 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto pb-16 md:pb-4">
+      <main className="flex-1 flex flex-col items-center justify-start p-2.5 sm:p-3.5 md:px-6 relative z-10 w-full max-w-7xl 2xl:max-w-[1500px] mx-auto pb-6 md:pb-4">
         {renderTabContent()}
       </main>
 
