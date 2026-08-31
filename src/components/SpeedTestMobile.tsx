@@ -83,45 +83,45 @@ export default function SpeedTestMobile({
         
         {/* Top Edge Server Node Meta */}
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 text-[11px]">
-          <div className="flex items-center gap-1.5 truncate max-w-[200px]">
+          <div className="flex items-center gap-1.5 truncate max-w-[210px]">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             <span className="font-bold text-slate-800 truncate">{activeServerName}</span>
           </div>
-          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200/60">
+          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200/60 shrink-0">
             {settings.routingProtocol === 'http3-quic' ? 'QUIC' : 'Anycast'}
           </span>
         </div>
 
         {/* Big Speed Readout */}
-        <div className="flex flex-col items-center justify-center py-2 text-center relative">
+        <div className="flex flex-col items-center justify-center py-1 text-center relative">
           
           {/* Status Pill */}
           <div className="mb-1">
             {status === 'idle' && (
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ready to Test</span>
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">READY TO TEST</span>
             )}
             {status === 'pinging' && (
-              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/80 animate-pulse">
+              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80 animate-pulse">
                 Probing Latency...
               </span>
             )}
             {status === 'jittering' && (
-              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/80 animate-pulse">
+              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/80 animate-pulse">
                 Measuring Jitter...
               </span>
             )}
             {status === 'downloading' && (
-              <span className="text-[10px] font-bold text-[#F6821F] bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200/80 animate-pulse">
+              <span className="text-[10px] font-bold text-[#F6821F] bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200/80 animate-pulse">
                 Testing Inbound Throughput...
               </span>
             )}
             {status === 'uploading' && (
-              <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/80 animate-pulse">
+              <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200/80 animate-pulse">
                 Testing Outbound Throughput...
               </span>
             )}
             {status === 'packet-probing' && (
-              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/80 animate-pulse">
+              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200/80 animate-pulse">
                 Analyzing Packet Stability...
               </span>
             )}
@@ -143,7 +143,7 @@ export default function SpeedTestMobile({
           </div>
 
           {/* Mini Live Spline Waveform */}
-          <div className="w-full h-12 mt-1 relative overflow-hidden">
+          <div className="w-full h-14 mt-1 relative overflow-hidden">
             <svg 
               className="w-full h-full" 
               viewBox="0 0 320 60" 
@@ -177,7 +177,7 @@ export default function SpeedTestMobile({
             <button
               id="mobile-start-test-btn"
               onClick={onStartTest}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm shadow-md shadow-blue-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm shadow-md shadow-blue-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               {isCompleted ? <RotateCcw className="w-4 h-4" /> : <Play className="w-4 h-4 fill-white" />}
               <span>{isCompleted ? 'TEST AGAIN' : 'START SPEED TEST'}</span>
@@ -186,7 +186,7 @@ export default function SpeedTestMobile({
             <button
               id="mobile-cancel-test-btn"
               onClick={onCancelTest}
-              className="w-full py-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-sm active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-sm active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></div>
               <span>CANCEL TEST</span>
@@ -208,8 +208,8 @@ export default function SpeedTestMobile({
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-1">
-            <span className="font-sans font-black text-2xl text-slate-900">
-              {downloadVal !== null ? (downloadVal / factor).toFixed(1) : '-'}
+            <span className={`font-sans font-black text-2xl ${downloadVal !== null ? 'text-slate-900' : 'text-slate-300'}`}>
+              {downloadVal !== null ? (downloadVal / factor).toFixed(1) : '--'}
             </span>
             <span className="text-[10px] font-bold text-slate-400">{unit}</span>
           </div>
@@ -224,8 +224,8 @@ export default function SpeedTestMobile({
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-1">
-            <span className="font-sans font-black text-2xl text-slate-900">
-              {uploadVal !== null ? (uploadVal / factor).toFixed(1) : '-'}
+            <span className={`font-sans font-black text-2xl ${uploadVal !== null ? 'text-slate-900' : 'text-slate-300'}`}>
+              {uploadVal !== null ? (uploadVal / factor).toFixed(1) : '--'}
             </span>
             <span className="text-[10px] font-bold text-slate-400">{unit}</span>
           </div>
@@ -241,11 +241,13 @@ export default function SpeedTestMobile({
           </div>
           <div className="mt-2 flex items-baseline justify-between">
             <div className="flex items-baseline gap-0.5">
-              <span className="font-sans font-black text-2xl text-slate-900">{pingVal !== null ? pingVal : '-'}</span>
+              <span className={`font-sans font-black text-2xl ${pingVal !== null ? 'text-slate-900' : 'text-slate-300'}`}>
+                {pingVal !== null ? pingVal : '--'}
+              </span>
               <span className="text-[10px] text-amber-600 font-bold">ms</span>
             </div>
             <span className="text-[10px] text-indigo-600 font-bold">
-              {jitterVal !== null ? `±${jitterVal}ms` : '-'}
+              {jitterVal !== null ? `±${jitterVal}ms` : '--'}
             </span>
           </div>
         </div>
@@ -260,8 +262,8 @@ export default function SpeedTestMobile({
           </div>
           <div className="mt-2 flex items-baseline justify-between">
             <div className="flex items-baseline gap-0.5">
-              <span className="font-sans font-black text-2xl text-slate-900">
-                {packetLossVal !== null ? packetLossVal.toFixed(1) : '-'}
+              <span className={`font-sans font-black text-2xl ${packetLossVal !== null ? 'text-slate-900' : 'text-slate-300'}`}>
+                {packetLossVal !== null ? packetLossVal.toFixed(1) : '--'}
               </span>
               <span className="text-[10px] text-blue-600 font-bold">%</span>
             </div>
