@@ -112,9 +112,9 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-[#F8FAFC] modern-grid-bg text-[#0F172A] relative flex flex-col font-sans selection:bg-blue-500/10 selection:text-blue-600">
       
-      {/* Clean Transparent Header tucked inward */}
-      <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-8 sm:px-12 md:px-16 transition-all">
-        <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 relative flex items-center justify-between px-4 sm:px-6">
+      {/* Clean Transparent Header */}
+      <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-3 sm:px-8 md:px-16 transition-all">
+        <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 relative flex items-center justify-between px-1 sm:px-4 md:px-6">
           
           {/* Standalone Transparent Infinity Pulse Logo Mark + Text (Left) */}
           <div 
@@ -125,18 +125,18 @@ export default function App() {
             <img 
               src="/logo-mark.png" 
               alt="Speed Test Logo" 
-              className="h-6 sm:h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              className="h-5 sm:h-6 md:h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
-            <span className="font-sans text-sm sm:text-base font-black tracking-tight text-slate-900 select-none">
+            <span className="font-sans text-xs sm:text-sm md:text-base font-black tracking-tight text-slate-900 select-none">
               Speed Test
             </span>
           </div>
 
-          {/* Unit Selector Pill (Centered in Navbar) */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center bg-slate-100/90 p-0.5 rounded-lg border border-slate-200/80 shadow-inner z-10">
+          {/* Unit Selector Pill (Right on Mobile, Mathematically Centered on Desktop) */}
+          <div className="md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center bg-slate-100/90 p-0.5 rounded-lg border border-slate-200/80 shadow-inner z-10 shrink-0">
             <button
               onClick={() => setUnit('Mbps')}
-              className={`px-3 py-0.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 outline-none focus:outline-none focus:ring-0 select-none ${
+              className={`px-2.5 sm:px-3 py-0.5 rounded-md text-[11px] sm:text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 outline-none focus:outline-none focus:ring-0 select-none ${
                 unit === 'Mbps'
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900'
@@ -146,7 +146,7 @@ export default function App() {
             </button>
             <button
               onClick={() => setUnit('MB/s')}
-              className={`px-3 py-0.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 outline-none focus:outline-none focus:ring-0 select-none ${
+              className={`px-2.5 sm:px-3 py-0.5 rounded-md text-[11px] sm:text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1 outline-none focus:outline-none focus:ring-0 select-none ${
                 unit === 'MB/s'
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-900'
@@ -156,7 +156,7 @@ export default function App() {
             </button>
           </div>
 
-          {/* Desktop Navigation Switcher (Right) */}
+          {/* Desktop Navigation Switcher (Right on Desktop) */}
           <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-0.5 rounded-lg border border-slate-200/80 z-10">
             {navItems.map((item) => {
               const IconComp = item.icon;
