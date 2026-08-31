@@ -115,8 +115,8 @@ export default function App() {
           
           {/* Brand Logo with Live Status Node */}
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-sm shadow-blue-500/20 group cursor-pointer transition-transform hover:scale-105 active:scale-95">
-              <Zap className="w-3.5 h-3.5 fill-white/20 transition-transform group-hover:rotate-12 duration-300" />
+            <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center shadow-sm shadow-blue-500/20 group cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-white border border-slate-200/90">
+              <img src="/logo.jpg" alt="NetPulse Infinity Pulse Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex items-center gap-1.5">
               <span className="font-sans text-sm sm:text-base font-black tracking-tight text-slate-900">
