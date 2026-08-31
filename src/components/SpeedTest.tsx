@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw, ArrowDown, ArrowUp, Tv, Gamepad2, Video, Info, ShieldCheck, Share2, Copy, Check, Clock } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
+import SpeedTestMobile from './SpeedTestMobile';
 
 interface SpeedTestProps {
   settings: SimulationSettings;
@@ -520,7 +521,37 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-2.5 sm:gap-3 select-none" id="speed-test-section">
+    <>
+      {/* 1. MOBILE-FIRST SPEED TEST INTERFACE (Visible on mobile screens < md) */}
+      <SpeedTestMobile
+        status={status}
+        currentSpeed={currentSpeed}
+        downloadVal={downloadVal}
+        uploadVal={uploadVal}
+        pingVal={pingVal}
+        jitterVal={jitterVal}
+        packetLossVal={packetLossVal}
+        packetsReceived={packetsReceived}
+        packetsTotal={packetsTotal}
+        downloadSpeedHistory={downloadSpeedHistory}
+        uploadSpeedHistory={uploadSpeedHistory}
+        unit={unit}
+        factor={factor}
+        settings={settings}
+        activeServerName={activeServerName}
+        measuredTime={measuredTime}
+        copiedLink={copiedLink}
+        onStartTest={handleStartTest}
+        onCancelTest={() => {}}
+        onCopyResults={handleCopyLink}
+        generateCloudflareSpline={generateCloudflareSpline}
+        calcVideoScore={getVideoStreamingScore}
+        calcGamingScore={getOnlineGamingScore}
+        calcChatScore={getVideoChattingScore}
+      />
+
+      {/* 2. DESKTOP SPEED TEST DASHBOARD (Preserved 100% untouched for desktop >= md) */}
+      <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto hidden md:flex flex-col gap-2 pb-1 flex-1 min-h-0 select-none animate-fade-in" id="dashboard-speed-section">
       
       {/* 1. CLOUDFLARE SPEEDOMETER HERO CONSOLE ("Your Internet Speed") */}
       <div className="w-full max-w-7xl 2xl:max-w-[1500px] bg-white rounded-xl p-3.5 sm:p-4.5 flex flex-col border border-slate-200 shadow-sm" id="dashboard-dial">
@@ -935,5 +966,6 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       </div>
 
     </div>
-  );
+  </>
+);
 }

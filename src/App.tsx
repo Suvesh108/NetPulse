@@ -200,8 +200,8 @@ export default function App() {
       </main>
 
       {/* Floating Bottom Navigation Bar for Mobile & Tablet */}
-      <div className="md:hidden fixed bottom-3 inset-x-4 z-50 animate-fade-in">
-        <nav className="mx-auto max-w-sm bg-white/90 border border-slate-200/90 backdrop-blur-2xl rounded-2xl p-1 flex items-center justify-around shadow-xl shadow-slate-900/5">
+      <div className="md:hidden fixed bottom-3 inset-x-3 z-50 animate-fade-in pointer-events-none">
+        <nav className="mx-auto max-w-sm bg-white/95 border border-slate-200/90 backdrop-blur-2xl rounded-2xl p-1.5 flex items-center justify-around shadow-2xl shadow-slate-900/10 pointer-events-auto">
           {navItems.map((item) => {
             const IconComp = item.icon;
             const isActive = activeTab === item.id;
@@ -211,22 +211,24 @@ export default function App() {
                 key={item.id}
                 id={`nav-mobile-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200 cursor-pointer relative ${
+                className={`flex-1 flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition-all duration-200 cursor-pointer relative outline-none focus:outline-none focus:ring-0 select-none ${
                   isActive ? 'text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
-                <div className={`p-1 rounded-lg transition-all ${
+                <div className={`p-1.5 rounded-lg transition-all ${
                   isActive 
-                    ? (item.id === 'speed' ? 'bg-blue-50 text-blue-600' : item.id === 'history' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-800')
+                    ? (item.id === 'speed' ? 'bg-blue-50 text-blue-600 shadow-xs' : item.id === 'history' ? 'bg-indigo-50 text-indigo-600 shadow-xs' : 'bg-slate-100 text-slate-800 shadow-xs')
                     : 'bg-transparent text-slate-400'
                 }`}>
                   <IconComp className="w-4 h-4 shrink-0" />
                 </div>
-                <span className="text-[9px] uppercase tracking-wider font-semibold">
+                <span className="text-[9px] uppercase tracking-wider font-extrabold">
                   {item.label}
                 </span>
                 {item.badge !== undefined && (
-                  <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-indigo-500"></span>
+                  <span className="absolute top-1 right-1/4 min-w-4 h-4 px-1 rounded-full bg-indigo-600 text-[9px] font-bold text-white flex items-center justify-center font-mono shadow-xs">
+                    {item.badge}
+                  </span>
                 )}
               </button>
             );
