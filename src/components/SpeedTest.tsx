@@ -7,16 +7,12 @@ interface SpeedTestProps {
   settings: SimulationSettings;
   onUpdateSettings: (settings: SimulationSettings) => void;
   onTestComplete: (result: SpeedTestResult) => void;
-  onStatusChange?: (status: TestStatus) => void;
+  onTestingChange?: (isTesting: boolean) => void;
   unit?: 'Mbps' | 'MB/s';
 }
 
-export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, onStatusChange, unit = 'Mbps' }: SpeedTestProps) {
+export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, onTestingChange, unit = 'Mbps' }: SpeedTestProps) {
   const [status, setStatus] = useState<TestStatus>('idle');
-
-  useEffect(() => {
-    onStatusChange?.(status);
-  }, [status, onStatusChange]);
   const [currentSpeed, setCurrentSpeed] = useState<number>(0);
   const [downloadVal, setDownloadVal] = useState<number | null>(null);
   const [uploadVal, setUploadVal] = useState<number | null>(null);
@@ -41,6 +37,11 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const elapsedRef = useRef(0);
   const timerFinishedRef = useRef(false);
   const finalResultsRef = useRef<any>(null);
+
+  // Broadcast testing lifecycle to App / Navbar Logo
+  useEffect(() => {
+    onTestingChange?.(status !== 'idle' && status !== 'completed');
+  }, [status, onTestingChange]);
 
   // Safe Cleanup
   useEffect(() => {
