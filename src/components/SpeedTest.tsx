@@ -7,10 +7,11 @@ interface SpeedTestProps {
   settings: SimulationSettings;
   onUpdateSettings: (settings: SimulationSettings) => void;
   onTestComplete: (result: SpeedTestResult) => void;
+  onTestingStatusChange?: (isTesting: boolean) => void;
   unit?: 'Mbps' | 'MB/s';
 }
 
-export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, unit = 'Mbps' }: SpeedTestProps) {
+export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, onTestingStatusChange, unit = 'Mbps' }: SpeedTestProps) {
   const [status, setStatus] = useState<TestStatus>('idle');
   const [currentSpeed, setCurrentSpeed] = useState<number>(0);
   const [downloadVal, setDownloadVal] = useState<number | null>(null);
@@ -36,6 +37,12 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const elapsedRef = useRef(0);
   const timerFinishedRef = useRef(false);
   const finalResultsRef = useRef<any>(null);
+
+  // Sync testing status with parent
+  useEffect(() => {
+    const isRunning = status !== 'idle' && status !== 'completed';
+    onTestingStatusChange?.(isRunning);
+  }, [status, onTestingStatusChange]);
 
   // Safe Cleanup
   useEffect(() => {

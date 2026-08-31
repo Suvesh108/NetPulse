@@ -9,6 +9,7 @@ import { SpeedTestResult, SimulationSettings } from './types';
 export default function App() {
   const [activeTab, setActiveTab] = useState<'speed' | 'history' | 'settings'>('speed');
   const [unit, setUnit] = useState<'Mbps' | 'MB/s'>('Mbps');
+  const [isTesting, setIsTesting] = useState(false);
   
   const [historyResults, setHistoryResults] = useState<SpeedTestResult[]>(() => {
     try {
@@ -90,6 +91,7 @@ export default function App() {
             settings={settings} 
             onUpdateSettings={setSettings} 
             onTestComplete={handleTestComplete}
+            onTestingStatusChange={setIsTesting}
             unit={unit}
           />
         );
@@ -114,15 +116,14 @@ export default function App() {
       <header className="w-full shrink-0 bg-transparent z-50 pt-2.5 sm:pt-3 px-8 sm:px-12 md:px-16 transition-all">
         <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto h-11 sm:h-12 flex items-center justify-between px-4 sm:px-6">
           
-          {/* Standalone Transparent Infinity Pulse Logo Mark */}
+          {/* Standalone Transparent Infinity Pulse Logo Mark with live active test animation */}
           <div 
             onClick={() => setActiveTab('speed')} 
             className="flex items-center group cursor-pointer"
             title="NetPulse Speed Test"
           >
-            <img 
-              src="/logo-mark.png" 
-              alt="NetPulse Infinity Pulse Logo" 
+            <InfinityPulseLogo 
+              isTesting={isTesting}
               className="h-6 sm:h-7 md:h-7.5 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </div>
