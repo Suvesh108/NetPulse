@@ -9,6 +9,7 @@ import { SpeedTestResult, SimulationSettings } from './types';
 export default function App() {
   const [activeTab, setActiveTab] = useState<'speed' | 'history' | 'settings'>('speed');
   const [unit, setUnit] = useState<'Mbps' | 'MB/s'>('Mbps');
+  const [isTesting, setIsTesting] = useState(false);
   
   const [historyResults, setHistoryResults] = useState<SpeedTestResult[]>(() => {
     try {
@@ -90,6 +91,7 @@ export default function App() {
             settings={settings} 
             onUpdateSettings={setSettings} 
             onTestComplete={handleTestComplete}
+            onTestingStateChange={setIsTesting}
             unit={unit}
           />
         );
@@ -123,7 +125,9 @@ export default function App() {
             <img 
               src="/logo-mark.png" 
               alt="Speed Test Logo" 
-              className="h-6 sm:h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              className={`h-6 sm:h-7 w-auto object-contain transition-all duration-300 group-hover:scale-105 ${
+                isTesting ? 'animate-logo-pulse' : ''
+              }`} 
             />
             <span className="font-sans text-sm sm:text-base font-black tracking-tight text-slate-900 select-none">
               Speed Test
