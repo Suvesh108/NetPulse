@@ -1,0 +1,36 @@
+name: Release NetPulse APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: NetPulse ${{ github.ref_name }}
+          body: |
+            ## 🚀 NetPulse ${{ github.ref_name }}
+            
+            ### 📦 Download Assets
+            - **Android APK (Direct Install)**: `NetPulse-v0.1.apk`
+            
+            ### ✨ Features
+            - Native mobile layout built for Android touch displays.
+            - Real-time Cloudflare Anycast/QUIC throughput testing.
+            - Low-latency Ping, Jitter, Packet Loss, and Bufferbloat metrics.
+            - Network Quality Scores for 4K Video Streaming, Online Gaming, and Video Chatting.
+          files: |
+            NetPulse-v0.1.apk
+            netpulse.apk
