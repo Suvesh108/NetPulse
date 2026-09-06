@@ -157,19 +157,19 @@ export default function SpeedTestMobile({
     }[color];
 
     return (
-      <div className="flex flex-col gap-0.5 py-1.5 border-b border-slate-100 last:border-0">
+      <div className="flex flex-col gap-0.5 py-1.5 border-b border-slate-100 dark:border-slate-800/80 last:border-0">
         <div className="flex items-center justify-between text-[11px]">
           <div className="flex items-center gap-1">
-            <span className="font-bold text-slate-800 truncate text-[11px]">{title}</span>
-            <span className="text-[9px] text-slate-400 font-mono">({pctComplete})</span>
+            <span className="font-bold text-slate-800 dark:text-slate-200 truncate text-[11px]">{title}</span>
+            <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">({pctComplete})</span>
           </div>
-          <span className={`font-mono text-[11px] font-black ${valMbps !== null ? colorClasses.text : 'text-slate-300'}`}>
+          <span className={`font-mono text-[11px] font-black ${valMbps !== null ? colorClasses.text : 'text-slate-300 dark:text-slate-700'}`}>
             {valMbps !== null ? `${(valMbps / factor).toFixed(1)} ${unit}` : '--'}
           </span>
         </div>
 
-        <div className="relative w-full h-3.5 bg-slate-100/80 rounded overflow-hidden flex items-center px-1">
-          <div className="absolute inset-x-2 flex justify-between text-[7px] font-mono text-slate-400 pointer-events-none opacity-40">
+        <div className="relative w-full h-3.5 bg-slate-100/80 dark:bg-slate-800/80 rounded overflow-hidden flex items-center px-1">
+          <div className="absolute inset-x-2 flex justify-between text-[7px] font-mono text-slate-400 dark:text-slate-500 pointer-events-none opacity-40">
             <span>0</span>
             <span>20M</span>
             <span>40M</span>

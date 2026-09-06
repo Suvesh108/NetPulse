@@ -22,7 +22,7 @@ interface ReleaseInfo {
 }
 
 export default function InAppUpdater() {
-  const CURRENT_VERSION = 'v0.6';
+  const CURRENT_VERSION = 'v0.7';
   const [checking, setChecking] = useState(false);
   const [release, setRelease] = useState<ReleaseInfo | null>(null);
   const [hasUpdate, setHasUpdate] = useState(false);
@@ -46,7 +46,7 @@ export default function InAppUpdater() {
       }
 
       const data = await response.json();
-      const latestTag = data.tag_name || 'v0.6';
+      const latestTag = data.tag_name || 'v0.7';
       
       const apkAsset = data.assets?.find((a: any) => a.name.endsWith('.apk'));
       const apkUrl = apkAsset?.browser_download_url || `https://github.com/Suvesh108/NetPulse/releases/download/${latestTag}/NetPulse-${latestTag}.apk`;
@@ -55,7 +55,7 @@ export default function InAppUpdater() {
       setRelease({
         tag_name: latestTag,
         name: data.name || `NetPulse ${latestTag}`,
-        body: data.body || '• Circular Infinity Pulse Vector Ribbon brand logo\n• Refined midnight OLED & crisp light mode theme sync\n• In-App Internal APK self-updater\n• Multi-Server CDN benchmark & live oscilloscope',
+        body: data.body || '• Midnight dark launcher disc & adaptive icon plate fix\n• Tailwind CSS v4 class-based dark & light mode synchronization\n• High-contrast header brand typography\n• In-App Internal APK self-updater',
         published_at: data.published_at ? new Date(data.published_at).toLocaleDateString() : 'Recent',
         apkUrl,
         apkSize
@@ -72,11 +72,11 @@ export default function InAppUpdater() {
     } catch (err: any) {
       console.warn('Update check note:', err.message);
       setRelease({
-        tag_name: 'v0.6',
-        name: 'NetPulse v0.6',
-        body: '• Circular Infinity Pulse Vector Ribbon brand logo\n• Refined midnight OLED & crisp light mode theme sync\n• In-App Internal APK self-updater\n• Multi-Server CDN benchmark & live oscilloscope',
+        tag_name: 'v0.7',
+        name: 'NetPulse v0.7',
+        body: '• Midnight dark launcher disc & adaptive icon plate fix\n• Tailwind CSS v4 class-based dark & light mode synchronization\n• High-contrast header brand typography\n• In-App Internal APK self-updater',
         published_at: new Date().toLocaleDateString(),
-        apkUrl: 'https://github.com/Suvesh108/NetPulse/releases/download/v0.6/NetPulse-v0.6.apk',
+        apkUrl: 'https://github.com/Suvesh108/NetPulse/releases/download/v0.7/NetPulse-v0.7.apk',
         apkSize: 4756613
       });
       setHasUpdate(false);
@@ -88,7 +88,7 @@ export default function InAppUpdater() {
 
   // Perform 100% in-app internal download and system installation
   const handleInternalUpdate = async () => {
-    const targetUrl = release?.apkUrl || 'https://github.com/Suvesh108/NetPulse/releases/download/v0.6/NetPulse-v0.6.apk';
+    const targetUrl = release?.apkUrl || 'https://github.com/Suvesh108/NetPulse/releases/download/v0.7/NetPulse-v0.7.apk';
     setIsUpdating(true);
     setDownloadProgress(5);
     setStatusMessage('Downloading internal update package...');

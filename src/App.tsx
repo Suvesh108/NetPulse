@@ -145,17 +145,22 @@ function MainApp() {
           {/* Logo Mark + Text (Left) */}
           <div 
             onClick={() => setActiveTab('speed')} 
-            className="flex items-center gap-2 group cursor-pointer shrink-0 z-10"
-            title="Speed Test"
+            className="flex items-center gap-2.5 group cursor-pointer shrink-0 z-10"
+            title="NetPulse Speed Test"
           >
             <img 
-              src="/logo-mark.png" 
-              alt="Speed Test Logo" 
-              className="h-5 sm:h-6 md:h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              src="/favicon.png" 
+              alt="NetPulse Logo" 
+              className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 object-contain transition-transform duration-300 group-hover:scale-105 rounded-md" 
             />
-            <span className="font-sans text-xs sm:text-sm md:text-base font-black tracking-tight text-slate-900 dark:text-white select-none">
-              Speed Test
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="font-sans text-sm sm:text-base md:text-lg font-black tracking-tight text-slate-900 dark:text-white select-none">
+                NetPulse
+              </span>
+              <span className="hidden sm:inline-block text-[10px] font-mono text-blue-600 dark:text-blue-400 font-bold">
+                PRO
+              </span>
+            </div>
           </div>
 
           {/* Unit Selector Pill (Right on Mobile, Perfectly Centered on Desktop) */}

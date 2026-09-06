@@ -2,15 +2,15 @@
 
 # ⚡ NetPulse — High-Performance Edge Network Speed Test & Telemetry
 
-[![Version](https://img.shields.io/badge/version-0.6-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.6)
-[![Android APK](https://img.shields.io/badge/Android-APK_v0.6-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.6)
+[![Version](https://img.shields.io/badge/version-0.7-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.7)
+[![Android APK](https://img.shields.io/badge/Android-APK_v0.7-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.7)
 [![SEO Optimized](https://img.shields.io/badge/SEO-Rank_1_Ready-blueviolet.svg)](https://github.com/Suvesh108/NetPulse)
 [![Security Hardened](https://img.shields.io/badge/Security-Hardened-emerald.svg)](https://github.com/Suvesh108/NetPulse)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **NetPulse** is a next-generation internet speed testing and edge network diagnostic suite engineered for real-time bandwidth precision directly against Cloudflare's global Anycast and HTTP/3 QUIC backbones. Built with React 19, TypeScript, Tailwind CSS, and Capacitor for native Android deployment.
 
-[📱 Download Android APK (v0.6)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.6) • [🌐 Live Web App](https://netpulse-iota.vercel.app/) • [📦 GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
+[📱 Download Android APK (v0.7)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.7) • [🌐 Live Web App](https://netpulse-iota.vercel.app/) • [📦 GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
 
 ---
 
@@ -22,13 +22,13 @@
 
 ---
 
-## 🚀 Key Features in NetPulse v0.6
+## 🚀 Key Features in NetPulse v0.7
 
-### 🌟 1. Circular Infinity Pulse Vector Ribbon Logo
-* **3D Gradient Ribbon Emblem**: Modern vector ribbon logo with smooth azure-cyan to violet-magenta gradient folds, integrated seamlessly across web favicons, touch icons, and native Android launcher densities (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`).
+### 🌟 1. Android Adaptive Icon & Midnight Launcher Disc Fix
+* **Eliminated Harsh White Plate**: The Android app launcher icon is rendered on a sleek `#0B1120` midnight disc with an optimized 72% safe-zone adaptive foreground, ensuring seamless integration on any launcher and wallpaper.
 
-### 🌟 2. Seamless Light & Midnight OLED Dark Themes
-* **Comprehensive Contrast & Pure Black**: Every container, settings panel, dropdown menu, telemetry card, oscilloscope monitor, and history table automatically synchronizes with crisp modern light and midnight OLED dark (`#000000` / `#030712`) modes.
+### 🌟 2. Tailwind CSS v4 Theme & Contrast Synchronization
+* **Class-Based Dark/Light Synchronization**: Integrated `@custom-variant dark` in Tailwind CSS v4, guaranteeing pure `#030712` OLED black mode and crisp `#F8FAFC` light mode contrast across all telemetry cards, boxes, and typography.
 
 ### 🌟 3. In-App Direct APK Updater (No Browser Needed)
 * **In-App Streaming Download**: Check for updates and download new `.apk` packages directly inside the Settings console with a real-time progress bar (`0% ➔ 100%`).
@@ -68,9 +68,9 @@
 
 ---
 
-## 📦 Native Android App (`NetPulse-v0.6.apk`)
+## 📦 Native Android App (`NetPulse-v0.7.apk`)
 
-* **Direct APK Download**: [NetPulse-v0.6.apk (GitHub Release v0.6)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.6)
+* **Direct APK Download**: [NetPulse-v0.7.apk (GitHub Release v0.7)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.7)
 * **Package Name**: `com.netpulse.speedtest`
 * **Target SDK**: Android 15 (API Level 35)
 * **Minimum SDK**: Android 5.1 (API Level 22)
