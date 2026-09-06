@@ -2,14 +2,14 @@
 
 # ⚡ NetPulse — High-Performance Edge Network Speed Test
 
-[![Version](https://img.shields.io/badge/version-0.1-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.1)
-[![Android APK](https://img.shields.io/badge/Android-APK_v0.1-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.1)
+[![Version](https://img.shields.io/badge/version-0.2-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.2)
+[![Android APK](https://img.shields.io/badge/Android-APK_v0.2-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.2)
 [![Security Hardened](https://img.shields.io/badge/Security-Hardened-emerald.svg)](https://github.com/Suvesh108/NetPulse)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **NetPulse** is a high-fidelity speed testing suite designed for real-time edge bandwidth diagnostics directly against Cloudflare's global Anycast backbone. Built with React 19, TypeScript, Tailwind CSS, and Capacitor for native Android deployment.
 
-[📱 Download Android APK (v0.1)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.1) • [🌐 Web Repository](https://github.com/Suvesh108/NetPulse)
+[📱 Download Android APK (v0.2)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.2) • [🌐 Web Repository](https://github.com/Suvesh108/NetPulse)
 
 ---
 

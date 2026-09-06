@@ -4,6 +4,7 @@ import {
   Cpu, Network, Radio, Zap, Check, ChevronDown, ChevronUp, Sliders, Activity, Sparkles
 } from 'lucide-react';
 import { SimulationSettings, EngineBackend, RoutingProtocol } from '../types';
+import InAppUpdater from './InAppUpdater';
 
 interface SettingsPanelProps {
   settings: SimulationSettings;
@@ -407,6 +408,9 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
               </div>
             </div>
           </div>
+
+          {/* In-App Software Updater Card */}
+          <InAppUpdater />
 
         </div>
 

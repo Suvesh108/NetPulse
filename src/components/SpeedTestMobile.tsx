@@ -75,6 +75,69 @@ export default function SpeedTestMobile({
   const gamingGrade = calcGamingScore();
   const chatGrade = calcChatScore();
 
+  // Dynamic speedometer theme coloring based on active test phase
+  const getPhaseTheme = () => {
+    switch (status) {
+      case 'downloading':
+        return {
+          primary: '#F6821F',
+          secondary: '#EA580C',
+          textClass: 'text-[#F6821F]',
+          bgLight: 'bg-orange-50',
+          borderClass: 'border-orange-200',
+          glowShadow: 'shadow-orange-500/25'
+        };
+      case 'uploading':
+        return {
+          primary: '#8D1EB1',
+          secondary: '#7C3AED',
+          textClass: 'text-[#8D1EB1]',
+          bgLight: 'bg-purple-50',
+          borderClass: 'border-purple-200',
+          glowShadow: 'shadow-purple-500/25'
+        };
+      case 'pinging':
+      case 'jittering':
+        return {
+          primary: '#D97706',
+          secondary: '#F59E0B',
+          textClass: 'text-amber-600',
+          bgLight: 'bg-amber-50',
+          borderClass: 'border-amber-200',
+          glowShadow: 'shadow-amber-500/25'
+        };
+      case 'packet-probing':
+        return {
+          primary: '#2563EB',
+          secondary: '#3B82F6',
+          textClass: 'text-blue-600',
+          bgLight: 'bg-blue-50',
+          borderClass: 'border-blue-200',
+          glowShadow: 'shadow-blue-500/25'
+        };
+      case 'completed':
+        return {
+          primary: '#059669',
+          secondary: '#10B981',
+          textClass: 'text-emerald-600',
+          bgLight: 'bg-emerald-50',
+          borderClass: 'border-emerald-200',
+          glowShadow: 'shadow-emerald-500/25'
+        };
+      default:
+        return {
+          primary: '#2563EB',
+          secondary: '#3B82F6',
+          textClass: 'text-blue-600',
+          bgLight: 'bg-blue-50',
+          borderClass: 'border-blue-200',
+          glowShadow: 'shadow-blue-500/25'
+        };
+    }
+  };
+
+  const theme = getPhaseTheme();
+
   // Box plot row component for mobile
   const renderMobileBoxPlotRow = (
     title: string,
@@ -143,7 +206,7 @@ export default function SpeedTestMobile({
     <div className="w-full flex flex-col gap-3 pb-28 select-none animate-fade-in md:hidden">
       
       {/* 1. MOBILE HERO SPEEDOMETER CONSOLE */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col gap-3 relative overflow-hidden">
+      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col gap-3 relative overflow-hidden transition-all duration-300">
         
         {/* Top Edge Server Node Meta */}
         <div className="flex items-center justify-between pb-2 border-b border-slate-100 text-[11px]">
@@ -196,9 +259,9 @@ export default function SpeedTestMobile({
             )}
           </div>
 
-          {/* Large Numerals */}
+          {/* Large Numerals with Dynamic Color */}
           <div className="flex items-baseline justify-center gap-1.5 my-1">
-            <span className="font-sans font-black text-5xl tracking-tight text-slate-900 leading-none">
+            <span className={`font-sans font-black text-5xl tracking-tight leading-none transition-colors duration-300 ${isTesting ? theme.textClass : 'text-slate-900'}`}>
               {currentSpeed > 0 ? (currentSpeed / factor).toFixed(1) : (isCompleted && downloadVal !== null ? (downloadVal / factor).toFixed(1) : '0.0')}
             </span>
             <span className="text-sm font-extrabold text-slate-400 uppercase tracking-wider">
@@ -206,7 +269,7 @@ export default function SpeedTestMobile({
             </span>
           </div>
 
-          {/* Live Spline Waveform */}
+          {/* Dynamic Spline Waveform with Phase Theme Gradient */}
           <div className="w-full h-14 mt-1 relative overflow-hidden">
             <svg 
               className="w-full h-full" 
@@ -215,8 +278,8 @@ export default function SpeedTestMobile({
             >
               <defs>
                 <linearGradient id="mobileSplineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor={theme.primary} stopOpacity="0.38" />
+                  <stop offset="100%" stopColor={theme.primary} stopOpacity="0.0" />
                 </linearGradient>
               </defs>
               <path 
@@ -226,8 +289,8 @@ export default function SpeedTestMobile({
               <path 
                 d={spline.stroke} 
                 fill="none" 
-                stroke="#3B82F6" 
-                strokeWidth="2.5" 
+                stroke={theme.primary} 
+                strokeWidth="2.75" 
                 strokeLinecap="round" 
                 strokeLinejoin="round" 
               />

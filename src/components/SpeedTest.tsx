@@ -570,8 +570,18 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
           <h2 className="text-sm sm:text-base font-bold text-[#18181B] tracking-tight">Your Internet Speed</h2>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-[#F6821F] uppercase tracking-wider">
-              {status === 'idle' ? 'Ready' : (status === 'completed' ? 'Finished' : 'Testing')}
+            <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider transition-all duration-300 ${
+              status === 'downloading'
+                ? 'bg-orange-50 text-[#F6821F] border border-orange-200 animate-pulse'
+                : (status === 'uploading'
+                  ? 'bg-purple-50 text-[#8D1EB1] border border-purple-200 animate-pulse'
+                  : (status === 'pinging' || status === 'jittering'
+                    ? 'bg-amber-50 text-amber-600 border border-amber-200 animate-pulse'
+                    : (status === 'completed'
+                      ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                      : 'bg-slate-100 text-slate-500')))
+            }`}>
+              {status === 'idle' ? 'Ready' : (status === 'completed' ? 'Finished' : (status === 'downloading' ? 'Testing Download' : (status === 'uploading' ? 'Testing Upload' : 'Testing Latency')))}
             </span>
           </div>
         </div>
@@ -580,14 +590,16 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 my-2.5 items-stretch">
           
           {/* SECTION 1: DOWNLOAD (5 Columns) */}
-          <div className="lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-5 lg:border-r lg:border-slate-100">
+          <div className={`lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-5 lg:border-r lg:border-slate-100 rounded-xl transition-all duration-300 ${
+            status === 'downloading' ? 'bg-orange-50/50 p-2.5 -m-2.5 ring-1 ring-[#F6821F]/40 shadow-sm' : ''
+          }`}>
             <div>
               <div className="flex items-center gap-1 mb-0.5">
                 <span className="text-xs font-bold text-slate-800">Download</span>
                 <Info className="w-3 h-3 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1.5">
-                <span id="download-val" className="font-sans text-4xl sm:text-[42px] font-bold text-[#18181B] tracking-tight leading-none">
+                <span id="download-val" className={`font-sans text-4xl sm:text-[42px] font-bold tracking-tight leading-none transition-colors duration-300 ${status === 'downloading' ? 'text-[#F6821F]' : 'text-[#18181B]'}`}>
                   {downloadVal !== null 
                     ? (unit === 'MB/s' ? (downloadVal / 8).toFixed(1) : downloadVal.toFixed(1)) 
                     : (status === 'downloading' 
@@ -627,7 +639,9 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           </div>
 
           {/* SECTION 2: UPLOAD (5 Columns) */}
-          <div className="lg:col-span-5 flex flex-col justify-between px-0 lg:px-5 lg:border-r lg:border-slate-100">
+          <div className={`lg:col-span-5 flex flex-col justify-between px-0 lg:px-5 lg:border-r lg:border-slate-100 rounded-xl transition-all duration-300 ${
+            status === 'uploading' ? 'bg-purple-50/50 p-2.5 -m-2.5 ring-1 ring-[#8D1EB1]/40 shadow-sm' : ''
+          }`}>
             <div>
               <div className="flex items-center gap-1 mb-0.5">
                 <span className="text-xs font-bold text-slate-800">Upload</span>

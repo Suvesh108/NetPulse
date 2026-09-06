@@ -24,13 +24,13 @@ jobs:
             ## 🚀 NetPulse ${{ github.ref_name }}
             
             ### 📦 Download Assets
-            - **Android APK (Direct Install)**: `NetPulse-v0.1.apk`
+            - **Android APK (Direct Install)**: `NetPulse-${{ github.ref_name }}.apk`
             
-            ### ✨ Features
-            - Native mobile layout built for Android touch displays.
-            - Real-time Cloudflare Anycast/QUIC throughput testing.
-            - Low-latency Ping, Jitter, Packet Loss, and Bufferbloat metrics.
-            - Network Quality Scores for 4K Video Streaming, Online Gaming, and Video Chatting.
+            ### ✨ What's New in ${{ github.ref_name }}
+            - **In-App Direct Updater**: Check for updates and download/install new releases directly from Settings without using Chrome.
+            - **Native Infinity Pulse Icon**: Brand vector icon integrated across all Android launcher densities.
+            - **Dynamic Speedometer Colors**: Real-time phase color switching (Orange for Download, Purple for Upload).
+            - **Security Hardened**: Defensive HTTPS transport, backup protection, and USB debugging lockdown.
           files: |
-            NetPulse-v0.1.apk
+            NetPulse-v0.2.apk
             netpulse.apk
