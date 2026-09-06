@@ -3,21 +3,71 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>NetPulse - Speed Test</title>
     
+    <!-- Primary SEO Meta Tags -->
+    <title>NetPulse - High-Speed Edge Network Speed Test & Telemetry Diagnostics</title>
+    <meta name="title" content="NetPulse - High-Speed Edge Network Speed Test & Telemetry Diagnostics" />
+    <meta name="description" content="Free, real-time edge internet speed test powered by Cloudflare Anycast & QUIC. Measure true download, upload, ping latency, jitter, packet loss, bufferbloat, and gaming readiness." />
+    <meta name="keywords" content="speed test, internet speed test, wifi speed test, cloudflare speedtest, broadband speed test, ping test, jitter monitor, bufferbloat, latency test, netpulse, android speed test apk, network diagnostics, 4k streaming test, gaming ping monitor" />
+    <meta name="author" content="NetPulse Engineering" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://netpulse-iota.vercel.app/" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://netpulse-iota.vercel.app/" />
+    <meta property="og:title" content="NetPulse - Edge Network Speed Test & Telemetry" />
+    <meta property="og:description" content="Measure real-time bandwidth, ping latency, jitter, packet loss, and application readiness directly against global Anycast edge nodes." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/Suvesh108/NetPulse/main/public/favicon.png" />
+    <meta property="og:site_name" content="NetPulse Speed Test" />
+
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://netpulse-iota.vercel.app/" />
+    <meta property="twitter:title" content="NetPulse - Edge Network Speed Test & Telemetry" />
+    <meta property="twitter:description" content="Test your internet bandwidth, low latency, and gaming ping stability with NetPulse." />
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/Suvesh108/NetPulse/main/public/favicon.png" />
+
     <!-- Strict Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https: wss:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' https: data: blob:; frame-ancestors 'none';" />
     
+    <!-- Icons & Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="128x128" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
     
-    <!-- Fonts & Icons -->
+    <!-- Fonts & Icons Preconnect -->
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+
+    <!-- JSON-LD Structured Data Schema for Google Search Engine -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "NetPulse",
+      "url": "https://netpulse-iota.vercel.app/",
+      "description": "High-speed internet speed test suite for real-time bandwidth, latency, jitter, and network bufferbloat diagnostics.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "All (Web, Android, iOS, Windows, macOS)",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Edge CDN Speed Test",
+        "Multi-Server CDN Benchmark",
+        "Live Gaming Latency Oscilloscope",
+        "Wi-Fi Signal & Channel Analyzer",
+        "Shareable Speed Certificate Card",
+        "Midnight OLED Dark Mode"
+      ]
+    }
+    </script>
   </head>
-  <body class="bg-[#F8FAFC] text-[#0F172A] antialiased select-none">
+  <body class="bg-[#F8FAFC] dark:bg-[#030712] text-[#0F172A] dark:text-[#F8FAFC] antialiased select-none transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

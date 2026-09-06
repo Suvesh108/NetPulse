@@ -21,16 +21,19 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: NetPulse ${{ github.ref_name }}
           body: |
-            ## 🚀 NetPulse ${{ github.ref_name }}
+            ## 🚀 NetPulse ${{ github.ref_name }} - Major Feature & SEO Release
             
             ### 📦 Download Assets
             - **Android APK (Direct Install)**: `NetPulse-${{ github.ref_name }}.apk`
             
             ### ✨ What's New in ${{ github.ref_name }}
-            - **In-App Direct Updater**: Check for updates and download/install new releases directly from Settings without using Chrome.
-            - **Native Infinity Pulse Icon**: Brand vector icon integrated across all Android launcher densities.
-            - **Dynamic Speedometer Colors**: Real-time phase color switching (Orange for Download, Purple for Upload).
-            - **Security Hardened**: Defensive HTTPS transport, backup protection, and USB debugging lockdown.
+            - **Multi-Server Edge CDN Benchmark**: Compare Cloudflare Anycast, AWS CloudFront, and Google Cloud CDN side-by-side.
+            - **Shareable Speed Certificate**: Export high-resolution PNG speed cards with verified badges.
+            - **Live Gaming Latency Oscilloscope**: Continuous real-time ping and jitter stability monitor.
+            - **Midnight OLED Dark Mode**: Pure black OLED theme with instant header toggle.
+            - **Wi-Fi & Channel Health Analyzer**: Real-time link speed and channel band diagnostics.
+            - **Scheduled Background Routine**: Automated tests and custom minimum speed threshold alerts.
+            - **In-App APK Direct Updater**: Background APK updates directly within Settings.
           files: |
-            NetPulse-v0.2.apk
+            NetPulse-v0.3.apk
             netpulse.apk

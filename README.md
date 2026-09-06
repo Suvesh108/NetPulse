@@ -1,107 +1,111 @@
 <div align="center">
 
-# ⚡ NetPulse — High-Performance Edge Network Speed Test
+# ⚡ NetPulse — High-Performance Edge Network Speed Test & Telemetry
 
-[![Version](https://img.shields.io/badge/version-0.2-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.2)
-[![Android APK](https://img.shields.io/badge/Android-APK_v0.2-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.2)
+[![Version](https://img.shields.io/badge/version-0.3-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.3)
+[![Android APK](https://img.shields.io/badge/Android-APK_v0.3-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.3)
+[![SEO Optimized](https://img.shields.io/badge/SEO-Rank_1_Ready-blueviolet.svg)](https://github.com/Suvesh108/NetPulse)
 [![Security Hardened](https://img.shields.io/badge/Security-Hardened-emerald.svg)](https://github.com/Suvesh108/NetPulse)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**NetPulse** is a high-fidelity speed testing suite designed for real-time edge bandwidth diagnostics directly against Cloudflare's global Anycast backbone. Built with React 19, TypeScript, Tailwind CSS, and Capacitor for native Android deployment.
+**NetPulse** is a next-generation internet speed testing and edge network diagnostic suite engineered for real-time bandwidth precision directly against Cloudflare's global Anycast and HTTP/3 QUIC backbones. Built with React 19, TypeScript, Tailwind CSS, and Capacitor for native Android deployment.
 
-[📱 Download Android APK (v0.2)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.2) • [🌐 Web Repository](https://github.com/Suvesh108/NetPulse)
+[📱 Download Android APK (v0.3)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.3) • [🌐 Live Web App](https://netpulse-iota.vercel.app/) • [📦 GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
 
 ---
 
 </div>
 
-## 🚀 Key Features
+## 📖 About NetPulse
 
-### 📡 Diagnostic Engine
-* **Cloudflare Anycast & QUIC Backbone**: Direct connection to global edge PoPs measuring true download, upload, ping, and jitter.
-* **Loaded Latency & Bufferbloat Probing**: Measures network bufferbloat response during simultaneous heavy download and upload streams (`↓`, `↑`).
-* **Multi-Payload Box Plot Telemetry**: Measures throughput across staged payload distributions (`100 kB`, `1 MB`, `10 MB`, `25 MB`).
-* **Real-time Spline Area Waveform**: Smooth SVG spline graphing dynamically rendering the continuous throughput curves.
-* **Network Quality Score (AIM Assessment)**: Generates readiness ratings for **4K Ultra HD Video Streaming**, **Competitive Online Gaming**, and **HD Video Conferencing**.
-
-### 📱 Dedicated Mobile-First Interface
-* **Zero Collision Header**: Isolated navigation bar ensuring brand logos and unit toggle selectors never overlap on narrow mobile viewports.
-* **Full-Width Touch Controls**: Large thumb-friendly test trigger with touch scale micro-interactions.
-* **Detailed Mobile Diagnostic Cards**: Complete breakdown including Upload Measurements, Download Measurements, Latency Measurements, and Packet Delivery ratios.
-* **Floating Bottom Navigation Dock**: Frosted glass backdrop dock providing fluid navigation between Speed Test, History, and Engine Settings.
+**NetPulse** solves the inaccuracy and bloat of legacy speed tests by establishing direct, unthrottled TCP/QUIC streams to the nearest edge PoPs. Whether assessing high-speed fiber broadband, 5G mobile data, or local Wi-Fi 6 connectivity, NetPulse delivers sub-millisecond precision, loaded latency bufferbloat telemetry, and continuous stability ratings for 4K streaming and competitive online gaming.
 
 ---
 
-## 🔒 Security Architecture & APK Hardening
+## 🚀 Key Features in NetPulse v0.3
 
-The NetPulse native Android APK (`NetPulse-v0.1.apk`) has been defensively hardened against common mobile vulnerabilities:
+### 🌟 1. Multi-Server CDN Benchmark (Cloudflare vs AWS vs Google Cloud)
+* **Side-by-Side Cloud Comparison**: Concurrently probes **Cloudflare Anycast**, **AWS CloudFront**, and **Google Cloud CDN** to identify the lowest latency and highest throughput edge network in your geographical area.
+* **Winner Node Detection**: Automatically awards the **Fastest Edge Network** badge based on real-time response times.
 
-| Protection Mechanism | Configuration | Security Benefit |
+### 🌟 2. Shareable "Speed Certificate" Card (PNG Export)
+* **Verified Network Badges**: Generates high-fidelity speed certificate cards displaying Download, Upload, Ping, Jitter, ISP, and application quality ratings.
+* **One-Click Image Download**: Exports crystal-clear 1200x630 PNG images formatted for social media, technical support logs, or ISP verification tickets.
+
+### 🌟 3. Live Gaming Latency Oscilloscope
+* **Real-time Ping Waveform**: Continuously samples ping and jitter every second, rendering a live SVG waveform to capture micro-spikes.
+* **Connection Stability Rating**: Calculates a percentage stability score (`99.4% Rock Solid`) to diagnose packet drops and frame lag during online gaming and video calls.
+
+### 🌟 4. Midnight OLED Dark Mode
+* **Pure OLED Pure Black**: Instant header toggle between crisp light mode and high-contrast OLED dark mode (`#000000` / `#030712`) designed to conserve battery on mobile OLED displays.
+* **Session Persistence**: Remembers theme preferences across visits.
+
+### 🌟 5. Wi-Fi & Channel Health Analyzer
+* **Local Link Telemetry**: Inspects estimated Wi-Fi link speed, gateway RTT, and detected frequency band (`2.4 GHz`, `5.0 GHz`, or `6.0 GHz`).
+* **Router Optimization Tips**: Provides intelligent guidance for optimal router placement and line-of-sight signal health.
+
+### 🌟 6. Scheduled Background Routine & Speed Alerts
+* **Automated Periodic Probing**: Configure automatic speed diagnostics every `1h`, `6h`, `12h`, or `24h`.
+* **Low-Speed Threshold Alerts**: Set minimum bandwidth thresholds (e.g. `< 50 Mbps`) with browser push notification alerts when network quality degrades.
+
+### 🔄 7. In-App Direct APK Updater (No Browser Needed)
+* **In-App Streaming Download**: Check for updates and download new `.apk` packages directly inside the Settings console with a real-time progress bar (`0% ➔ 100%`).
+* **Auto-Install Trigger**: Automatically triggers the Android native package installer (`application/vnd.android.package-archive`) without opening Chrome.
+
+---
+
+## 🔒 Security Architecture & Defensive Hardening
+
+| Protection Layer | Technical Specification | Security Benefit |
 | :--- | :--- | :--- |
-| **Strict HTTPS Transport** | `network_security_config.xml` (`cleartextTrafficPermitted="false"`) | Blocks unencrypted HTTP traffic and prevents Man-in-the-Middle (MitM) sniffing or packet injection. |
-| **USB Debugging Lockdown** | `webContentsDebuggingEnabled: false` | Disables remote Chrome DevTools debugging on production builds, preventing runtime memory/DOM inspection via USB. |
-| **Backup Extraction Prevention** | `android:allowBackup="false"` & `android:fullBackupContent="false"` | Disallows `adb backup` extraction of local storage, cached test logs, or session tokens. |
-| **Content Security Policy (CSP)** | Strict `<meta http-equiv="Content-Security-Policy">` | Restricts script, style, and connect origins to verified domains, eliminating XSS and malicious script injection. |
-| **Mixed Content Blocking** | `allowMixedContent: false` | Rejects insecure HTTP resources from being requested inside HTTPS contexts. |
-| **Code Obfuscation & Log Stripping** | ProGuard / R8 Rules (`proguard-rules.pro`) | Strips debugging logs (`Log.d`, `Log.v`) and obfuscates internal application class hierarchies. |
-| **Principle of Least Privilege** | Minimal Android permissions | Strictly requests `INTERNET` and `ACCESS_NETWORK_STATE` with zero unnecessary hardware permissions. |
+| **Strict HTTPS Enforced** | `network_security_config.xml` (`cleartextTrafficPermitted="false"`) | Rejects unencrypted HTTP traffic to eliminate Man-in-the-Middle (MitM) sniffing. |
+| **DevTools Lockdown** | `webContentsDebuggingEnabled: false` | Blocks USB Chrome DevTools debugging in production builds. |
+| **Backup Leak Prevention** | `android:allowBackup="false"` | Prevents `adb backup` extraction of app tokens and diagnostic history. |
+| **Content Security Policy** | Strict CSP meta tags with `frame-ancestors 'none'` | Eliminates Cross-Site Scripting (XSS) and iframe clickjacking. |
+| **Code Obfuscation & R8** | ProGuard rules with log stripping (`Log.d`, `Log.v`) | Removes debug telemetry from compiled binaries. |
 
 ---
 
-## 📦 Native Android App (`NetPulse-v0.1.apk`)
+## 📦 Native Android App (`NetPulse-v0.3.apk`)
 
-Directly download and install the latest compiled APK:
-
-* **Download**: [NetPulse-v0.1.apk (GitHub Release v0.1)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.1)
-* **Package ID**: `com.netpulse.speedtest`
-* **Target Android SDK**: Android 15 (API level 35)
-* **Minimum Android SDK**: Android 5.1 (API level 22)
+* **Direct APK Download**: [NetPulse-v0.3.apk (GitHub Release v0.3)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.3)
+* **Package Name**: `com.netpulse.speedtest`
+* **Target SDK**: Android 15 (API Level 35)
+* **Minimum SDK**: Android 5.1 (API Level 22)
+* **Size**: `4.60 MB`
 
 ---
 
 ## 🛠️ Technology Stack
 
-* **Frontend**: React 19, TypeScript, Tailwind CSS
-* **Native Mobile Bridge**: Capacitor 8 (Android Platform)
-* **Speed Test SDK**: `@cloudflare/speedtest`
-* **Build System**: Vite 6, Gradle 8.14, OpenJDK 21 LTS
-* **Icons**: `lucide-react`
+* **Frontend**: React 19 (TypeScript), Tailwind CSS 4, Lucide Icons
+* **Mobile Runtime**: Capacitor 8 (Android Platform)
+* **Diagnostic Engine**: `@cloudflare/speedtest` Web SDK
+* **Build Tooling**: Vite 6, OpenJDK 21 LTS, Gradle 8.14
 
 ---
 
-## 💻 Local Development Setup
+## 💻 Local Development & Build Instructions
 
-### 1. Prerequisites
-* Node.js 18+ and npm
-* OpenJDK 21 LTS
-* Android SDK (API 35)
-
-### 2. Clone and Install
 ```bash
+# 1. Clone repository
 git clone https://github.com/Suvesh108/NetPulse.git
 cd netpulse
+
+# 2. Install dependencies
 npm install
-```
 
-### 3. Start Development Server
-```bash
+# 3. Start local development server (Accessible on LAN: http://0.0.0.0:3000)
 npm run dev
-```
-*(Server will start on `http://localhost:3000` and `http://0.0.0.0:3000` for local mobile testing)*
 
-### 4. Build Production Web Bundle & Android APK
-```bash
-# Build web production bundle
+# 4. Build production web bundle
 npm run build
 
-# Sync assets to Capacitor Android
+# 5. Sync and build Android APK
 npx cap sync android
-
-# Build native Android APK
 cd android
 ./gradlew assembleDebug
 ```
-The compiled APK will be generated at `android/app/build/outputs/apk/debug/app-debug.apk`.
 
 ---
 

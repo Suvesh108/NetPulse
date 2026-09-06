@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { SimulationSettings, EngineBackend, RoutingProtocol } from '../types';
 import InAppUpdater from './InAppUpdater';
+import ScheduledTests from './ScheduledTests';
 
 interface SettingsPanelProps {
   settings: SimulationSettings;
@@ -411,6 +412,9 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
 
           {/* In-App Software Updater Card */}
           <InAppUpdater />
+
+          {/* Automated Scheduled Tests & Alerts Card */}
+          <ScheduledTests />
 
         </div>
 
