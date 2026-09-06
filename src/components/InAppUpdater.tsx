@@ -22,7 +22,7 @@ interface ReleaseInfo {
 }
 
 export default function InAppUpdater() {
-  const CURRENT_VERSION = 'v0.4';
+  const CURRENT_VERSION = 'v0.5';
   const [checking, setChecking] = useState(false);
   const [release, setRelease] = useState<ReleaseInfo | null>(null);
   const [hasUpdate, setHasUpdate] = useState(false);
@@ -46,16 +46,16 @@ export default function InAppUpdater() {
       }
 
       const data = await response.json();
-      const latestTag = data.tag_name || 'v0.4';
+      const latestTag = data.tag_name || 'v0.5';
       
       const apkAsset = data.assets?.find((a: any) => a.name.endsWith('.apk'));
       const apkUrl = apkAsset?.browser_download_url || `https://github.com/Suvesh108/NetPulse/releases/download/${latestTag}/NetPulse-${latestTag}.apk`;
-      const apkSize = apkAsset?.size || 4603480;
+      const apkSize = apkAsset?.size || 4756613;
 
       setRelease({
         tag_name: latestTag,
         name: data.name || `NetPulse ${latestTag}`,
-        body: data.body || '• In-App Internal APK self-updater\n• Website Infinity Pulse brand logo in Android launcher\n• Multi-Server CDN benchmark & live oscilloscope\n• Midnight OLED pure black dark mode',
+        body: data.body || '• Website Tab Logo in Android APK launcher & Adaptive Icon\n• Midnight OLED pure black & crisp light mode theme sync\n• In-App Internal APK self-updater\n• Multi-Server CDN benchmark & live oscilloscope',
         published_at: data.published_at ? new Date(data.published_at).toLocaleDateString() : 'Recent',
         apkUrl,
         apkSize
@@ -72,12 +72,12 @@ export default function InAppUpdater() {
     } catch (err: any) {
       console.warn('Update check note:', err.message);
       setRelease({
-        tag_name: 'v0.4',
-        name: 'NetPulse v0.4',
-        body: '• In-App Internal APK self-updater (Zero external redirects)\n• Website Infinity Pulse brand logo in Android launcher\n• Multi-Server CDN benchmark & live oscilloscope\n• Midnight OLED pure black dark mode',
+        tag_name: 'v0.5',
+        name: 'NetPulse v0.5',
+        body: '• Website Tab Logo in Android APK launcher & Adaptive Icon\n• Midnight OLED pure black & crisp light mode theme sync\n• In-App Internal APK self-updater\n• Multi-Server CDN benchmark & live oscilloscope',
         published_at: new Date().toLocaleDateString(),
-        apkUrl: 'https://github.com/Suvesh108/NetPulse/releases/download/v0.4/NetPulse-v0.4.apk',
-        apkSize: 4603480
+        apkUrl: 'https://github.com/Suvesh108/NetPulse/releases/download/v0.5/NetPulse-v0.5.apk',
+        apkSize: 4756613
       });
       setHasUpdate(false);
       setStatusMessage(`NetPulse ${CURRENT_VERSION} is up to date`);
@@ -88,7 +88,7 @@ export default function InAppUpdater() {
 
   // Perform 100% in-app internal download and system installation
   const handleInternalUpdate = async () => {
-    const targetUrl = release?.apkUrl || 'https://github.com/Suvesh108/NetPulse/releases/download/v0.4/NetPulse-v0.4.apk';
+    const targetUrl = release?.apkUrl || 'https://github.com/Suvesh108/NetPulse/releases/download/v0.5/NetPulse-v0.5.apk';
     setIsUpdating(true);
     setDownloadProgress(5);
     setStatusMessage('Downloading internal update package...');

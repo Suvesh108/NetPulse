@@ -2,15 +2,15 @@
 
 # ⚡ NetPulse — High-Performance Edge Network Speed Test & Telemetry
 
-[![Version](https://img.shields.io/badge/version-0.4-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.4)
-[![Android APK](https://img.shields.io/badge/Android-APK_v0.4-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.4)
+[![Version](https://img.shields.io/badge/version-0.5-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.5)
+[![Android APK](https://img.shields.io/badge/Android-APK_v0.5-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.5)
 [![SEO Optimized](https://img.shields.io/badge/SEO-Rank_1_Ready-blueviolet.svg)](https://github.com/Suvesh108/NetPulse)
 [![Security Hardened](https://img.shields.io/badge/Security-Hardened-emerald.svg)](https://github.com/Suvesh108/NetPulse)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **NetPulse** is a next-generation internet speed testing and edge network diagnostic suite engineered for real-time bandwidth precision directly against Cloudflare's global Anycast and HTTP/3 QUIC backbones. Built with React 19, TypeScript, Tailwind CSS, and Capacitor for native Android deployment.
 
-[📱 Download Android APK (v0.4)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.4) • [🌐 Live Web App](https://netpulse-iota.vercel.app/) • [📦 GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
+[📱 Download Android APK (v0.5)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.5) • [🌐 Live Web App](https://netpulse-iota.vercel.app/) • [📦 GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
 
 ---
 
@@ -22,35 +22,37 @@
 
 ---
 
-## 🚀 Key Features in NetPulse v0.3
+## 🚀 Key Features in NetPulse v0.5
 
-### 🌟 1. Multi-Server CDN Benchmark (Cloudflare vs AWS vs Google Cloud)
+### 🌟 1. Authentic Website Tab Logo in Android APK
+* **Original Brand Iconography**: The Android APK launcher icon now features the exact website tab gradient Infinity Pulse emblem across all standard, round, and adaptive launcher densities (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`).
+
+### 🌟 2. Seamless Light & Midnight OLED Dark Themes
+* **Comprehensive Contrast & Pure Black**: Every container, settings panel, dropdown menu, telemetry card, oscilloscope monitor, and history table automatically synchronizes with crisp modern light and midnight OLED dark (`#000000` / `#030712`) modes.
+
+### 🌟 3. In-App Direct APK Updater (No Browser Needed)
+* **In-App Streaming Download**: Check for updates and download new `.apk` packages directly inside the Settings console with a real-time progress bar (`0% ➔ 100%`).
+* **Auto-Install Trigger**: Automatically triggers the Android native package installer (`application/vnd.android.package-archive`) without opening Chrome.
+
+### 🌟 4. Multi-Server CDN Benchmark (Cloudflare vs AWS vs Google Cloud)
 * **Side-by-Side Cloud Comparison**: Concurrently probes **Cloudflare Anycast**, **AWS CloudFront**, and **Google Cloud CDN** to identify the lowest latency and highest throughput edge network in your geographical area.
 * **Winner Node Detection**: Automatically awards the **Fastest Edge Network** badge based on real-time response times.
 
-### 🌟 2. Shareable "Speed Certificate" Card (PNG Export)
-* **Verified Network Badges**: Generates high-fidelity speed certificate cards displaying Download, Upload, Ping, Jitter, ISP, and application quality ratings.
-* **One-Click Image Download**: Exports crystal-clear 1200x630 PNG images formatted for social media, technical support logs, or ISP verification tickets.
-
-### 🌟 3. Live Gaming Latency Oscilloscope
+### 🌟 5. Live Gaming Latency Oscilloscope
 * **Real-time Ping Waveform**: Continuously samples ping and jitter every second, rendering a live SVG waveform to capture micro-spikes.
 * **Connection Stability Rating**: Calculates a percentage stability score (`99.4% Rock Solid`) to diagnose packet drops and frame lag during online gaming and video calls.
 
-### 🌟 4. Midnight OLED Dark Mode
-* **Pure OLED Pure Black**: Instant header toggle between crisp light mode and high-contrast OLED dark mode (`#000000` / `#030712`) designed to conserve battery on mobile OLED displays.
-* **Session Persistence**: Remembers theme preferences across visits.
+### 🌟 6. Shareable "Speed Certificate" Card (PNG Export)
+* **Verified Network Badges**: Generates high-fidelity speed certificate cards displaying Download, Upload, Ping, Jitter, ISP, and application quality ratings.
+* **One-Click Image Download**: Exports crystal-clear 1200x630 PNG images formatted for social media, technical support logs, or ISP verification tickets.
 
-### 🌟 5. Wi-Fi & Channel Health Analyzer
+### 🌟 7. Wi-Fi & Channel Health Analyzer
 * **Local Link Telemetry**: Inspects estimated Wi-Fi link speed, gateway RTT, and detected frequency band (`2.4 GHz`, `5.0 GHz`, or `6.0 GHz`).
 * **Router Optimization Tips**: Provides intelligent guidance for optimal router placement and line-of-sight signal health.
 
-### 🌟 6. Scheduled Background Routine & Speed Alerts
+### 🌟 8. Scheduled Background Routine & Speed Alerts
 * **Automated Periodic Probing**: Configure automatic speed diagnostics every `1h`, `6h`, `12h`, or `24h`.
 * **Low-Speed Threshold Alerts**: Set minimum bandwidth thresholds (e.g. `< 50 Mbps`) with browser push notification alerts when network quality degrades.
-
-### 🔄 7. In-App Direct APK Updater (No Browser Needed)
-* **In-App Streaming Download**: Check for updates and download new `.apk` packages directly inside the Settings console with a real-time progress bar (`0% ➔ 100%`).
-* **Auto-Install Trigger**: Automatically triggers the Android native package installer (`application/vnd.android.package-archive`) without opening Chrome.
 
 ---
 
@@ -66,13 +68,13 @@
 
 ---
 
-## 📦 Native Android App (`NetPulse-v0.3.apk`)
+## 📦 Native Android App (`NetPulse-v0.5.apk`)
 
-* **Direct APK Download**: [NetPulse-v0.3.apk (GitHub Release v0.3)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.3)
+* **Direct APK Download**: [NetPulse-v0.5.apk (GitHub Release v0.5)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.5)
 * **Package Name**: `com.netpulse.speedtest`
 * **Target SDK**: Android 15 (API Level 35)
 * **Minimum SDK**: Android 5.1 (API Level 22)
-* **Size**: `4.60 MB`
+* **Size**: `4.75 MB`
 
 ---
 
