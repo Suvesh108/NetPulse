@@ -2,15 +2,15 @@
 
 # ⚡ NetPulse — High-Performance Edge Network Speed Test & Telemetry
 
-[![Version](https://img.shields.io/badge/version-0.3-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.3)
-[![Android APK](https://img.shields.io/badge/Android-APK_v0.3-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.3)
+[![Version](https://img.shields.io/badge/version-0.4-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.4)
+[![Android APK](https://img.shields.io/badge/Android-APK_v0.4-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.4)
 [![SEO Optimized](https://img.shields.io/badge/SEO-Rank_1_Ready-blueviolet.svg)](https://github.com/Suvesh108/NetPulse)
 [![Security Hardened](https://img.shields.io/badge/Security-Hardened-emerald.svg)](https://github.com/Suvesh108/NetPulse)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **NetPulse** is a next-generation internet speed testing and edge network diagnostic suite engineered for real-time bandwidth precision directly against Cloudflare's global Anycast and HTTP/3 QUIC backbones. Built with React 19, TypeScript, Tailwind CSS, and Capacitor for native Android deployment.
 
-[📱 Download Android APK (v0.3)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.3) • [🌐 Live Web App](https://netpulse-iota.vercel.app/) • [📦 GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
+[📱 Download Android APK (v0.4)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.4) • [🌐 Live Web App](https://netpulse-iota.vercel.app/) • [📦 GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
 
 ---
 
