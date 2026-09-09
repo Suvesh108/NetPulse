@@ -13,4 +13,5 @@ android/app/build/
 scratch/
 release-builds/
 *.zip
+*.exe
 
