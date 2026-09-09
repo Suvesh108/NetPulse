@@ -1,115 +1,216 @@
 <div align="center">
 
-# ⚡ NetPulse — High-Performance Edge Network Speed Test & Telemetry
+<img src="public/favicon.png" width="92" height="92" alt="NetPulse Logo" style="border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);" />
 
-[![Version](https://img.shields.io/badge/version-0.8-blue.svg)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.8)
-[![Android APK](https://img.shields.io/badge/Android-APK_v0.8-brightgreen.svg?logo=android)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.8)
-[![SEO Optimized](https://img.shields.io/badge/SEO-Rank_1_Ready-blueviolet.svg)](https://github.com/Suvesh108/NetPulse)
-[![Security Hardened](https://img.shields.io/badge/Security-Hardened-emerald.svg)](https://github.com/Suvesh108/NetPulse)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+# ⚡ NetPulse PRO
+### Enterprise-Grade Edge Network Telemetry & Real-Time Bandwidth Engine
 
-**NetPulse** is a next-generation internet speed testing and edge network diagnostic suite engineered for real-time bandwidth precision directly against Cloudflare's global Anycast and HTTP/3 QUIC backbones. Built with React 19, TypeScript, Tailwind CSS, and Capacitor for native Android deployment.
+[![Version](https://img.shields.io/badge/Release-v0.8-059669?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.8)
+[![Android APK](https://img.shields.io/badge/Android_APK-v0.8-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.8)
+[![Live Web App](https://img.shields.io/badge/Live_Web_App-net--pulse-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://net-pulse-iota.vercel.app/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 
-[📱 Download Android APK (v0.8)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.8) • [🌐 Live Web App](https://netpulse-iota.vercel.app/) • [📦 GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
+[![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.1-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Cloudflare Anycast](https://img.shields.io/badge/Engine-Cloudflare_Anycast-F38020?style=flat-square&logo=cloudflare&logoColor=white)](https://speed.cloudflare.com/)
+[![HTTP/3 QUIC](https://img.shields.io/badge/Protocol-HTTP%2F3_QUIC-7C3AED?style=flat-square&logo=internetexplorer&logoColor=white)](https://cloudflare.com/)
+[![Security Hardened](https://img.shields.io/badge/Security-Hardened-10B981?style=flat-square&logo=shieldcheck&logoColor=white)](https://github.com/Suvesh108/NetPulse)
+
+<br />
+
+**[ 🌐 Launch Live Web App ](https://net-pulse-iota.vercel.app/)** &nbsp;•&nbsp;
+**[ 📱 Download Android APK (v0.8) ](https://github.com/Suvesh108/NetPulse/releases/tag/v0.8)** &nbsp;•&nbsp;
+**[ 📦 GitHub Releases ](https://github.com/Suvesh108/NetPulse/releases)** &nbsp;•&nbsp;
+**[ 📄 MIT License ](LICENSE)**
+
+<br />
 
 ---
 
 </div>
 
-## 📖 About NetPulse
+## 📖 Executive Summary & Mission
 
-**NetPulse** solves the inaccuracy and bloat of legacy speed tests by establishing direct, unthrottled TCP/QUIC streams to the nearest edge PoPs. Whether assessing high-speed fiber broadband, 5G mobile data, or local Wi-Fi 6 connectivity, NetPulse delivers sub-millisecond precision, loaded latency bufferbloat telemetry, and continuous stability ratings for 4K streaming and competitive online gaming.
+Traditional speed test services are notorious for ad congestion, intrusive tracking beacons, artificial throughput smoothing, and restrictive local ISP routing biases. 
+
+**NetPulse PRO** re-engineers network telemetry from first principles. By opening direct, unthrottled TCP and HTTP/3 QUIC socket streams against Cloudflare's global Anycast edge network (330+ points of presence), NetPulse measures raw packet transit times, bufferbloat loaded latency, and sustained inbound/outbound saturation with sub-millisecond precision. 
+
+Whether diagnosing high-speed Gigabit fiber broadband, ultra-dense 5G NR carriers, or local Wi-Fi 6E/7 frequency congestion, NetPulse gives engineers and power users zero-latency observability without third-party advertisements or data harvesting.
 
 ---
 
-## 🚀 Key Features in NetPulse v0.8
+## ⚡ Architecture & Telemetry Ingestion
 
-### 🌟 1. Responsive Dual-Gauge Speed Test on Android & Mobile
-* **Unified Desktop-Fidelity Experience**: The Android APK now displays the authentic **"Your Internet Speed"** console with side-by-side **Download** (orange sparkline) and **Upload** (purple sparkline) metrics, live percentiles, and a compact 3-column telemetry bar (Latency, Jitter, Packet Loss).
-* **Full Mobile Bottom Clearance**: Added spacious bottom clearance (`pb-28`) ensuring all measurement cards and Network Quality Score tiles remain fully accessible above the floating bottom navigation bar.
+```
+                       ┌─────────────────────────────────────────────────────────┐
+                       │                   NetPulse PRO Engine                   │
+                       │           (React 19 • TypeScript • Capacitor)           │
+                       └────────────────────────────┬────────────────────────────┘
+                                                    │
+                 ┌──────────────────────────────────┼──────────────────────────────────┐
+                 ▼                                  ▼                                  ▼
+   ┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+   │    Cloudflare Anycast     │      │   AWS CloudFront Global   │      │    Google Cloud Premium   │
+   │      Edge POP Backbone    │      │     Edge Edge CDN Node    │      │       Edge PoP Tier       │
+   ├───────────────────────────┤      ├───────────────────────────┤      ├───────────────────────────┤
+   │ • HTTP/3 QUIC Streaming   │      │ • Multi-CDN Benchmarking  │      │ • Regional Latency Audits │
+   │ • Loaded Bufferbloat RTT  │      │ • Node Winner Telemetry   │      │ • Geo-Proximity Routing   │
+   │ • 90th Percentile Splines │      │ • TCP Handshake Drift     │      │ • Anycast Route Auditing  │
+   └─────────────┬─────────────┘      └─────────────┬─────────────┘      └─────────────┬─────────────┘
+                 │                                  │                                  │
+                 └──────────────────────────────────┼──────────────────────────────────┘
+                                                    ▼
+                               ┌────────────────────────────────────────┐
+                               │       Hardware & Link Diagnostics      │
+                               ├────────────────────────────────────────┤
+                               │ • 1 Hz Gaming Latency Oscilloscope     │
+                               │ • Wi-Fi Band Detection (2.4/5.0/6.0G)  │
+                               │ • 1200x630 Verified Speed Certificate  │
+                               │ • 100% In-App Background APK Updater   │
+                               └────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Key Highlights & Capabilities (v0.8)
+
+### 🌟 1. Responsive Dual-Gauge Speed Console
+- **Unified Desktop & Android APK Fidelity**: Displays simultaneous, real-time **Download** (vibrant amber-orange sparkline) and **Upload** (purple sparkline) curves with mathematically calculated 90th percentile boundary indicators.
+- **Adaptive Telemetry Dock**: Latency, jitter, and packet delivery loss automatically format into an ultra-compact 3-column dock on mobile devices and a full telemetry column on widescreen monitors.
+- **Touch-Optimized Controls**: High-contrast action bar with quick Start Test / Retest, instant URL result sharing, and multi-phase progress filters (Latency | Jitter | Download | Upload).
 
 ### 🌟 2. Fixed Dark Mode Box-Plot Track Contrast
-* **Synchronized Dark Theme Contrast**: Replaced bright white/light-gray box plot tracks with theme-adaptive `bg-slate-100/80 dark:bg-slate-800/80` backgrounds, eliminating blinding gray blocks in dark mode across Download and Upload payload breakdowns.
+- **Deep OLED Dark Theme (#030712)**: Replaced harsh light-gray box-plot tracks with theme-synchronized g-slate-100/80 dark:bg-slate-800/80 backgrounds, providing comfortable, glare-free telemetry inspections during nighttime audits.
+- **Payload Distribution Whisker Plots**: Accurately visualizes min, Q1, median, Q3, and max bandwidth velocity across 100 kB, 1 MB, 10 MB, and 25 MB sample chunks.
 
-### 🌟 3. Complete Mobile Bottom Navigation Typography
-* **No Label Truncation**: Refined label sizing and typography in the floating bottom navigation dock, displaying **"DIAGNOSTICS"** completely without trailing ellipsis (`DIAGNOSTI...`).
+### 🌟 3. Multi-Cloud Edge CDN Benchmark
+- **Concurrent Edge Testing**: Directly pits **Cloudflare Anycast**, **AWS CloudFront**, and **Google Cloud CDN** against each other in real-time.
+- **Winner Detection**: Awards an automated **Fastest Edge Network** badge with microsecond response differential metrics.
 
-### 🌟 4. In-App Direct APK Updater (No Browser Needed)
-* **In-App Streaming Download**: Check for updates and download new `.apk` packages directly inside the Settings console with a real-time progress bar (`0% ➔ 100%`).
-* **Auto-Install Trigger**: Automatically triggers the Android native package installer (`application/vnd.android.package-archive`) without opening Chrome.
+### 🌟 4. Continuous Gaming Latency Oscilloscope
+- **Real-Time 1 Hz Waveform**: Samples real-world packet latency every second to expose micro-stutters, ping spikes, and ISP throttling invisible to average speed tests.
+- **Rock-Solid Stability Rating**: Generates percentage-based gaming and VoIP stability assessments (e.g. 99.8% Rock Solid).
 
-### 🌟 5. Multi-Server CDN Benchmark (Cloudflare vs AWS vs Google Cloud)
-* **Side-by-Side Cloud Comparison**: Concurrently probes **Cloudflare Anycast**, **AWS CloudFront**, and **Google Cloud CDN** to identify the lowest latency and highest throughput edge network in your geographical area.
-* **Winner Node Detection**: Automatically awards the **Fastest Edge Network** badge based on real-time response times.
+### 🌟 5. Shareable "Speed Certificate" Cards
+- **Verified Network Cards**: Generates high-resolution 1200x630 cryptographic-styled diagnostic summary cards featuring connection speeds, bufferbloat indicators, and ISP edge notes.
+- **One-Click PNG Export**: Download instant PNG images engineered for social sharing, technical ISP support tickets, or billing disputes.
 
-### 🌟 6. Live Gaming Latency Oscilloscope
-* **Real-time Ping Waveform**: Continuously samples ping and jitter every second, rendering a live SVG waveform to capture micro-spikes.
-* **Connection Stability Rating**: Calculates a percentage stability score (`99.4% Rock Solid`) to diagnose packet drops and frame lag during online gaming and video calls.
+### 🌟 6. Wi-Fi & Channel Health Diagnostic
+- **Local Link Inspection**: Measures Wi-Fi link speed, gateway RTT, and detected frequency bands (2.4 GHz, 5.0 GHz, 6.0 GHz).
+- **Signal Optimization Tips**: Provides intelligent recommendations for router placement, interference mitigation, and channel congestion reduction.
 
-### 🌟 7. Shareable "Speed Certificate" Card (PNG Export)
-* **Verified Network Badges**: Generates high-fidelity speed certificate cards displaying Download, Upload, Ping, Jitter, ISP, and application quality ratings.
-* **One-Click Image Download**: Exports crystal-clear 1200x630 PNG images formatted for social media, technical support logs, or ISP verification tickets.
+### 🌟 7. 100% In-App Internal APK Self-Updater
+- **Zero Browser Redirects**: Android APK users can check for releases, stream background APK updates with live progress percentage indicators, and invoke the system package installer entirely within the app.
 
-### 🌟 8. Wi-Fi & Channel Health Analyzer
-* **Local Link Telemetry**: Inspects estimated Wi-Fi link speed, gateway RTT, and detected frequency band (`2.4 GHz`, `5.0 GHz`, or `6.0 GHz`).
-* **Router Optimization Tips**: Provides intelligent guidance for optimal router placement and line-of-sight signal health.
+---
+
+## 📊 Comparison: NetPulse PRO vs Traditional Speed Tests
+
+| Feature | Legacy Speed Tests (Ookla / Fast) | NetPulse PRO |
+| :--- | :---: | :---: |
+| **Telemetry Engine** | Third-party proxy / Sponsored nodes | **Direct Cloudflare Anycast HTTP/3 QUIC** |
+| **Ad Bloat & Tracking** | ❌ Heavy banner ads & tracking scripts | **✅ 100% Zero Ads & Zero Tracking** |
+| **Dual-Gauge Sparklines** | ❌ Sequential single-dial readout | **✅ Real-time dual Download & Upload splines** |
+| **Loaded Bufferbloat Latency** | ⚠️ Partial or hidden | **✅ Detailed unloaded & loaded latency bars** |
+| **Multi-CDN Benchmark** | ❌ Single selected server | **✅ Side-by-side Cloudflare vs AWS vs Google** |
+| **Gaming Ping Oscilloscope** | ❌ One-time ping average | **✅ Live continuous 1 Hz waveform monitor** |
+| **Verified PNG Certificate** | ⚠️ Static watermarked screenshot | **✅ 1200x630 verified export card** |
+| **Native Android App** | ⚠️ Ad-supported app store binary | **✅ Hardened APK with internal self-updater** |
+| **Open Source** | ❌ Proprietary closed-source | **✅ 100% Open Source under MIT License** |
 
 ---
 
 ## 🔒 Security Architecture & Defensive Hardening
 
-| Protection Layer | Technical Specification | Security Benefit |
+| Protection Layer | Technical Implementation | Security & Privacy Benefit |
 | :--- | :--- | :--- |
-| **Strict HTTPS Enforced** | `network_security_config.xml` (`cleartextTrafficPermitted="false"`) | Rejects unencrypted HTTP traffic to eliminate Man-in-the-Middle (MitM) sniffing. |
-| **DevTools Lockdown** | `webContentsDebuggingEnabled: false` | Blocks USB Chrome DevTools debugging in production builds. |
-| **Backup Leak Prevention** | `android:allowBackup="false"` | Prevents `adb backup` extraction of app tokens and diagnostic history. |
-| **Content Security Policy** | Strict CSP meta tags with `frame-ancestors 'none'` | Eliminates Cross-Site Scripting (XSS) and iframe clickjacking. |
-| **Code Obfuscation & R8** | ProGuard rules with log stripping (`Log.d`, `Log.v`) | Removes debug telemetry from compiled binaries. |
+| **Strict HTTPS Enforced** | 
+etwork_security_config.xml (cleartextTrafficPermitted="false") | Rejects plain-text unencrypted HTTP traffic to eliminate Man-in-the-Middle (MitM) attacks. |
+| **DevTools Lockdown** | webContentsDebuggingEnabled: false | Disables USB debugging and inspector access in production Android releases. |
+| **Backup Leak Prevention** | ndroid:allowBackup="false" | Prevents db backup extraction of local storage, cached results, and test history. |
+| **Content Security Policy** | Strict CSP meta tags with rame-ancestors 'none' | Eliminates Cross-Site Scripting (XSS) and prevents iframe clickjacking. |
+| **Code Obfuscation & R8** | ProGuard rules with log stripping (Log.d, Log.v) | Strips debug telemetry, stack signatures, and sensitive metadata from compiled binaries. |
 
 ---
 
-## 📦 Native Android App (`NetPulse-v0.8.apk`)
+## 📦 Native Android Package (NetPulse-v0.8.apk)
 
 * **Direct APK Download**: [NetPulse-v0.8.apk (GitHub Release v0.8)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.8)
-* **Package Name**: `com.netpulse.speedtest`
-* **Target SDK**: Android 15 (API Level 35)
-* **Minimum SDK**: Android 5.1 (API Level 22)
-* **Size**: `~5.1 MB`
+* **Latest Universal Binary**: [netpulse.apk (Direct Mirror)](https://github.com/Suvesh108/NetPulse/raw/main/netpulse.apk)
+* **Package Name**: com.netpulse.speedtest
+* **Target Android Version**: Android 15 (API Level 35)
+* **Minimum Android Version**: Android 5.1 Lollipop (API Level 22)
+* **Package Size**: 5.12 MB (Ultra-lightweight)
 
 ---
 
 ## 🛠️ Technology Stack
 
-* **Frontend**: React 19 (TypeScript), Tailwind CSS 4, Lucide Icons
-* **Mobile Runtime**: Capacitor 8 (Android Platform)
-* **Diagnostic Engine**: `@cloudflare/speedtest` Web SDK
-* **Build Tooling**: Vite 6, OpenJDK 21 LTS, Gradle 8.14
+| Layer | Technologies |
+| :--- | :--- |
+| **Core Framework** | React 19, TypeScript 5.8, Vite 6 |
+| **Styling & Theming** | Tailwind CSS v4.1, Modern Glassmorphism, OLED Dark Mode |
+| **Iconography & Motion** | Lucide Icons, Motion (Framer Motion v12) |
+| **Network Engine** | @cloudflare/speedtest Web SDK, HTTP/3 Anycast Edge |
+| **Mobile Runtime** | Capacitor 8 (Android Platform) |
+| **Compilation** | OpenJDK 21 LTS, Gradle 8.14, Android SDK Build Tools 35.0.0 |
 
 ---
 
-## 💻 Local Development & Build Instructions
+## 💻 Local Development & Build Guide
+
+### Prerequisites
+- **Node.js**: v18.0+ or v20.0+ (Node v20 LTS recommended)
+- **npm** or **pnpm**
+- **JDK 21 LTS** & **Android Studio / Command Line Tools** (for APK builds)
 
 ```bash
-# 1. Clone repository
+# 1. Clone the repository
 git clone https://github.com/Suvesh108/NetPulse.git
-cd netpulse
+cd NetPulse
 
 # 2. Install dependencies
 npm install
 
-# 3. Start local development server (Accessible on LAN: http://0.0.0.0:3000)
+# 3. Start local development server (Accessible on local network via http://0.0.0.0:3000)
 npm run dev
 
-# 4. Build production web bundle
+# 4. Compile optimized web production bundle
 npm run build
 
-# 5. Sync and build Android APK
+# 5. Sync Capacitor Android project
 npx cap sync android
+
+# 6. Build release Android APK
 cd android
 ./gradlew assembleDebug
 ```
 
+Compiled APK will be generated at:
+`android/app/build/outputs/apk/debug/app-debug.apk`
+
 ---
 
-## 📄 License
-This project is open-source and available under the [MIT License](LICENSE).
+## 📄 License & Intellectual Property
+
+This project is open-source software licensed under the **[MIT License](LICENSE)**.
+
+```
+MIT License
+Copyright (c) 2026 Suvesh Kumar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction...
+```
+
+See the full license terms in [LICENSE](LICENSE) or [LICENSE.md](LICENSE.md).
+
+<div align="center">
+
+---
+
+**Crafted with precision by [Suvesh Kumar](https://github.com/Suvesh108)** • Built for edge speed enthusiasts worldwide.
+
+</div>
