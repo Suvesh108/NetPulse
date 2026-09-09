@@ -154,183 +154,183 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
   const selectedProtocol = routingProtocols.find(p => p.id === settings.routingProtocol) || routingProtocols[0];
 
   return (
-    <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-3 pb-24 md:pb-2 flex-1 min-h-0 select-none animate-fade-in" id="settings-section">
+    <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-4 pb-28 md:pb-16 flex-1 min-h-0 select-none animate-fade-in" id="settings-section">
       
-      {/* 2-COLUMN UNIFIED BENTO GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+      {/* 2-COLUMN BALANCED BENTO GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-4 items-start">
         
-        {/* LEFT COLUMN: CORE ENGINE & ROUTING DROPDOWNS (7 Cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#0B1120] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-4 transition-colors">
+        {/* LEFT COLUMN: TOPOLOGY, BUFFERBLOAT & CONFIG MATRIX */}
+        <div className="flex flex-col gap-3.5 sm:gap-4">
           
-          <div>
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800/80 mb-3.5">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-sm">
-                  <Server className="w-3.5 h-3.5" />
-                </div>
-                <div>
-                  <h3 className="font-sans font-bold text-sm text-slate-900 dark:text-slate-100">Network & Engine Topology</h3>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500">Target server backbone and transport mechanism</span>
-                </div>
-              </div>
-              <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800 font-bold uppercase tracking-wider">
-                Active Edge
-              </span>
-            </div>
-
-            {/* 1. Backend Selector Dropdown */}
-            <div className="flex flex-col gap-1.5 mb-3 relative z-30" ref={backendRef}>
-              <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                <span>Server Engine Backend</span>
-                <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">{engineBackends.length} nodes</span>
-              </label>
-
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setBackendDropdownOpen(!backendDropdownOpen);
-                    setProtocolDropdownOpen(false);
-                  }}
-                  className={`w-full p-2.5 sm:p-3 rounded-xl border bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between transition-all duration-150 cursor-pointer focus:outline-none ${
-                    backendDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm bg-white dark:bg-slate-900' : 'border-slate-200 dark:border-slate-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono border ${selectedBackend.color} dark:bg-opacity-20`}>
-                      {selectedBackend.badge}
-                    </span>
-                    <div className="flex flex-col text-left">
-                      <span className="font-sans font-bold text-xs text-slate-900 dark:text-slate-100">{selectedBackend.name}</span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{selectedBackend.pops}</span>
-                    </div>
+          {/* Card 1: Network & Engine Topology */}
+          <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-4 transition-colors">
+            
+            <div>
+              <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800/80 mb-3.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-sm">
+                    <Server className="w-3.5 h-3.5" />
                   </div>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${backendDropdownOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''}`} />
-                </button>
+                  <div>
+                    <h3 className="font-sans font-bold text-sm text-slate-900 dark:text-slate-100">Network & Engine Topology</h3>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500">Target server backbone and transport mechanism</span>
+                  </div>
+                </div>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800 font-bold uppercase tracking-wider">
+                  Active Edge
+                </span>
+              </div>
 
-                {backendDropdownOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col p-1 gap-1 animate-fade-in max-h-56 overflow-y-auto">
-                    {engineBackends.map((engine) => {
-                      const isSelected = settings.engineBackend === engine.id;
-                      return (
-                        <div
-                          key={engine.id}
-                          onClick={() => {
-                            handleUpdateField('engineBackend', engine.id);
-                            setBackendDropdownOpen(false);
-                          }}
-                          className={`p-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer ${
-                            isSelected 
-                              ? 'bg-blue-50/80 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200' 
-                              : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className={`px-1.5 py-0.2 rounded text-[8px] font-bold font-mono border shrink-0 ${engine.color} dark:bg-opacity-20`}>
-                              {engine.badge}
-                            </span>
+              {/* 1. Backend Selector Dropdown */}
+              <div className="flex flex-col gap-1.5 mb-3 relative z-30" ref={backendRef}>
+                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                  <span>Server Engine Backend</span>
+                  <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">{engineBackends.length} nodes</span>
+                </label>
+
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBackendDropdownOpen(!backendDropdownOpen);
+                      setProtocolDropdownOpen(false);
+                    }}
+                    className={`w-full p-2.5 sm:p-3 rounded-xl border bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between transition-all duration-150 cursor-pointer focus:outline-none ${
+                      backendDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm bg-white dark:bg-slate-900' : 'border-slate-200 dark:border-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono border ${selectedBackend.color} dark:bg-opacity-20`}>
+                        {selectedBackend.badge}
+                      </span>
+                      <div className="flex flex-col text-left">
+                        <span className="font-sans font-bold text-xs text-slate-900 dark:text-slate-100">{selectedBackend.name}</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{selectedBackend.pops}</span>
+                      </div>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${backendDropdownOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''}`} />
+                  </button>
+
+                  {backendDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col p-1 gap-1 animate-fade-in max-h-56 overflow-y-auto">
+                      {engineBackends.map((engine) => {
+                        const isSelected = settings.engineBackend === engine.id;
+                        return (
+                          <div
+                            key={engine.id}
+                            onClick={() => {
+                              handleUpdateField('engineBackend', engine.id);
+                              setBackendDropdownOpen(false);
+                            }}
+                            className={`p-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer ${
+                              isSelected 
+                                ? 'bg-blue-50/80 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200' 
+                                : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+                            }`}
+                          >
                             <div className="flex flex-col">
-                              <span className="font-bold text-xs">{engine.name}</span>
-                              <span className="text-[9px] text-slate-400 dark:text-slate-500">{engine.description}</span>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-xs">{engine.name}</span>
+                                <span className={`px-1 py-0.2 rounded text-[8px] font-bold font-mono border ${engine.color} dark:bg-opacity-20`}>
+                                  {engine.badge}
+                                </span>
+                              </div>
+                              <span className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5">{engine.description}</span>
                             </div>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 ml-2" />}
                           </div>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 ml-2" />}
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {settings.engineBackend === 'custom' && (
+                  <div className="mt-1 p-2 bg-purple-50/60 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-lg flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-purple-900 dark:text-purple-300">Custom Speedtest Endpoint URL</label>
+                    <input
+                      type="text"
+                      value={settings.customServerUrl || ''}
+                      onChange={(e) => handleUpdateField('customServerUrl', e.target.value)}
+                      placeholder="https://speed.yourdomain.com/__down"
+                      className="w-full px-2.5 py-1 bg-white dark:bg-slate-900 rounded border border-purple-200 dark:border-purple-800 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    />
                   </div>
                 )}
               </div>
 
-              {settings.engineBackend === 'custom' && (
-                <div className="mt-1 p-2 bg-purple-50/60 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-lg flex flex-col gap-1">
-                  <label className="text-[10px] font-bold text-purple-900 dark:text-purple-300">Custom Speedtest Endpoint URL</label>
-                  <input
-                    type="text"
-                    value={settings.customServerUrl || ''}
-                    onChange={(e) => handleUpdateField('customServerUrl', e.target.value)}
-                    placeholder="https://speed.yourdomain.com/__down"
-                    className="w-full px-2.5 py-1 bg-white dark:bg-slate-900 rounded border border-purple-200 dark:border-purple-800 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                  />
-                </div>
-              )}
-            </div>
+              {/* 2. Routing Protocol Selector Dropdown */}
+              <div className="flex flex-col gap-1.5 relative z-20" ref={protocolRef}>
+                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                  <span>Routing Protocol & Transport</span>
+                  <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">{routingProtocols.length} protocols</span>
+                </label>
 
-            {/* 2. Routing Protocol Selector Dropdown */}
-            <div className="flex flex-col gap-1.5 relative z-20" ref={protocolRef}>
-              <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                <span>Routing Protocol & Transport</span>
-                <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">{routingProtocols.length} protocols</span>
-              </label>
-
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProtocolDropdownOpen(!protocolDropdownOpen);
-                    setBackendDropdownOpen(false);
-                  }}
-                  className={`w-full p-2.5 sm:p-3 rounded-xl border bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between transition-all duration-150 cursor-pointer focus:outline-none ${
-                    protocolDropdownOpen ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-sm bg-white dark:bg-slate-900' : 'border-slate-200 dark:border-slate-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-base">{selectedProtocol.icon}</span>
-                    <div className="flex flex-col text-left">
-                      <span className="font-sans font-bold text-xs text-slate-900 dark:text-slate-100">{selectedProtocol.name}</span>
-                      <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-mono font-bold">{selectedProtocol.speedTag}</span>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProtocolDropdownOpen(!protocolDropdownOpen);
+                      setBackendDropdownOpen(false);
+                    }}
+                    className={`w-full p-2.5 sm:p-3 rounded-xl border bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between transition-all duration-150 cursor-pointer focus:outline-none ${
+                      protocolDropdownOpen ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-sm bg-white dark:bg-slate-900' : 'border-slate-200 dark:border-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-base">{selectedProtocol.icon}</span>
+                      <div className="flex flex-col text-left">
+                        <span className="font-sans font-bold text-xs text-slate-900 dark:text-slate-100">{selectedProtocol.name}</span>
+                        <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-mono font-bold">{selectedProtocol.speedTag}</span>
+                      </div>
                     </div>
-                  </div>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${protocolDropdownOpen ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''}`} />
-                </button>
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${protocolDropdownOpen ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''}`} />
+                  </button>
 
-                {protocolDropdownOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col p-1 gap-1 animate-fade-in max-h-56 overflow-y-auto">
-                    {routingProtocols.map((proto) => {
-                      const isSelected = settings.routingProtocol === proto.id;
-                      return (
-                        <div
-                          key={proto.id}
-                          onClick={() => {
-                            handleUpdateField('routingProtocol', proto.id);
-                            setProtocolDropdownOpen(false);
-                          }}
-                          className={`p-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer ${
-                            isSelected 
-                              ? 'bg-indigo-50/80 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200' 
-                              : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-base shrink-0">{proto.icon}</span>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-xs">{proto.name}</span>
-                              <span className="text-[9px] text-slate-400 dark:text-slate-500">{proto.description}</span>
+                  {protocolDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col p-1 gap-1 animate-fade-in max-h-56 overflow-y-auto">
+                      {routingProtocols.map((proto) => {
+                        const isSelected = settings.routingProtocol === proto.id;
+                        return (
+                          <div
+                            key={proto.id}
+                            onClick={() => {
+                              handleUpdateField('routingProtocol', proto.id);
+                              setProtocolDropdownOpen(false);
+                            }}
+                            className={`p-2 rounded-lg flex items-center justify-between transition-all duration-150 cursor-pointer ${
+                              isSelected 
+                                ? 'bg-indigo-50/80 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200' 
+                                : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-base shrink-0">{proto.icon}</span>
+                              <div className="flex flex-col">
+                                <span className="font-bold text-xs">{proto.name}</span>
+                                <span className="text-[9px] text-slate-400 dark:text-slate-500">{proto.description}</span>
+                              </div>
                             </div>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0 ml-2" />}
                           </div>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0 ml-2" />}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
+
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+              <span>TLS 1.3 / QUIC 0-RTT Support</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Auto-Negotiated</span>
             </div>
 
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-            <span>TLS 1.3 / QUIC 0-RTT Support</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-bold">Auto-Negotiated</span>
-          </div>
-
-        </div>
-
-        {/* RIGHT COLUMN: BUFFERBLOAT & LIVE STATS (5 Cols) */}
-        <div className="lg:col-span-5 flex flex-col gap-3 justify-between">
-          
-          {/* Bufferbloat / Loaded Latency Toggles */}
-          <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2.5 transition-colors">
+          {/* Card 2: Bufferbloat / Loaded Latency Toggles */}
+          <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2.5 transition-colors">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
@@ -382,14 +382,14 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
             </div>
           </div>
 
-          {/* Engine Diagnostic Output Matrix */}
-          <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2 transition-colors">
+          {/* Card 3: Engine Diagnostic Output Matrix */}
+          <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2 transition-colors">
             <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Active Configuration</span>
               </div>
-              <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500">v2.5.0-edge</span>
+              <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500">v1.0.0</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
@@ -414,10 +414,15 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
             </div>
           </div>
 
-          {/* In-App Software Updater Card */}
+        </div>
+
+        {/* RIGHT COLUMN: UPDATER & SCHEDULED TESTS */}
+        <div className="flex flex-col gap-3.5 sm:gap-4">
+          
+          {/* Card 1: In-App Software Updater */}
           <InAppUpdater />
 
-          {/* Automated Scheduled Tests & Alerts Card */}
+          {/* Card 2: Automated Scheduled Tests & Alerts */}
           <ScheduledTests />
 
         </div>

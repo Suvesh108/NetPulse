@@ -22,8 +22,8 @@
 }
 
 html.dark .modern-grid-bg {
-  background-color: #030712 !important;
-  background-image: radial-gradient(#1E293B 0.75px, transparent 0.75px) !important;
+  background-color: #000000 !important;
+  background-image: radial-gradient(#262626 0.75px, transparent 0.75px) !important;
   background-size: 20px 20px;
 }
 
@@ -41,16 +41,51 @@ html, body {
 }
 
 html.dark, html.dark body {
-  background-color: #030712 !important;
+  background-color: #000000 !important;
   color: #F8FAFC !important;
 }
 
-/* Locked single window viewport on desktop screens only */
+/* Desktop scrolling enabled for long-form diagnostics, history and settings */
 @media (min-width: 768px) {
   html, body {
-    height: 100dvh;
-    overflow: hidden;
+    min-height: 100dvh;
+    overflow-y: auto;
   }
+}
+
+/* Modern Minimal Scrollbars & Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Premium Smooth Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+  transition: all 0.25s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
 }
 
 /* Glassmorphism Card System */
@@ -63,12 +98,33 @@ html.dark, html.dark body {
 }
 
 html.dark .modern-glass-card {
-  background: rgba(11, 17, 32, 0.85);
-  border: 1px solid rgba(30, 41, 59, 0.9);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  background: rgba(18, 18, 18, 0.95);
+  border: 1px solid rgba(38, 38, 38, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
 }
 
-/* Sleek Glowing Dial & Rings */
+/* Premium Card Hover Motion & Physics */
+.premium-card {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.25s ease,
+              background-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+.premium-card:hover {
+  transform: translateY(-2.5px) scale(1.003);
+  box-shadow: 0 12px 30px -6px rgba(0, 0, 0, 0.08), 0 0 16px -2px rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+html.dark .premium-card:hover {
+  transform: translateY(-2.5px) scale(1.003);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.9), 0 0 24px -4px rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Keyframe Animations */
 @keyframes modern-pulse {
   0%, 100% { transform: scale(1); opacity: 0.3; }
   50% { transform: scale(1.15); opacity: 0.05; }
@@ -76,7 +132,44 @@ html.dark .modern-glass-card {
 
 @keyframes float-slow {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes float-orb-1 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.12); }
+  66% { transform: translate(-30px, 20px) scale(0.95); }
+}
+
+@keyframes float-orb-2 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(-35px, 35px) scale(1.1); }
+  66% { transform: translate(25px, -20px) scale(0.92); }
+}
+
+@keyframes glow-pulse-button {
+  0%, 100% { 
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.35), 0 4px 12px rgba(0, 0, 0, 0.15); 
+  }
+  50% { 
+    box-shadow: 0 0 35px rgba(59, 130, 246, 0.65), 0 0 15px rgba(99, 102, 241, 0.45); 
+  }
+}
+
+@keyframes tab-slide-in {
+  0% { 
+    opacity: 0; 
+    transform: translateY(12px) scale(0.995); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
 .animate-pulse-ring {
@@ -85,6 +178,22 @@ html.dark .modern-glass-card {
 
 .animate-float {
   animation: float-slow 4s ease-in-out infinite;
+}
+
+.animate-orb-1 {
+  animation: float-orb-1 18s ease-in-out infinite;
+}
+
+.animate-orb-2 {
+  animation: float-orb-2 22s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse-button 2.5s infinite ease-in-out;
+}
+
+.animate-tab-slide {
+  animation: tab-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Remove default button & input black focus boxes/outlines across all browsers */
@@ -99,21 +208,3 @@ button:focus, button:focus-visible,
   box-shadow: none;
 }
 
-/* Modern Minimal Scrollbars */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 9999px;
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
-}

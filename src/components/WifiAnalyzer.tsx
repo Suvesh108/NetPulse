@@ -63,31 +63,30 @@ export default function WifiAnalyzer() {
   const signalPercentage = Math.max(5, Math.min(100, Math.round(((rssi - (-90)) / (-30 - (-90))) * 100)));
 
   return (
-    <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-4 transition-colors">
+    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-4 transition-colors">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-cyan-600 text-white flex items-center justify-center shadow-sm">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80 gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-cyan-600 text-white flex items-center justify-center shadow-sm shrink-0">
             <Wifi className="w-3.5 h-3.5" />
           </div>
-          <div>
-            <h3 className="font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              Wi-Fi RF Signal & Link Analyzer
-              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-extrabold border ${rating.badge}`}>
-                {rating.label}
-              </span>
+          <div className="flex items-center gap-2 min-w-0">
+            <h3 className="font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
+              Wi-Fi RF Link
             </h3>
-            <span className="text-[9px] text-slate-400">Calibrated RSSI (-dBm), Signal-to-Noise (SNR), channel band, & coverage</span>
+            <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full font-extrabold border shrink-0 ${rating.badge}`}>
+              {rating.label}
+            </span>
           </div>
         </div>
 
         <button
           onClick={analyzeConnection}
           disabled={analyzing}
-          className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+          className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
         >
-          <RefreshCw className={`w-3 h-3 ${analyzing ? 'animate-spin text-cyan-600' : 'text-slate-500'}`} />
+          <RefreshCw className={`w-3.5 h-3.5 shrink-0 ${analyzing ? 'animate-spin text-cyan-600' : 'text-slate-500'}`} />
           <span>{analyzing ? 'Scanning...' : 'Re-Scan'}</span>
         </button>
       </div>
@@ -179,16 +178,6 @@ export default function WifiAnalyzer() {
             <span className="font-black text-sm text-slate-900 dark:text-slate-100">{connectionInfo.rtt} ms</span>
             <span className="block text-[9px] text-emerald-600 font-bold">Zero AP Congestion</span>
           </div>
-        </div>
-      </div>
-
-      {/* Actionable Coverage Tips */}
-      <div className="p-2.5 rounded-xl bg-cyan-50/50 dark:bg-cyan-950/20 border border-cyan-200/60 dark:border-cyan-800/40 flex items-center justify-between text-[10px]">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
-          <span className="text-slate-700 dark:text-slate-300">
-            <b>Signal Advice:</b> RSSI at <b>{rssi} dBm</b> delivers low packet latency and maximum PHY modulation. Ideal for real-time multiplayer gaming and 4K HDR streaming.
-          </span>
         </div>
       </div>
 

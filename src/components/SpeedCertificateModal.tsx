@@ -45,8 +45,8 @@ export default function SpeedCertificateModal({
 
       // Dark background gradient
       const bgGrad = ctx.createLinearGradient(0, 0, 1200, 680);
-      bgGrad.addColorStop(0, '#090D16');
-      bgGrad.addColorStop(1, '#030712');
+      bgGrad.addColorStop(0, '#121212');
+      bgGrad.addColorStop(1, '#000000');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, 1200, 680);
 
@@ -64,44 +64,44 @@ export default function SpeedCertificateModal({
       ctx.font = '18px monospace';
       ctx.fillText(`Edge Node: ${activeServerName} • Date: ${dateStr}`, 60, 120);
 
-      // Download Box
+      // Latency Box
       ctx.fillStyle = '#1E293B';
       ctx.fillRect(60, 160, 340, 170);
-      ctx.fillStyle = '#F6821F';
+      ctx.fillStyle = '#F59E0B';
       ctx.font = 'bold 20px sans-serif';
-      ctx.fillText('DOWNLOAD SPEED', 80, 200);
+      ctx.fillText('PING & JITTER', 80, 200);
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 60px sans-serif';
-      ctx.fillText(`${downloadSpeed.toFixed(1)}`, 80, 270);
+      ctx.fillText(`${ping}`, 80, 270);
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#94A3B8';
-      ctx.fillText(unit, 280, 270);
+      ctx.fillText(`ms (±${jitter}ms)`, 170, 270);
 
-      // Upload Box
+      // Download Box
       ctx.fillStyle = '#1E293B';
       ctx.fillRect(430, 160, 340, 170);
-      ctx.fillStyle = '#A855F7';
+      ctx.fillStyle = '#F6821F';
       ctx.font = 'bold 20px sans-serif';
-      ctx.fillText('UPLOAD SPEED', 450, 200);
+      ctx.fillText('DOWNLOAD SPEED', 450, 200);
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 60px sans-serif';
-      ctx.fillText(`${uploadSpeed.toFixed(1)}`, 450, 270);
+      ctx.fillText(`${downloadSpeed.toFixed(1)}`, 450, 270);
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#94A3B8';
       ctx.fillText(unit, 650, 270);
 
-      // Latency Box
+      // Upload Box
       ctx.fillStyle = '#1E293B';
       ctx.fillRect(800, 160, 340, 170);
-      ctx.fillStyle = '#F59E0B';
+      ctx.fillStyle = '#A855F7';
       ctx.font = 'bold 20px sans-serif';
-      ctx.fillText('PING & JITTER', 820, 200);
+      ctx.fillText('UPLOAD SPEED', 820, 200);
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 60px sans-serif';
-      ctx.fillText(`${ping}`, 820, 270);
+      ctx.fillText(`${uploadSpeed.toFixed(1)}`, 820, 270);
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#94A3B8';
-      ctx.fillText(`ms (±${jitter}ms)`, 910, 270);
+      ctx.fillText(unit, 1020, 270);
 
       // Readiness Ratings Strip
       ctx.fillStyle = '#0F172A';
@@ -140,19 +140,19 @@ export default function SpeedCertificateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in">
-      <div className="bg-white dark:bg-[#0B1120] w-full max-w-xl rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col gap-4 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
+      <div className="bg-white dark:bg-[#121212] w-full max-w-xl rounded-3xl p-6 border border-slate-200 dark:border-[#262626] shadow-2xl flex flex-col gap-4 relative">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-[#222222] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Certificate Card Body */}
-        <div ref={cardRef} className="p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white border border-slate-700/60 shadow-xl flex flex-col gap-4">
+        <div ref={cardRef} className="p-5 rounded-2xl bg-gradient-to-br from-black via-zinc-950 to-neutral-900 text-white border border-neutral-800 shadow-xl flex flex-col gap-4">
           
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <div className="flex items-center gap-2">
@@ -172,8 +172,13 @@ export default function SpeedCertificateModal({
             </div>
           </div>
 
-          {/* Key Metrics */}
+          {/* Key Metrics: Latency -> Download -> Upload */}
           <div className="grid grid-cols-3 gap-2 text-center font-mono">
+            <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex flex-col">
+              <span className="text-[9px] text-amber-400 font-bold">LATENCY</span>
+              <span className="text-2xl font-black text-white">{ping}</span>
+              <span className="text-[9px] text-slate-400">ms (±{jitter}ms)</span>
+            </div>
             <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex flex-col">
               <span className="text-[9px] text-[#F6821F] font-bold">DOWNLOAD</span>
               <span className="text-2xl font-black text-white">{downloadSpeed.toFixed(1)}</span>
@@ -183,11 +188,6 @@ export default function SpeedCertificateModal({
               <span className="text-[9px] text-purple-400 font-bold">UPLOAD</span>
               <span className="text-2xl font-black text-white">{uploadSpeed.toFixed(1)}</span>
               <span className="text-[9px] text-slate-400">{unit}</span>
-            </div>
-            <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex flex-col">
-              <span className="text-[9px] text-amber-400 font-bold">LATENCY</span>
-              <span className="text-2xl font-black text-white">{ping}</span>
-              <span className="text-[9px] text-slate-400">ms (±{jitter}ms)</span>
             </div>
           </div>
 

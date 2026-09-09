@@ -99,30 +99,31 @@ export default function PingOscilloscope() {
     : `M ${padding},${height / 2} L ${width - padding},${height / 2}`;
 
   return (
-    <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-3 transition-colors">
+    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-3 transition-colors">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80 gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
             <Gamepad2 className="w-3.5 h-3.5" />
           </div>
-          <div>
-            <h3 className="font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100">Live Gaming Latency Oscilloscope</h3>
-            <span className="text-[9px] text-slate-400">Continuous ping stability & jitter spike monitor</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <h3 className="font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
+              Ping Oscilloscope
+            </h3>
           </div>
         </div>
 
         <button
           onClick={isRunning ? stopMonitoring : startMonitoring}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 whitespace-nowrap ${
             isRunning 
               ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 border border-rose-200 dark:border-rose-800 active:scale-95'
               : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white active:scale-95'
           }`}
         >
-          {isRunning ? <Square className="w-3 h-3 fill-rose-600" /> : <Play className="w-3 h-3 fill-white" />}
-          <span>{isRunning ? 'Stop Monitor' : 'Start Monitor'}</span>
+          {isRunning ? <Square className="w-3 h-3 fill-rose-600 shrink-0" /> : <Play className="w-3 h-3 fill-white shrink-0" />}
+          <span>{isRunning ? 'Stop' : 'Start'}</span>
         </button>
       </div>
 

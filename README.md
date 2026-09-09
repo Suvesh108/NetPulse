@@ -2,25 +2,27 @@
 
 <img src="public/favicon.png" width="92" height="92" alt="NetPulse Logo" style="border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);" />
 
-# ⚡ NetPulse PRO
+# ⚡ NetPulse
 ### Enterprise-Grade Edge Network Telemetry & Real-Time Bandwidth Engine
 
-[![Version](https://img.shields.io/badge/Release-v0.9-059669?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.9)
-[![Android APK](https://img.shields.io/badge/Android_APK-v0.9-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.9)
+[![Version](https://img.shields.io/badge/Release-v1.0-059669?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v1.0)
+[![Windows App](https://img.shields.io/badge/Windows_Desktop-v1.0-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-Windows-v1.0.zip)
+[![Android APK](https://img.shields.io/badge/Android_APK-v1.0-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk)
 [![Live Web App](https://img.shields.io/badge/Live_Web_App-net--pulse-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://net-pulse-iota.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 
 [![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.1-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Electron](https://img.shields.io/badge/Desktop-Electron_44-47848F?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![Cloudflare Anycast](https://img.shields.io/badge/Engine-Cloudflare_Anycast-F38020?style=flat-square&logo=cloudflare&logoColor=white)](https://speed.cloudflare.com/)
 [![HTTP/3 QUIC](https://img.shields.io/badge/Protocol-HTTP%2F3_QUIC-7C3AED?style=flat-square&logo=internetexplorer&logoColor=white)](https://cloudflare.com/)
-[![Security Hardened](https://img.shields.io/badge/Security-Hardened-10B981?style=flat-square&logo=shieldcheck&logoColor=white)](https://github.com/Suvesh108/NetPulse)
 
 <br />
 
 **[ 🌐 Launch Live Web App ](https://net-pulse-iota.vercel.app/)** &nbsp;•&nbsp;
-**[ 📱 Download Android APK (v0.9) ](https://github.com/Suvesh108/NetPulse/releases/tag/v0.9)** &nbsp;•&nbsp;
+**[ 💻 Download Windows App (v1.0) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-Windows-v1.0.zip)** &nbsp;•&nbsp;
+**[ 📱 Download Android APK (v1.0) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk)** &nbsp;•&nbsp;
 **[ 📦 GitHub Releases ](https://github.com/Suvesh108/NetPulse/releases)** &nbsp;•&nbsp;
 **[ 📄 MIT License ](LICENSE)**
 
@@ -34,7 +36,7 @@
 
 Traditional speed test services are notorious for ad congestion, intrusive tracking beacons, artificial throughput smoothing, and restrictive local ISP routing biases. 
 
-**NetPulse PRO** re-engineers network telemetry from first principles. By opening direct, unthrottled TCP and HTTP/3 QUIC socket streams against Cloudflare's global Anycast edge network (330+ points of presence), NetPulse measures raw packet transit times, bufferbloat loaded latency, and sustained inbound/outbound saturation with sub-millisecond precision. 
+**NetPulse** re-engineers network telemetry from first principles. By opening direct, unthrottled TCP and HTTP/3 QUIC socket streams against Cloudflare's global Anycast edge network (330+ points of presence), NetPulse measures raw packet transit times, bufferbloat loaded latency, and sustained inbound/outbound saturation with sub-millisecond precision. 
 
 Whether diagnosing high-speed Gigabit fiber broadband, ultra-dense 5G NR carriers, or local Wi-Fi 6E/7 frequency congestion, NetPulse gives engineers and power users zero-latency observability without third-party advertisements or data harvesting.
 
@@ -44,7 +46,7 @@ Whether diagnosing high-speed Gigabit fiber broadband, ultra-dense 5G NR carrier
 
 ```
                        ┌─────────────────────────────────────────────────────────┐
-                       │                   NetPulse PRO Engine                   │
+                       │                     NetPulse Engine                     │
                        │           (React 19 • TypeScript • Capacitor)           │
                        └────────────────────────────┬────────────────────────────┘
                                                     │
@@ -115,9 +117,9 @@ Whether diagnosing high-speed Gigabit fiber broadband, ultra-dense 5G NR carrier
 
 ---
 
-## 📊 Comparison: NetPulse PRO vs Traditional Speed Tests
+## 📊 Comparison: NetPulse vs Traditional Speed Tests
 
-| Feature | Legacy Speed Tests (Ookla / Fast) | NetPulse PRO v0.9 |
+| Feature | Legacy Speed Tests (Ookla / Fast) | NetPulse v0.9 |
 | :--- | :---: | :---: |
 | **Telemetry Engine** | Third-party proxy / Sponsored nodes | **Direct Cloudflare Anycast HTTP/3 QUIC** |
 | **Ad Bloat & Tracking** | ❌ Heavy banner ads & tracking scripts | **✅ 100% Zero Ads & Zero Tracking** |

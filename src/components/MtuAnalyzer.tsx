@@ -55,38 +55,35 @@ export default function MtuAnalyzer() {
   };
 
   return (
-    <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-4 transition-colors">
+    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-4 transition-colors">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800">
+      <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800/80">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800 shrink-0">
             <Network className="w-4 h-4" />
           </div>
-          <div>
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              Path MTU & Fragmentation Analyzer
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                PMTUD Engine
-              </span>
+          <div className="flex items-center gap-2 min-w-0">
+            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+              Path MTU
             </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Detect packet fragmentation boundaries, VPN encapsulation overhead, and maximum transmission capacity.
-            </p>
+            <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shrink-0">
+              PMTUD
+            </span>
           </div>
         </div>
 
         <button
           onClick={runMtuAnalysis}
           disabled={isTesting}
-          className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0 whitespace-nowrap ${
             isTesting 
               ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
               : 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20'
           }`}
         >
-          {isTesting ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-          <span>{isTesting ? 'Probing Frames...' : 'Analyze Path MTU'}</span>
+          {isTesting ? <RotateCcw className="w-3.5 h-3.5 animate-spin shrink-0" /> : <Play className="w-3.5 h-3.5 fill-current shrink-0" />}
+          <span>{isTesting ? 'Probing...' : 'Analyze MTU'}</span>
         </button>
       </div>
 

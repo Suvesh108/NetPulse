@@ -47,7 +47,7 @@ export default function ScheduledTests() {
   };
 
   return (
-    <div className="bg-white dark:bg-[#0B1120] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-3 transition-colors">
+    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-3 transition-colors">
       
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
