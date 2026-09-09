@@ -205,7 +205,7 @@ of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction...
 ```
 
-See the full license terms in [LICENSE](LICENSE) or [LICENSE.md](LICENSE.md).
+See the full license terms in [LICENSE](LICENSE).
 
 <div align="center">
 
