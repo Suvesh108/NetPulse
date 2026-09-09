@@ -157,7 +157,7 @@ function MainApp() {
               <span className="font-sans text-sm sm:text-base md:text-lg font-black tracking-tight text-slate-900 dark:text-white select-none">
                 NetPulse
               </span>
-              <span className="hidden sm:inline-block text-[10px] font-mono text-blue-600 dark:text-blue-400 font-bold">
+              <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400 font-bold">
                 PRO
               </span>
             </div>
@@ -264,7 +264,7 @@ function MainApp() {
                 }`}>
                   <IconComp className="w-4 h-4 shrink-0" />
                 </div>
-                <span className="text-[9px] uppercase tracking-wider font-extrabold truncate max-w-[65px]">
+                <span className="text-[9px] uppercase font-extrabold tracking-tight">
                   {item.label}
                 </span>
                 {item.badge !== undefined && (

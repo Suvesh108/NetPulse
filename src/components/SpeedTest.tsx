@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw, ArrowDown, ArrowUp, Tv, Gamepad2, Video, Info, ShieldCheck, Share2, Copy, Check, Clock } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
-import SpeedTestMobile from './SpeedTestMobile';
 
 interface SpeedTestProps {
   settings: SimulationSettings;
@@ -485,19 +484,19 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     }[color];
 
     return (
-      <div className="flex flex-col gap-0.5 py-0.5 border-b border-slate-100 last:border-0">
+      <div className="flex flex-col gap-0.5 py-0.5 border-b border-slate-100 dark:border-slate-800/80 last:border-0">
         <div className="flex items-center justify-between text-[11px]">
           <div className="flex items-center gap-1">
-            <span className="font-bold text-slate-800 truncate text-[11px]">{title}</span>
-            <span className="text-[9px] text-slate-400 font-mono">({pctComplete})</span>
+            <span className="font-bold text-slate-800 dark:text-slate-200 truncate text-[11px]">{title}</span>
+            <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono">({pctComplete})</span>
           </div>
-          <span className={`font-mono text-[11px] font-black ${colorClasses.text}`}>
+          <span className={`font-mono text-[11px] font-black ${valMbps !== null ? colorClasses.text : 'text-slate-300 dark:text-slate-700'}`}>
             {valMbps !== null ? `${valMbps.toFixed(1)} ${unit}` : '--'}
           </span>
         </div>
 
-        <div className="relative w-full h-3.5 bg-slate-100/80 rounded overflow-hidden flex items-center px-1">
-          <div className="absolute inset-x-2 flex justify-between text-[7px] font-mono text-slate-400 pointer-events-none opacity-40">
+        <div className="relative w-full h-3.5 bg-slate-100/80 dark:bg-slate-800/80 rounded overflow-hidden flex items-center px-1">
+          <div className="absolute inset-x-2 flex justify-between text-[7px] font-mono text-slate-400 dark:text-slate-500 pointer-events-none opacity-40">
             <span>0</span>
             <span>20M</span>
             <span>40M</span>
@@ -532,36 +531,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
   return (
     <>
-      {/* 1. MOBILE-FIRST SPEED TEST INTERFACE (Visible on mobile screens < md) */}
-      <SpeedTestMobile
-        status={status}
-        currentSpeed={currentSpeed}
-        downloadVal={downloadVal}
-        uploadVal={uploadVal}
-        pingVal={pingVal}
-        jitterVal={jitterVal}
-        packetLossVal={packetLossVal}
-        packetsReceived={packetsReceived}
-        packetsTotal={packetsTotal}
-        downloadSpeedHistory={downloadSpeedHistory}
-        uploadSpeedHistory={uploadSpeedHistory}
-        unit={unit}
-        factor={factor}
-        settings={settings}
-        activeServerName={activeServerName}
-        measuredTime={measuredTime}
-        copiedLink={copiedLink}
-        onStartTest={handleStartTest}
-        onCancelTest={() => {}}
-        onCopyResults={handleCopyLink}
-        generateCloudflareSpline={generateCloudflareSpline}
-        calcVideoScore={getVideoStreamingScore}
-        calcGamingScore={getOnlineGamingScore}
-        calcChatScore={getVideoChattingScore}
-      />
-
-      {/* 2. DESKTOP SPEED TEST DASHBOARD (Preserved 100% untouched for desktop >= md) */}
-      <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto hidden md:flex flex-col gap-2 pb-1 flex-1 min-h-0 select-none animate-fade-in" id="dashboard-speed-section">
+      {/* UNIFIED SPEED TEST DASHBOARD (Responsive for Mobile & Desktop) */}
+      <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-2.5 pb-28 md:pb-2 flex-1 min-h-0 select-none animate-fade-in" id="dashboard-speed-section">
       
       {/* 1. CLOUDFLARE SPEEDOMETER HERO CONSOLE ("Your Internet Speed") */}
       <div className="w-full max-w-7xl 2xl:max-w-[1500px] bg-white dark:bg-[#0B1120] rounded-xl p-3.5 sm:p-4.5 flex flex-col border border-slate-200 dark:border-slate-800 shadow-sm transition-colors" id="dashboard-dial">
@@ -587,10 +558,10 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         </div>
 
         {/* 3-Section Grid: Download | Upload | Telemetry Column */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 my-2.5 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 my-2.5 items-stretch">
           
           {/* SECTION 1: DOWNLOAD (5 Columns) */}
-          <div className={`lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-5 lg:border-r lg:border-slate-100 dark:lg:border-slate-800/80 rounded-xl transition-all duration-300 ${
+          <div className={`lg:col-span-5 flex flex-col justify-between pr-0 lg:pr-5 pb-3 lg:pb-0 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800/80 rounded-xl transition-all duration-300 ${
             status === 'downloading' ? 'bg-orange-50/50 dark:bg-orange-950/20 p-2.5 -m-2.5 ring-1 ring-[#F6821F]/40 shadow-sm' : ''
           }`}>
             <div>
@@ -639,7 +610,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           </div>
 
           {/* SECTION 2: UPLOAD (5 Columns) */}
-          <div className={`lg:col-span-5 flex flex-col justify-between px-0 lg:px-5 lg:border-r lg:border-slate-100 dark:lg:border-slate-800/80 rounded-xl transition-all duration-300 ${
+          <div className={`lg:col-span-5 flex flex-col justify-between px-0 lg:px-5 pb-3 lg:pb-0 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800/80 rounded-xl transition-all duration-300 ${
             status === 'uploading' ? 'bg-purple-50/50 dark:bg-purple-950/20 p-2.5 -m-2.5 ring-1 ring-[#8D1EB1]/40 shadow-sm' : ''
           }`}>
             <div>
@@ -688,16 +659,16 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           </div>
 
           {/* SECTION 3: LATENCY, JITTER & PACKET LOSS (2 Columns) */}
-          <div className="lg:col-span-2 flex flex-col justify-between gap-1.5 pl-0 lg:pl-1">
+          <div className="lg:col-span-2 grid grid-cols-3 lg:flex lg:flex-col justify-between gap-2 lg:gap-1.5 pl-0 lg:pl-1 divide-x lg:divide-x-0 divide-slate-100 dark:divide-slate-800">
             
             {/* Latency */}
-            <div className="flex flex-col">
+            <div className="flex flex-col px-1 lg:px-0">
               <div className="flex items-center gap-1">
                 <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">Latency</span>
                 <Info className="w-2.5 h-2.5 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1">
-                <span id="ping-val" className="font-sans text-2xl font-bold text-[#18181B] dark:text-white">
+                <span id="ping-val" className="font-sans text-xl sm:text-2xl font-bold text-[#18181B] dark:text-white">
                   {pingVal !== null ? pingVal : '-'}
                 </span>
                 <span className="text-[10px] font-medium text-slate-500">ms</span>
@@ -713,13 +684,13 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             </div>
 
             {/* Jitter */}
-            <div className="flex flex-col pt-1 border-t border-slate-100 dark:border-slate-800/80">
+            <div className="flex flex-col pl-2 lg:pl-0 pt-0 lg:pt-1 border-t-0 lg:border-t border-slate-100 dark:border-slate-800/80">
               <div className="flex items-center gap-1">
                 <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">Jitter</span>
                 <Info className="w-2.5 h-2.5 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1">
-                <span id="jitter-val" className="font-sans text-2xl font-bold text-[#18181B] dark:text-white">
+                <span id="jitter-val" className="font-sans text-xl sm:text-2xl font-bold text-[#18181B] dark:text-white">
                   {jitterVal !== null ? jitterVal : '-'}
                 </span>
                 <span className="text-[10px] font-medium text-slate-500">ms</span>
@@ -735,13 +706,13 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             </div>
 
             {/* Packet Loss */}
-            <div className="flex flex-col pt-1 border-t border-slate-100 dark:border-slate-800/80">
+            <div className="flex flex-col pl-2 lg:pl-0 pt-0 lg:pt-1 border-t-0 lg:border-t border-slate-100 dark:border-slate-800/80">
               <div className="flex items-center gap-1">
                 <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">Packet Loss</span>
                 <Info className="w-2.5 h-2.5 text-slate-400" />
               </div>
               <div className="flex items-baseline gap-1">
-                <span id="packet-loss-val" className="font-sans text-2xl font-bold text-[#18181B] dark:text-white">
+                <span id="packet-loss-val" className="font-sans text-xl sm:text-2xl font-bold text-[#18181B] dark:text-white">
                   {packetLossVal !== null ? packetLossVal.toFixed(1) : (status === 'idle' ? '-' : '0.0')}
                 </span>
                 <span className="text-[10px] font-medium text-slate-500">%</span>
@@ -753,14 +724,14 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         </div>
 
         {/* Action Buttons & Phase Indicator */}
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80 gap-2">
+        <div className="flex flex-wrap items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80 gap-2">
           
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2">
             <button 
               id="dial-go-button"
               onClick={handleStartTest}
               disabled={status !== 'idle' && status !== 'completed'}
-              className={`px-4 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${
+              className={`px-4 py-2 sm:py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer active:scale-95 ${
                 status === 'idle' || status === 'completed'
                   ? 'bg-[#18181B] dark:bg-slate-800 text-white hover:bg-black dark:hover:bg-slate-700 shadow-sm' 
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 cursor-not-allowed'
@@ -781,7 +752,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
             <button 
               onClick={handleCopyLink}
-              className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-800 transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs"
+              className="px-3 py-2 sm:py-1.5 rounded-lg bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-800 transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs active:scale-95"
             >
               {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
               <span>{copiedLink ? 'Copied' : 'Share'}</span>
