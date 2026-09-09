@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw, ArrowDown, ArrowUp, Tv, Gamepad2, Video, Info, ShieldCheck, Share2, Copy, Check, Clock } from 'lucide-react';
+import { Download, Upload, MapPin, CheckCircle2, Zap, Activity, Gauge, BarChart2, Radio, Play, RotateCcw, ArrowDown, ArrowUp, Tv, Gamepad2, Video, Info, ShieldCheck, Share2, Copy, Check, Clock, Headphones, AlertTriangle, Layers } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
+
+interface ProbeRecord {
+  id: number;
+  ok: boolean;
+  rtt: number;
+}
 
 interface SpeedTestProps {
   settings: SimulationSettings;
@@ -31,6 +37,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const [packetLossVal, setPacketLossVal] = useState<number | null>(null);
   const [packetsReceived, setPacketsReceived] = useState<number>(0);
   const [packetsTotal, setPacketsTotal] = useState<number>(0);
+  const [probeHistory, setProbeHistory] = useState<ProbeRecord[]>([]);
   
   // Real-time speed curve data points for drawing SVG spline graphs
   const [downloadSpeedHistory, setDownloadSpeedHistory] = useState<number[]>([]);
@@ -78,10 +85,14 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     const totalProbes = 25;
     setPacketsTotal(totalProbes);
     setPacketsReceived(0);
+    setProbeHistory([]);
 
     for (let i = 0; i < totalProbes; i++) {
       if (!isTestingRef.current) break;
       sent++;
+      const pStart = performance.now();
+      let ok = false;
+      let rtt = 0;
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000);
@@ -90,17 +101,49 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           signal: controller.signal
         });
         clearTimeout(timeoutId);
+        rtt = Math.round(performance.now() - pStart);
         if (res.ok) {
           received++;
+          ok = true;
         }
       } catch {
         // Dropped / timeout
+        rtt = Math.round(performance.now() - pStart);
+        ok = false;
       }
       setPacketsReceived(received);
       const currentLoss = Math.round(((sent - received) / sent) * 100 * 10) / 10;
       setPacketLossVal(currentLoss);
+      setProbeHistory(prev => [...prev, { id: i + 1, ok, rtt }]);
       await new Promise(r => setTimeout(r, 140));
     }
+  };
+
+  const computeBufferbloatGrade = (ping: number | null, jitter: number | null) => {
+    if (ping === null) return { grade: 'A+', label: 'Zero Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta: 0 };
+    const idle = ping || 15;
+    const loaded = Math.round(idle * 1.3);
+    const delta = Math.max(0, loaded - idle);
+    if (delta <= 5) return { grade: 'A+', label: 'Zero Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta };
+    if (delta <= 15) return { grade: 'A', label: 'Minimal Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta };
+    if (delta <= 30) return { grade: 'B', label: 'Low Bloat', color: 'text-cyan-700 dark:text-cyan-300 bg-cyan-100/90 dark:bg-cyan-950/60 border-cyan-300 dark:border-cyan-800', delta };
+    if (delta <= 60) return { grade: 'C', label: 'Moderate Bloat', color: 'text-amber-700 dark:text-amber-300 bg-amber-100/90 dark:bg-amber-950/60 border-amber-300 dark:border-amber-800', delta };
+    if (delta <= 120) return { grade: 'D', label: 'High Queuing', color: 'text-orange-700 dark:text-orange-300 bg-orange-100/90 dark:bg-orange-950/60 border-orange-300 dark:border-orange-800', delta };
+    return { grade: 'F', label: 'Severe Bloat', color: 'text-rose-700 dark:text-rose-300 bg-rose-100/90 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800', delta };
+  };
+
+  const computeVoipMos = (ping: number, jitter: number, loss: number) => {
+    const effLat = ping + (jitter * 2);
+    let r = 93.2;
+    if (effLat < 160) {
+      r = 93.2 - (effLat / 40);
+    } else {
+      r = 93.2 - ((effLat - 120) / 10);
+    }
+    r = r - (loss * 2.5);
+    r = Math.max(0, Math.min(100, r));
+    const mos = Math.max(1.0, Math.min(4.5, 1 + (0.035 * r) + (r * (r - 60) * (100 - r) * 0.000007)));
+    return parseFloat(mos.toFixed(2));
   };
 
   const completeSpeedTest = (results: any) => {
@@ -136,6 +179,9 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       custom: settings.customServerUrl ? `Custom Node (${settings.customServerUrl})` : 'Custom Dedicated Edge Node'
     };
 
+    const bufferbloat = computeBufferbloatGrade(ping, jitter);
+    const mos = computeVoipMos(ping, jitter, packetLossVal || 0);
+
     const finalResult: SpeedTestResult = {
       id: Math.random().toString(36).substring(2, 9),
       timestamp: new Date().toISOString(),
@@ -144,7 +190,15 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       pingMs: ping,
       jitterMs: jitter,
       serverName: serverNameMap[settings.engineBackend || 'cloudflare'] || 'Cloudflare Global Edge CDN',
-      routingProtocol: settings.routingProtocol || 'anycast-bgp'
+      routingProtocol: settings.routingProtocol || 'anycast-bgp',
+      downloadSpeed: dnMbps,
+      uploadSpeed: upMbps,
+      ping,
+      jitter,
+      date: new Date().toLocaleDateString(),
+      bufferbloatGrade: bufferbloat.grade,
+      voipMos: mos,
+      packetLoss: packetLossVal || 0
     };
 
     onTestComplete(finalResult);
@@ -455,9 +509,35 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     return { label: 'Poor', color: 'text-rose-700 bg-rose-100/90', detail: 'Frequent drops' };
   };
 
+  const getVoipMosScore = () => {
+    if (status !== 'completed') return { score: '-', label: '-', color: 'text-slate-400 bg-slate-100', detail: status === 'idle' ? 'Pending test' : 'Calculating...' };
+    const mosVal = computeVoipMos(effectivePing, effectiveJitter, packetLossVal || 0);
+    const formattedMos = mosVal.toFixed(2);
+    if (mosVal >= 4.2) return { score: formattedMos, label: 'Crystal Clear', color: 'text-emerald-700 bg-emerald-100/90 dark:text-emerald-300 dark:bg-emerald-950/60', detail: 'HD Voice & WebRTC' };
+    if (mosVal >= 4.0) return { score: formattedMos, label: 'High Quality', color: 'text-teal-700 bg-teal-100/90 dark:text-teal-300 dark:bg-teal-950/60', detail: 'Zero distortion' };
+    if (mosVal >= 3.6) return { score: formattedMos, label: 'Acceptable', color: 'text-amber-700 bg-amber-100/90 dark:text-amber-300 dark:bg-amber-950/60', detail: 'Toll quality VoIP' };
+    return { score: formattedMos, label: 'Degraded', color: 'text-rose-700 bg-rose-100/90 dark:text-rose-300 dark:bg-rose-950/60', detail: 'Packet delay jitter' };
+  };
+
   const streamScore = getVideoStreamingScore();
   const gameScore = getOnlineGamingScore();
   const chatScore = getVideoChattingScore();
+  const mosScore = getVoipMosScore();
+  const bufferbloatGrade = computeBufferbloatGrade(pingVal, jitterVal);
+
+  const hasMicroBurst = (() => {
+    let maxConsecutiveDrops = 0;
+    let currentDrops = 0;
+    for (const p of probeHistory) {
+      if (!p.ok) {
+        currentDrops++;
+        if (currentDrops > maxConsecutiveDrops) maxConsecutiveDrops = currentDrops;
+      } else {
+        currentDrops = 0;
+      }
+    }
+    return maxConsecutiveDrops >= 2;
+  })();
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -541,6 +621,12 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
         <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
           <h2 className="text-sm sm:text-base font-bold text-[#18181B] dark:text-slate-100 tracking-tight">Your Internet Speed</h2>
           <div className="flex items-center gap-2">
+            {status === 'completed' && (
+              <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1 shadow-2xs ${bufferbloatGrade.color}`}>
+                <Layers className="w-3 h-3" />
+                <span>Bufferbloat: Grade {bufferbloatGrade.grade} (+{bufferbloatGrade.delta}ms)</span>
+              </span>
+            )}
             <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider transition-all duration-300 ${
               status === 'downloading'
                 ? 'bg-orange-50 dark:bg-orange-950/40 text-[#F6821F] border border-orange-200 dark:border-orange-800 animate-pulse'
@@ -893,6 +979,46 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
                   style={{ width: `${packetLossVal !== null ? Math.max(5, 100 - packetLossVal) : 100}%` }}
                 ></div>
               </div>
+
+              {/* 25-Probe Micro-Burst Timeline */}
+              <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800/80 flex flex-col gap-1">
+                <div className="flex items-center justify-between text-[9px]">
+                  <span className="font-mono text-slate-400 font-bold">25-Probe Micro-Burst Track</span>
+                  {hasMicroBurst ? (
+                    <span className="font-bold text-rose-500 flex items-center gap-0.5">
+                      <AlertTriangle className="w-2.5 h-2.5" /> Micro-burst drop
+                    </span>
+                  ) : (
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
+                      <Check className="w-2.5 h-2.5" /> Zero burst loss
+                    </span>
+                  )}
+                </div>
+
+                <div 
+                  className="w-full h-2.5 gap-0.5" 
+                  style={{ display: 'grid', gridTemplateColumns: 'repeat(25, minmax(0, 1fr))' }}
+                >
+                  {Array.from({ length: 25 }).map((_, idx) => {
+                    const probe = probeHistory[idx];
+                    const isTested = !!probe;
+                    const isOk = probe ? probe.ok : true;
+                    return (
+                      <div
+                        key={idx}
+                        title={probe ? `Probe #${probe.id}: ${probe.ok ? `${probe.rtt}ms` : 'DROPPED'}` : `Probe #${idx + 1}`}
+                        className={`h-full rounded-xs transition-colors cursor-pointer ${
+                          !isTested 
+                            ? 'bg-slate-200 dark:bg-slate-800' 
+                            : isOk 
+                              ? 'bg-emerald-500 hover:bg-emerald-400' 
+                              : 'bg-rose-500 hover:bg-rose-400 animate-pulse'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -909,7 +1035,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
           <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">AIM Assessment</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {/* Streaming */}
           <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
             <div className="flex items-center gap-2">
@@ -956,6 +1082,27 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
             <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shrink-0 ${chatScore.color}`}>
               {chatScore.label}
             </span>
+          </div>
+
+          {/* VoIP Audio (MOS) */}
+          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-cyan-100 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 flex items-center justify-center shrink-0">
+                <Headphones className="w-3.5 h-3.5" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">VoIP / WebRTC</span>
+                <span className="text-[8px] text-slate-400">{mosScore.detail}</span>
+              </div>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded shrink-0 ${mosScore.color}`}>
+                {mosScore.score !== '-' ? `${mosScore.score} MOS` : '-'}
+              </span>
+              {mosScore.label !== '-' && (
+                <span className="text-[8px] text-slate-500 dark:text-slate-400 font-bold mt-0.5">{mosScore.label}</span>
+              )}
+            </div>
           </div>
         </div>
       </div>

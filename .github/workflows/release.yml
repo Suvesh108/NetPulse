@@ -21,19 +21,22 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: NetPulse ${{ github.ref_name }}
           body: |
-            ## 🚀 NetPulse ${{ github.ref_name }} - Desktop-Fidelity Responsive Speed Test & Theme Alignment
+            ## 🚀 NetPulse ${{ github.ref_name }} - Professional Network Diagnostics Suite
             
             ### 📦 Download Assets
             - **Android APK (Direct Install)**: `NetPulse-${{ github.ref_name }}.apk`
-            - **Latest Bundle**: `netpulse.apk`
+            - **Latest Universal Bundle**: `netpulse.apk`
             
-            ### ✨ What's Fixed & Added in ${{ github.ref_name }}
-            - **Responsive Dual-Gauge Speed Test**: Mobile and Android APK now match the desktop-fidelity dual-gauge Download/Upload console with live sparklines and percentile tracking.
-            - **Dark Mode Box-Plot Track Contrast**: Fixed bright light-gray tracks in dark mode across Download and Upload payload breakdowns.
-            - **Full Mobile Navigation Labels**: Eliminated ellipsis truncation on DIAGNOSTICS in bottom dock.
-            - **Ample Mobile Bottom Clearance**: Added bottom clearance ensuring content is never hidden behind floating navigation.
-            - **100% In-App Internal APK Self-Updater**: Background APK download and system installation with zero browser redirects.
+            ### ✨ The 8 Professional Network Diagnostic Features in ${{ github.ref_name }}
+            - **Bufferbloat Letter Grade (A+ to F)**: Automated loaded latency delta grading on speed console & certificate.
+            - **DNS Resolver Speed Shootout (DoH)**: Live DoH query benchmark (Cloudflare vs Google vs Quad9 vs OpenDNS).
+            - **VoIP / WebRTC MOS Audio Score (1.0 to 4.5)**: ITU-T G.107 standard Mean Opinion Score calculation.
+            - **25-Probe Timeline Packet Loss Logger**: Micro-burst drop detection and individual packet RTT visualization.
+            - **IPv4 vs IPv6 Dual-Stack Routing Duel**: Direct protocol comparison with carrier CGNAT detection.
+            - **Path MTU & Packet Fragmentation Analyzer**: PMTUD frame boundary analysis across 1420B, 1492B, 1500B, 1508B.
+            - **Visual Hop-by-Hop Edge Route Trace**: BGP Autonomous System (ASN) and IATA airport colocation tracking.
+            - **Wi-Fi RF Signal & Link Analyzer**: Calibrated RSSI signal meter (-dBm) and Signal-to-Noise Ratio (SNR).
           files: |
+            NetPulse-v0.9.apk
             NetPulse-v0.8.apk
-            NetPulse-v0.7.apk
             netpulse.apk

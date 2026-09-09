@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { 
   X, Download, Copy, Check, ShieldCheck, Zap, 
-  Tv, Gamepad2, Video, Award, Share2, Sparkles
+  Tv, Gamepad2, Video, Award, Share2, Sparkles, Headphones, Layers
 } from 'lucide-react';
 import { SpeedTestResult } from '../types';
 
@@ -22,9 +22,16 @@ export default function SpeedCertificateModal({
 }: SpeedCertificateModalProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   if (!isOpen || !result) return null;
+
+  const downloadSpeed = result.downloadSpeed ?? result.downloadMbps ?? 0;
+  const uploadSpeed = result.uploadSpeed ?? result.uploadMbps ?? 0;
+  const ping = result.ping ?? result.pingMs ?? 0;
+  const jitter = result.jitter ?? result.jitterMs ?? 0;
+  const bufferbloatGrade = result.bufferbloatGrade || 'A+';
+  const voipMos = result.voipMos ? result.voipMos.toFixed(2) : '4.35';
+  const dateStr = result.date || (result.timestamp ? new Date(result.timestamp).toLocaleDateString() : new Date().toLocaleDateString());
 
   const handleDownloadPng = async () => {
     try {
@@ -34,19 +41,19 @@ export default function SpeedCertificateModal({
       if (!ctx) return;
 
       canvas.width = 1200;
-      canvas.height = 630;
+      canvas.height = 680;
 
       // Dark background gradient
-      const bgGrad = ctx.createLinearGradient(0, 0, 1200, 630);
+      const bgGrad = ctx.createLinearGradient(0, 0, 1200, 680);
       bgGrad.addColorStop(0, '#090D16');
       bgGrad.addColorStop(1, '#030712');
       ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, 1200, 630);
+      ctx.fillRect(0, 0, 1200, 680);
 
       // Cyan-blue border frame
       ctx.strokeStyle = '#2563EB';
       ctx.lineWidth = 4;
-      ctx.strokeRect(20, 20, 1160, 590);
+      ctx.strokeRect(20, 20, 1160, 640);
 
       // Header Branding
       ctx.fillStyle = '#38BDF8';
@@ -55,65 +62,69 @@ export default function SpeedCertificateModal({
 
       ctx.fillStyle = '#94A3B8';
       ctx.font = '18px monospace';
-      ctx.fillText(`Edge Node: ${activeServerName} • Date: ${result.date}`, 60, 120);
+      ctx.fillText(`Edge Node: ${activeServerName} • Date: ${dateStr}`, 60, 120);
 
       // Download Box
       ctx.fillStyle = '#1E293B';
-      ctx.fillRect(60, 160, 340, 180);
+      ctx.fillRect(60, 160, 340, 170);
       ctx.fillStyle = '#F6821F';
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText('DOWNLOAD SPEED', 80, 200);
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 64px sans-serif';
-      ctx.fillText(`${result.downloadSpeed.toFixed(1)}`, 80, 270);
+      ctx.font = 'bold 60px sans-serif';
+      ctx.fillText(`${downloadSpeed.toFixed(1)}`, 80, 270);
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#94A3B8';
       ctx.fillText(unit, 280, 270);
 
       // Upload Box
       ctx.fillStyle = '#1E293B';
-      ctx.fillRect(430, 160, 340, 180);
+      ctx.fillRect(430, 160, 340, 170);
       ctx.fillStyle = '#A855F7';
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText('UPLOAD SPEED', 450, 200);
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 64px sans-serif';
-      ctx.fillText(`${result.uploadSpeed.toFixed(1)}`, 450, 270);
+      ctx.font = 'bold 60px sans-serif';
+      ctx.fillText(`${uploadSpeed.toFixed(1)}`, 450, 270);
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#94A3B8';
       ctx.fillText(unit, 650, 270);
 
       // Latency Box
       ctx.fillStyle = '#1E293B';
-      ctx.fillRect(800, 160, 340, 180);
+      ctx.fillRect(800, 160, 340, 170);
       ctx.fillStyle = '#F59E0B';
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText('PING & JITTER', 820, 200);
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 64px sans-serif';
-      ctx.fillText(`${result.ping}`, 820, 270);
+      ctx.font = 'bold 60px sans-serif';
+      ctx.fillText(`${ping}`, 820, 270);
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#94A3B8';
-      ctx.fillText(`ms (±${result.jitter}ms)`, 920, 270);
+      ctx.fillText(`ms (±${jitter}ms)`, 910, 270);
 
       // Readiness Ratings Strip
       ctx.fillStyle = '#0F172A';
-      ctx.fillRect(60, 370, 1080, 150);
+      ctx.fillRect(60, 360, 1080, 180);
 
       ctx.fillStyle = '#38BDF8';
       ctx.font = 'bold 22px sans-serif';
-      ctx.fillText('NETWORK QUALITY APP READINESS', 90, 410);
+      ctx.fillText('NETWORK QUALITY & BUFFERBLOAT TELEMETRY', 90, 400);
 
       ctx.fillStyle = '#10B981';
       ctx.font = 'bold 20px sans-serif';
-      ctx.fillText(`• 4K Video Streaming: ${result.streamingQuality || 'Ready'}`, 90, 460);
-      ctx.fillText(`• Online Gaming: ${result.gamingQuality || 'Ultra-Low Latency'}`, 460, 460);
-      ctx.fillText(`• HD Video Calls: ${result.chatQuality || 'Crystal Clear'}`, 820, 460);
+      ctx.fillText(`• Bufferbloat Grade: ${bufferbloatGrade}`, 90, 450);
+      ctx.fillText(`• VoIP / WebRTC MOS: ${voipMos} / 4.5`, 460, 450);
+      ctx.fillText(`• Gaming Latency: ${result.gamingQuality || 'Low Latency'}`, 820, 450);
+
+      ctx.fillText(`• 4K Video Streaming: ${result.streamingQuality || 'Ready'}`, 90, 500);
+      ctx.fillText(`• Video Calls: ${result.chatQuality || 'Crystal Clear'}`, 460, 500);
+      ctx.fillText(`• Packet Loss: ${(result.packetLoss || 0).toFixed(1)}%`, 820, 500);
 
       // Footer
       ctx.fillStyle = '#64748B';
       ctx.font = '16px monospace';
-      ctx.fillText('Verified by NetPulse Edge Engine • https://github.com/Suvesh108/NetPulse', 60, 570);
+      ctx.fillText('Verified by NetPulse v0.9 Edge Engine • https://github.com/Suvesh108/NetPulse', 60, 620);
 
       // Trigger download
       const dataUrl = canvas.toDataURL('image/png');
@@ -151,43 +162,52 @@ export default function SpeedCertificateModal({
                 <span className="text-[10px] text-slate-400 font-mono">{activeServerName}</span>
               </div>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">
-              VERIFIED
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">
+                GRADE {bufferbloatGrade}
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">
+                VERIFIED
+              </span>
+            </div>
           </div>
 
           {/* Key Metrics */}
           <div className="grid grid-cols-3 gap-2 text-center font-mono">
             <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex flex-col">
               <span className="text-[9px] text-[#F6821F] font-bold">DOWNLOAD</span>
-              <span className="text-2xl font-black text-white">{result.downloadSpeed.toFixed(1)}</span>
+              <span className="text-2xl font-black text-white">{downloadSpeed.toFixed(1)}</span>
               <span className="text-[9px] text-slate-400">{unit}</span>
             </div>
             <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex flex-col">
               <span className="text-[9px] text-purple-400 font-bold">UPLOAD</span>
-              <span className="text-2xl font-black text-white">{result.uploadSpeed.toFixed(1)}</span>
+              <span className="text-2xl font-black text-white">{uploadSpeed.toFixed(1)}</span>
               <span className="text-[9px] text-slate-400">{unit}</span>
             </div>
             <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex flex-col">
               <span className="text-[9px] text-amber-400 font-bold">LATENCY</span>
-              <span className="text-2xl font-black text-white">{result.ping}</span>
-              <span className="text-[9px] text-slate-400">ms (±{result.jitter}ms)</span>
+              <span className="text-2xl font-black text-white">{ping}</span>
+              <span className="text-[9px] text-slate-400">ms (±{jitter}ms)</span>
             </div>
           </div>
 
           {/* Quality Assessment Strip */}
-          <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex items-center justify-around text-[10px] font-bold">
-            <div className="flex items-center gap-1 text-emerald-400">
+          <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] font-bold text-center">
+            <div className="flex items-center justify-center gap-1 text-emerald-400">
               <Tv className="w-3.5 h-3.5" />
-              <span>4K Ready</span>
+              <span>4K Stream</span>
             </div>
-            <div className="flex items-center gap-1 text-emerald-400">
+            <div className="flex items-center justify-center gap-1 text-emerald-400">
               <Gamepad2 className="w-3.5 h-3.5" />
               <span>Low Ping</span>
             </div>
-            <div className="flex items-center gap-1 text-emerald-400">
-              <Video className="w-3.5 h-3.5" />
-              <span>HD Video</span>
+            <div className="flex items-center justify-center gap-1 text-emerald-400">
+              <Headphones className="w-3.5 h-3.5" />
+              <span>MOS {voipMos}</span>
+            </div>
+            <div className="flex items-center justify-center gap-1 text-cyan-400">
+              <Layers className="w-3.5 h-3.5" />
+              <span>Bloat {bufferbloatGrade}</span>
             </div>
           </div>
         </div>

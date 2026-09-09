@@ -22,7 +22,7 @@ interface ReleaseInfo {
 }
 
 export default function InAppUpdater() {
-  const CURRENT_VERSION = 'v0.8';
+  const CURRENT_VERSION = 'v0.9';
   const [checking, setChecking] = useState(false);
   const [release, setRelease] = useState<ReleaseInfo | null>(null);
   const [hasUpdate, setHasUpdate] = useState(false);

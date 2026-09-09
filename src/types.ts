@@ -13,6 +13,20 @@ export interface SpeedTestResult {
   jitterMs: number;
   serverName: string;
   routingProtocol?: string;
+  
+  // v0.9 Extended Telemetry
+  downloadSpeed?: number;
+  uploadSpeed?: number;
+  ping?: number;
+  jitter?: number;
+  date?: string;
+  bufferbloatGrade?: string;
+  loadedLatencyMs?: number;
+  packetLoss?: number;
+  voipMos?: number;
+  streamingQuality?: string;
+  gamingQuality?: string;
+  chatQuality?: string;
 }
 
 export interface SimulationSettings {

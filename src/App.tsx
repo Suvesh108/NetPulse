@@ -10,6 +10,10 @@ import CdnBenchmark from './components/CdnBenchmark';
 import PingOscilloscope from './components/PingOscilloscope';
 import WifiAnalyzer from './components/WifiAnalyzer';
 import SpeedCertificateModal from './components/SpeedCertificateModal';
+import DnsBenchmark from './components/DnsBenchmark';
+import DualStackBenchmark from './components/DualStackBenchmark';
+import MtuAnalyzer from './components/MtuAnalyzer';
+import RouteTracer from './components/RouteTracer';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { SpeedTestResult, SimulationSettings } from './types';
 
@@ -111,14 +115,26 @@ function MainApp() {
       case 'diagnostics':
         return (
           <div className="w-full max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col gap-4 pb-24 md:pb-6 animate-fade-in">
+            {/* Visual Hop-by-Hop Edge Route Trace (Feature 7) */}
+            <RouteTracer />
+
+            {/* DNS Resolver Speed Shootout (Feature 2) */}
+            <DnsBenchmark />
+
+            {/* IPv4 vs IPv6 Dual-Stack Routing Duel (Feature 5) */}
+            <DualStackBenchmark />
+
+            {/* Path MTU & Packet Fragmentation Analyzer (Feature 6) */}
+            <MtuAnalyzer />
+
+            {/* Wi-Fi RF Signal & Link Analyzer (Feature 8) */}
+            <WifiAnalyzer />
+
             {/* Multi-Server Edge Benchmark */}
             <CdnBenchmark />
 
             {/* Live Continuous Gaming Latency Monitor */}
             <PingOscilloscope />
-
-            {/* Wi-Fi & Connection Health Analyzer */}
-            <WifiAnalyzer />
           </div>
         );
       case 'history':
