@@ -150,14 +150,15 @@ Whether diagnosing high-speed Gigabit fiber broadband, ultra-dense 5G NR carrier
 
 ---
 
-## 📦 Native Android Package (NetPulse-v0.9.apk)
+## 📦 Native Android & Desktop Packages (v1.0)
 
-* **Direct APK Download**: [NetPulse-v0.9.apk (GitHub Release v0.9)](https://github.com/Suvesh108/NetPulse/releases/tag/v0.9)
-* **Latest Universal Binary**: [netpulse.apk (Direct Mirror)](https://github.com/Suvesh108/NetPulse/raw/main/netpulse.apk)
+* **Direct Android APK**: [NetPulse-v1.0.apk (GitHub Release v1.0)](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk)
+* **Windows Installer**: [NetPulse-v1.0-Setup.exe (GitHub Release v1.0)](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0-Setup.exe)
+* **All Releases & Assets**: [GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
 * **Package Name**: `com.netpulse.speedtest`
 * **Target Android Version**: Android 15 (API Level 35)
 * **Minimum Android Version**: Android 5.1 Lollipop (API Level 22)
-* **Package Size**: ~5.15 MB (Ultra-lightweight)
+* **APK Size**: ~5.15 MB (Ultra-lightweight)
 
 ---
 

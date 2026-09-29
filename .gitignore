@@ -14,4 +14,5 @@ scratch/
 release-builds/
 *.zip
 *.exe
+*.apk
 
