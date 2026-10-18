@@ -14,7 +14,7 @@ export interface SpeedTestResult {
   serverName: string;
   routingProtocol?: string;
   
-  // v0.9 Extended Telemetry
+  // v0.9 & v1.1 Extended Telemetry
   downloadSpeed?: number;
   uploadSpeed?: number;
   ping?: number;
@@ -22,11 +22,15 @@ export interface SpeedTestResult {
   date?: string;
   bufferbloatGrade?: string;
   loadedLatencyMs?: number;
+  downloadLoadedLatencyMs?: number;
+  uploadLoadedLatencyMs?: number;
+  connectionMode?: 'multi' | 'single';
   packetLoss?: number;
   voipMos?: number;
   streamingQuality?: string;
   gamingQuality?: string;
   chatQuality?: string;
+  isScheduled?: boolean;
 }
 
 export interface SimulationSettings {
@@ -37,4 +41,9 @@ export interface SimulationSettings {
   customServerUrl?: string;
   packetProbesCount?: number;
   selectedRegion?: string;
+  connectionMode?: 'multi' | 'single';
+  autoScheduled?: boolean;
+  scheduledIntervalHours?: number;
+  scheduledThresholdMbps?: number;
 }
+

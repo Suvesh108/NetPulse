@@ -15,28 +15,58 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Web Assets
+        run: npm run build
+
+      - name: Setup Java JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Build Android Release APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          cd ..
+          cp android/app/build/outputs/apk/release/app-release.apk NetPulse-${{ github.ref_name }}.apk
+          cp android/app/build/outputs/apk/release/app-release.apk netpulse.apk
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: NetPulse ${{ github.ref_name }}
+          draft: false
+          prerelease: false
           body: |
-            ## 🚀 NetPulse ${{ github.ref_name }} - Professional Network Diagnostics Suite
+            ## 🚀 NetPulse ${{ github.ref_name }} - Enterprise Edge Network Telemetry & Diagnostics
+
+            ### 📦 Download Release Assets
+            - **Android APK (Direct Install)**: [NetPulse-${{ github.ref_name }}.apk](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/NetPulse-${{ github.ref_name }}.apk)
+            - **Universal Latest Android APK**: [netpulse.apk](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/netpulse.apk)
             
-            ### 📦 Download Assets
-            - **Android APK (Direct Install)**: `NetPulse-${{ github.ref_name }}.apk`
-            - **Latest Universal Bundle**: `netpulse.apk`
-            
-            ### ✨ The 8 Professional Network Diagnostic Features in ${{ github.ref_name }}
-            - **Bufferbloat Letter Grade (A+ to F)**: Automated loaded latency delta grading on speed console & certificate.
-            - **DNS Resolver Speed Shootout (DoH)**: Live DoH query benchmark (Cloudflare vs Google vs Quad9 vs OpenDNS).
-            - **VoIP / WebRTC MOS Audio Score (1.0 to 4.5)**: ITU-T G.107 standard Mean Opinion Score calculation.
-            - **25-Probe Timeline Packet Loss Logger**: Micro-burst drop detection and individual packet RTT visualization.
-            - **IPv4 vs IPv6 Dual-Stack Routing Duel**: Direct protocol comparison with carrier CGNAT detection.
-            - **Path MTU & Packet Fragmentation Analyzer**: PMTUD frame boundary analysis across 1420B, 1492B, 1500B, 1508B.
-            - **Visual Hop-by-Hop Edge Route Trace**: BGP Autonomous System (ASN) and IATA airport colocation tracking.
-            - **Wi-Fi RF Signal & Link Analyzer**: Calibrated RSSI signal meter (-dBm) and Signal-to-Noise Ratio (SNR).
+            ### ✨ What's New in NetPulse ${{ github.ref_name }}
+            - 🏎️ **Brand New Speedometer Logo**: High-fidelity aerodynamic speed meter branding across web, PWA, Windows, and Android adaptive mipmap icons.
+            - 📶 **Real-Time Bufferbloat Loaded Latency Engine**: True active saturation delta (download loaded latency & upload loaded latency) with Waveform-grade letter grading (A+ to F).
+            - 🔀 **Single-Stream vs Multi-Stream Testing**: Interactive connection mode toggle for auditing single TCP pipe throughput vs saturated multi-connection capacity.
+            - 🛡️ **Autonomous Watchdog Daemon**: Background degradation monitoring with configurable interval and push notifications for SLA drops.
+            - ⚡ **Multi-Cloud CDN Shootout**: Real concurrent HTTP/3 latency and throughput benchmarking across Cloudflare, AWS CloudFront, and Fastly edge networks.
+            - 🔐 **DNS-over-HTTPS (DoH) Resolver Shootout**: Cryptographic DNSSEC validation (`AD` flag) and sub-millisecond resolver timing across Cloudflare, Google, AdGuard, Quad9, and OpenDNS.
+            - 📏 **Exact Unit Conversion Math**: Corrected 8× factor across Mbps and MB/s modes in live preview and 1200x680 speed certificate card export.
           files: |
-            NetPulse-v0.9.apk
-            NetPulse-v0.8.apk
+            NetPulse-${{ github.ref_name }}.apk
             netpulse.apk

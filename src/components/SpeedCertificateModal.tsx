@@ -25,13 +25,17 @@ export default function SpeedCertificateModal({
 
   if (!isOpen || !result) return null;
 
+  const factor = unit === 'MB/s' ? 8 : 1;
   const downloadSpeed = result.downloadSpeed ?? result.downloadMbps ?? 0;
   const uploadSpeed = result.uploadSpeed ?? result.uploadMbps ?? 0;
+  const displayDownload = (downloadSpeed / factor).toFixed(1);
+  const displayUpload = (uploadSpeed / factor).toFixed(1);
   const ping = result.ping ?? result.pingMs ?? 0;
   const jitter = result.jitter ?? result.jitterMs ?? 0;
   const bufferbloatGrade = result.bufferbloatGrade || 'A+';
   const voipMos = result.voipMos ? result.voipMos.toFixed(2) : '4.35';
   const dateStr = result.date || (result.timestamp ? new Date(result.timestamp).toLocaleDateString() : new Date().toLocaleDateString());
+
 
   const handleDownloadPng = async () => {
     try {
@@ -85,7 +89,7 @@ export default function SpeedCertificateModal({
       ctx.fillText('DOWNLOAD SPEED', 450, 200);
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 60px sans-serif';
-      ctx.fillText(`${downloadSpeed.toFixed(1)}`, 450, 270);
+      ctx.fillText(`${displayDownload}`, 450, 270);
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#94A3B8';
       ctx.fillText(unit, 650, 270);
@@ -98,7 +102,7 @@ export default function SpeedCertificateModal({
       ctx.fillText('UPLOAD SPEED', 820, 200);
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 60px sans-serif';
-      ctx.fillText(`${uploadSpeed.toFixed(1)}`, 820, 270);
+      ctx.fillText(`${displayUpload}`, 820, 270);
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#94A3B8';
       ctx.fillText(unit, 1020, 270);
@@ -181,12 +185,12 @@ export default function SpeedCertificateModal({
             </div>
             <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex flex-col">
               <span className="text-[9px] text-[#F6821F] font-bold">DOWNLOAD</span>
-              <span className="text-2xl font-black text-white">{downloadSpeed.toFixed(1)}</span>
+              <span className="text-2xl font-black text-white">{displayDownload}</span>
               <span className="text-[9px] text-slate-400">{unit}</span>
             </div>
             <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex flex-col">
               <span className="text-[9px] text-purple-400 font-bold">UPLOAD</span>
-              <span className="text-2xl font-black text-white">{uploadSpeed.toFixed(1)}</span>
+              <span className="text-2xl font-black text-white">{displayUpload}</span>
               <span className="text-[9px] text-slate-400">{unit}</span>
             </div>
           </div>

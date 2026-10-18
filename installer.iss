@@ -1,5 +1,5 @@
-﻿#define MyAppName "NetPulse"
-#define MyAppVersion "1.0.0"
+#define MyAppName "NetPulse"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Suvesh108"
 #define MyAppURL "https://github.com/Suvesh108/NetPulse"
 #define MyAppExeName "NetPulse.exe"
@@ -17,7 +17,7 @@ DefaultDirName={localappdata}\Programs\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=.
-OutputBaseFilename=NetPulse-v1.0-Setup
+OutputBaseFilename=NetPulse-v1.1-Setup
 SetupIconFile=public\favicon.ico
 Compression=lzma2/max
 SolidCompression=yes

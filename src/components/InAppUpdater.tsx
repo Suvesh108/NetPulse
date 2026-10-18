@@ -24,7 +24,7 @@ interface ReleaseInfo {
 }
 
 export default function InAppUpdater() {
-  const CURRENT_VERSION = 'v1.0';
+  const CURRENT_VERSION = 'v1.1';
   const [checking, setChecking] = useState(false);
   const [release, setRelease] = useState<ReleaseInfo | null>(null);
   const [hasUpdate, setHasUpdate] = useState(false);
@@ -51,7 +51,7 @@ export default function InAppUpdater() {
       }
 
       const data = await response.json();
-      const latestTag = data.tag_name || 'v1.0';
+      const latestTag = data.tag_name || 'v1.1';
       
       const apkAsset = data.assets?.find((a: any) => a.name && a.name.endsWith('.apk'));
       const apkUrl = apkAsset?.browser_download_url || `https://github.com/Suvesh108/NetPulse/releases/download/${latestTag}/NetPulse-${latestTag}.apk`;
@@ -60,7 +60,7 @@ export default function InAppUpdater() {
       setRelease({
         tag_name: latestTag,
         name: data.name || `NetPulse ${latestTag}`,
-        body: data.body || '• Production Release v1.0 with official Windows Desktop & Android apps\n• Responsive dual-gauge Speed Test with real-time waveform splines\n• 8 Professional Network Diagnostic modules & Bufferbloat grading\n• High-performance Cloudflare Edge & QUIC Anycast routing',
+        body: data.body || '• Production Release v1.1 with brand new aerodynamic speed meter logo\n• Real-time Waveform-grade bufferbloat engine with active loaded latency delta\n• Single-stream vs Multi-stream testing mode toggle\n• Autonomous background network watchdog daemon with SLA threshold alerts\n• True multi-cloud CDN & DoH DNSSEC shootout benchmarks',
         published_at: data.published_at ? new Date(data.published_at).toLocaleDateString() : 'Recent',
         apkUrl,
         apkSize
@@ -77,11 +77,11 @@ export default function InAppUpdater() {
     } catch (err: any) {
       console.warn('Update check note:', err.message);
       setRelease({
-        tag_name: 'v1.0',
-        name: 'NetPulse v1.0 (Official Production Release)',
-        body: '• Production Release v1.0 with official Windows Desktop & Android apps\n• Responsive dual-gauge Speed Test with real-time waveform splines\n• 8 Professional Network Diagnostic modules & Bufferbloat grading\n• High-performance Cloudflare Edge & QUIC Anycast routing',
+        tag_name: 'v1.1',
+        name: 'NetPulse v1.1 (Official Production Release)',
+        body: '• Production Release v1.1 with brand new aerodynamic speed meter logo\n• Real-time Waveform-grade bufferbloat engine with active loaded latency delta\n• Single-stream vs Multi-stream testing mode toggle\n• Autonomous background network watchdog daemon with SLA threshold alerts\n• True multi-cloud CDN & DoH DNSSEC shootout benchmarks',
         published_at: new Date().toLocaleDateString(),
-        apkUrl: 'https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk',
+        apkUrl: 'https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk',
         apkSize: 5556363
       });
       setHasUpdate(false);
@@ -93,7 +93,7 @@ export default function InAppUpdater() {
 
   // Perform Android Native internal background APK download & installation
   const handleAndroidInternalUpdate = async () => {
-    const targetUrl = release?.apkUrl || 'https://github.com/Suvesh108/NetPulse/releases/download/v0.9/NetPulse-v0.9.apk';
+    const targetUrl = release?.apkUrl || 'https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk';
     setIsUpdating(true);
     setDownloadProgress(5);
     setStatusMessage('Downloading internal update package...');

@@ -145,7 +145,7 @@ function MainApp() {
           />
         );
       case 'settings':
-        return <SettingsPanel settings={settings} onUpdateSettings={setSettings} />;
+        return <SettingsPanel settings={settings} onUpdateSettings={setSettings} onScheduledResult={handleTestComplete} />;
     }
   };
 

@@ -361,6 +361,11 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
                               </span>
                             </div>
                             <div className="flex items-center gap-1">
+                              {result.isScheduled && (
+                                <span className="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                  Watchdog
+                                </span>
+                              )}
                               <span className="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-slate-100 dark:bg-[#262626] text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-slate-800">
                                 {protocolName}
                               </span>
@@ -557,7 +562,14 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
                           <Zap className="w-3 h-3" />
                         </div>
                         <div>
-                          <span className="text-slate-900 dark:text-slate-100 font-bold text-xs">{localDateStr} • {localFullDate}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-slate-900 dark:text-slate-100 font-bold text-xs">{localDateStr} • {localFullDate}</span>
+                            {result.isScheduled && (
+                              <span className="text-[8px] px-1 py-0.2 rounded font-mono font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                Watchdog
+                              </span>
+                            )}
+                          </div>
                           <span className="text-[10px] text-slate-400 block truncate max-w-[180px]">{result.serverName}</span>
                         </div>
                       </div>

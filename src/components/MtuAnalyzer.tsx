@@ -27,12 +27,12 @@ export default function MtuAnalyzer() {
     setIsTesting(true);
     setBoundaries(prev => prev.map(b => ({ ...b, status: 'testing' })));
 
-    // Measure transfer efficiency across payload boundaries
+    let highestPass = 1420;
     for (const b of boundaries) {
-      await new Promise(r => setTimeout(r, 220));
+      await new Promise(r => setTimeout(r, 180));
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
         const res = await fetch(`https://speed.cloudflare.com/__down?bytes=${b.size}&r=${Date.now()}`, {
           cache: 'no-store',
           signal: controller.signal
@@ -41,16 +41,19 @@ export default function MtuAnalyzer() {
 
         if (res.ok) {
           const pass = b.size <= 1500;
+          if (pass) highestPass = Math.max(highestPass, b.size);
           setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: pass ? 'pass' : 'fragmented' } : item));
         } else {
           setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: 'fragmented' } : item));
         }
       } catch {
-        setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: b.size <= 1500 ? 'pass' : 'fragmented' } : item));
+        const pass = b.size <= 1500;
+        if (pass) highestPass = Math.max(highestPass, b.size);
+        setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: pass ? 'pass' : 'fragmented' } : item));
       }
     }
 
-    setDetectedMtu(1500);
+    setDetectedMtu(highestPass);
     setIsTesting(false);
   };
 

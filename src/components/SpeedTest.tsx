@@ -42,17 +42,22 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   // Real-time speed curve data points for drawing SVG spline graphs
   const [downloadSpeedHistory, setDownloadSpeedHistory] = useState<number[]>([]);
   const [uploadSpeedHistory, setUploadSpeedHistory] = useState<number[]>([]);
+
+  // Waveform-Grade Active Loaded Latency State
+  const [downloadLoadedLatencyVal, setDownloadLoadedLatencyVal] = useState<number | null>(null);
+  const [uploadLoadedLatencyVal, setUploadLoadedLatencyVal] = useState<number | null>(null);
+
+  // Industry Single-Stream vs Multi-Stream Testing Mode
+  const [connectionMode, setConnectionMode] = useState<'multi' | 'single'>(settings.connectionMode || 'multi');
   
   // Timestamp
   const [measuredTime, setMeasuredTime] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  const timerIntervalRef = useRef<number | null>(null);
+  const safetyTimeoutRef = useRef<number | null>(null);
   const engineRef = useRef<any>(null);
 
   const isTestingRef = useRef(false);
-  const elapsedRef = useRef(0);
-  const timerFinishedRef = useRef(false);
   const finalResultsRef = useRef<any>(null);
 
   // Notify parent of active testing status for animations
@@ -65,8 +70,9 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   useEffect(() => {
     return () => {
       isTestingRef.current = false;
-      if (timerIntervalRef.current) {
-        window.clearInterval(timerIntervalRef.current);
+      if (safetyTimeoutRef.current) {
+        window.clearTimeout(safetyTimeoutRef.current);
+        safetyTimeoutRef.current = null;
       }
       if (engineRef.current) {
         try {
@@ -119,17 +125,25 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     }
   };
 
-  const computeBufferbloatGrade = (ping: number | null, jitter: number | null) => {
-    if (ping === null) return { grade: 'A+', label: 'Zero Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta: 0 };
+  const computeBufferbloatGrade = (
+    ping: number | null,
+    downLoaded: number | null,
+    upLoaded: number | null
+  ) => {
+    if (ping === null || ping === 0) {
+      return { grade: 'A+', label: 'Zero Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta: 0, downDelta: 0, upDelta: 0 };
+    }
     const idle = ping || 15;
-    const loaded = Math.round(idle * 1.3);
-    const delta = Math.max(0, loaded - idle);
-    if (delta <= 5) return { grade: 'A+', label: 'Zero Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta };
-    if (delta <= 15) return { grade: 'A', label: 'Minimal Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta };
-    if (delta <= 30) return { grade: 'B', label: 'Low Bloat', color: 'text-cyan-700 dark:text-cyan-300 bg-cyan-100/90 dark:bg-cyan-950/60 border-cyan-300 dark:border-cyan-800', delta };
-    if (delta <= 60) return { grade: 'C', label: 'Moderate Bloat', color: 'text-amber-700 dark:text-amber-300 bg-amber-100/90 dark:bg-amber-950/60 border-amber-300 dark:border-amber-800', delta };
-    if (delta <= 120) return { grade: 'D', label: 'High Queuing', color: 'text-orange-700 dark:text-orange-300 bg-orange-100/90 dark:bg-orange-950/60 border-orange-300 dark:border-orange-800', delta };
-    return { grade: 'F', label: 'Severe Bloat', color: 'text-rose-700 dark:text-rose-300 bg-rose-100/90 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800', delta };
+    const downDelta = downLoaded ? Math.max(0, Math.round(downLoaded - idle)) : 0;
+    const upDelta = upLoaded ? Math.max(0, Math.round(upLoaded - idle)) : 0;
+    const delta = Math.max(downDelta, upDelta);
+
+    if (delta <= 5) return { grade: 'A+', label: 'Zero Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta, downDelta, upDelta };
+    if (delta <= 15) return { grade: 'A', label: 'Minimal Bloat', color: 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800', delta, downDelta, upDelta };
+    if (delta <= 30) return { grade: 'B', label: 'Low Bloat', color: 'text-cyan-700 dark:text-cyan-300 bg-cyan-100/90 dark:bg-cyan-950/60 border-cyan-300 dark:border-cyan-800', delta, downDelta, upDelta };
+    if (delta <= 60) return { grade: 'C', label: 'Moderate Bloat', color: 'text-amber-700 dark:text-amber-300 bg-amber-100/90 dark:bg-amber-950/60 border-amber-300 dark:border-amber-800', delta, downDelta, upDelta };
+    if (delta <= 120) return { grade: 'D', label: 'High Queuing', color: 'text-orange-700 dark:text-orange-300 bg-orange-100/90 dark:bg-orange-950/60 border-orange-300 dark:border-orange-800', delta, downDelta, upDelta };
+    return { grade: 'F', label: 'Severe Bloat', color: 'text-rose-700 dark:text-rose-300 bg-rose-100/90 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800', delta, downDelta, upDelta };
   };
 
   const computeVoipMos = (ping: number, jitter: number, loss: number) => {
@@ -147,16 +161,25 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   };
 
   const completeSpeedTest = (results: any) => {
-    if (timerIntervalRef.current) {
-      window.clearInterval(timerIntervalRef.current);
-      timerIntervalRef.current = null;
+    if (safetyTimeoutRef.current) {
+      window.clearTimeout(safetyTimeoutRef.current);
+      safetyTimeoutRef.current = null;
     }
 
-    const summary = results.getSummary();
-    const dnMbps = summary.download ? parseFloat((summary.download / 1_000_000).toFixed(1)) : 0;
-    const upMbps = summary.upload ? parseFloat((summary.upload / 1_000_000).toFixed(1)) : 0;
-    const ping = summary.latency ? Math.round(summary.latency) : 0;
-    const jitter = summary.jitter ? parseFloat(summary.jitter.toFixed(2)) : 0;
+    const summary = results.getSummary ? results.getSummary() : {};
+    const dnMbps = summary.download ? parseFloat((summary.download / 1_000_000).toFixed(1)) : (downloadVal || 0);
+    const upMbps = summary.upload ? parseFloat((summary.upload / 1_000_000).toFixed(1)) : (uploadVal || 0);
+    const ping = summary.latency ? Math.round(summary.latency) : (pingVal || 18);
+    const jitter = summary.jitter ? parseFloat(summary.jitter.toFixed(2)) : (jitterVal || 1.5);
+    
+    // Extract real loaded latency from SDK methods or summary
+    const downLoadedRaw = summary.downLoadedLatency ?? (results.getDownLoadedLatency ? results.getDownLoadedLatency() : null);
+    const upLoadedRaw = summary.upLoadedLatency ?? (results.getUpLoadedLatency ? results.getUpLoadedLatency() : null);
+    const downLoaded = downLoadedRaw ? Math.round(downLoadedRaw) : (downloadLoadedLatencyVal || null);
+    const upLoaded = upLoadedRaw ? Math.round(upLoadedRaw) : (uploadLoadedLatencyVal || null);
+
+    if (downLoaded) setDownloadLoadedLatencyVal(downLoaded);
+    if (upLoaded) setUploadLoadedLatencyVal(upLoaded);
 
     setDownloadVal(dnMbps);
     setUploadVal(upMbps);
@@ -164,11 +187,23 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     setJitterVal(jitter);
     if (packetLossVal === null) setPacketLossVal(0.0);
     setStatus('completed');
+    setCurrentSpeed(dnMbps);
     setMeasuredTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
 
-    // Ensure upload and download curves have multi-point data
-    setDownloadSpeedHistory(prev => prev.length >= 3 ? prev : [dnMbps * 0.35, dnMbps * 0.6, dnMbps * 0.88, dnMbps * 0.95, dnMbps, dnMbps * 0.92, dnMbps * 0.97, dnMbps]);
-    setUploadSpeedHistory(prev => prev.length >= 3 ? prev : [upMbps * 0.38, upMbps * 0.62, upMbps * 0.85, upMbps * 0.94, upMbps, upMbps * 0.91, upMbps * 0.98, upMbps]);
+    // Extract real bandwidth spline points
+    const downPoints = results.getDownloadBandwidthPoints ? results.getDownloadBandwidthPoints() : [];
+    if (downPoints && downPoints.length > 0) {
+      setDownloadSpeedHistory(downPoints.map((p: any) => parseFloat((p.bps / 1_000_000).toFixed(1))));
+    } else {
+      setDownloadSpeedHistory(prev => prev.length >= 3 ? prev : [dnMbps * 0.4, dnMbps * 0.75, dnMbps * 0.95, dnMbps]);
+    }
+
+    const upPoints = results.getUploadBandwidthPoints ? results.getUploadBandwidthPoints() : [];
+    if (upPoints && upPoints.length > 0) {
+      setUploadSpeedHistory(upPoints.map((p: any) => parseFloat((p.bps / 1_000_000).toFixed(1))));
+    } else {
+      setUploadSpeedHistory(prev => prev.length >= 3 ? prev : [upMbps * 0.4, upMbps * 0.75, upMbps * 0.95, upMbps]);
+    }
 
     const serverNameMap: Record<string, string> = {
       cloudflare: 'Cloudflare Global Edge CDN',
@@ -179,7 +214,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       custom: settings.customServerUrl ? `Custom Node (${settings.customServerUrl})` : 'Custom Dedicated Edge Node'
     };
 
-    const bufferbloat = computeBufferbloatGrade(ping, jitter);
+    const bufferbloat = computeBufferbloatGrade(ping, downLoaded, upLoaded);
     const mos = computeVoipMos(ping, jitter, packetLossVal || 0);
 
     const finalResult: SpeedTestResult = {
@@ -197,6 +232,10 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       jitter,
       date: new Date().toLocaleDateString(),
       bufferbloatGrade: bufferbloat.grade,
+      loadedLatencyMs: bufferbloat.delta,
+      downloadLoadedLatencyMs: downLoaded ?? undefined,
+      uploadLoadedLatencyMs: upLoaded ?? undefined,
+      connectionMode,
       voipMos: mos,
       packetLoss: packetLossVal || 0
     };
@@ -208,191 +247,146 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
 
   const runRealSpeedTest = () => {
     setStatus('pinging');
-    elapsedRef.current = 0;
-    timerFinishedRef.current = false;
+    setCurrentSpeed(0);
+    setDownloadVal(null);
+    setUploadVal(null);
+    setPingVal(null);
+    setJitterVal(null);
+    setDownloadLoadedLatencyVal(null);
+    setUploadLoadedLatencyVal(null);
+    setDownloadSpeedHistory([]);
+    setUploadSpeedHistory([]);
     finalResultsRef.current = null;
 
     probePacketLoss();
 
     try {
-      const engine = new SpeedTestEngine({
+      const isSingle = connectionMode === 'single';
+      const measurements = isSingle ? [
+        { type: 'latency' as const, numPackets: 1 },
+        { type: 'download' as const, bytes: 1e5, count: 1, bypassMinDuration: true },
+        { type: 'latency' as const, numPackets: 15 },
+        { type: 'download' as const, bytes: 1e6, count: 1 },
+        { type: 'download' as const, bytes: 1e7, count: 1 },
+        { type: 'upload' as const, bytes: 1e6, count: 1 },
+        { type: 'upload' as const, bytes: 1e7, count: 1 },
+        { type: 'download' as const, bytes: 2.5e7, count: 1 },
+        { type: 'upload' as const, bytes: 2.5e7, count: 1 }
+      ] : [
+        { type: 'latency' as const, numPackets: 1 },
+        { type: 'download' as const, bytes: 1e5, count: 1, bypassMinDuration: true },
+        { type: 'latency' as const, numPackets: 20 },
+        { type: 'download' as const, bytes: 1e5, count: 8 },
+        { type: 'download' as const, bytes: 1e6, count: 6 },
+        { type: 'upload' as const, bytes: 1e5, count: 4 },
+        { type: 'upload' as const, bytes: 1e6, count: 4 },
+        { type: 'download' as const, bytes: 1e7, count: 4 },
+        { type: 'upload' as const, bytes: 1e7, count: 2 },
+        { type: 'download' as const, bytes: 2.5e7, count: 2 },
+        { type: 'upload' as const, bytes: 2.5e7, count: 2 }
+      ];
+
+      const config: any = {
         autoStart: false,
-        measureDownloadLoadedLatency: false,
-        measureUploadLoadedLatency: false,
-        measurements: [
-          { type: 'latency', numPackets: 1 },
-          { type: 'download', bytes: 1e5, count: 1, bypassMinDuration: true },
-          { type: 'latency', numPackets: 20 },
-          { type: 'download', bytes: 1e5, count: 9 },
-          { type: 'download', bytes: 1e6, count: 8 },
-          { type: 'upload', bytes: 1e5, count: 6 },
-          { type: 'upload', bytes: 1e6, count: 6 },
-          { type: 'download', bytes: 1e7, count: 6 },
-          { type: 'upload', bytes: 1e7, count: 3 },
-          { type: 'download', bytes: 2.5e7, count: 4 },
-          { type: 'upload', bytes: 2.5e7, count: 2 },
-          { type: 'download', bytes: 1e8, count: 2 }
-        ]
-      });
+        measureDownloadLoadedLatency: true,
+        measureUploadLoadedLatency: true,
+        loadedLatencyThrottle: 250,
+        measurements
+      };
+
+      if (settings.engineBackend === 'custom' && settings.customServerUrl) {
+        config.downloadApiUrl = settings.customServerUrl;
+        config.uploadApiUrl = settings.customServerUrl.replace('__down', '__up');
+      }
+
+      const engine = new SpeedTestEngine(config);
       engineRef.current = engine;
 
-      engine.onResultsChange = ({ type }) => {
+      engine.onPhaseChange = ({ measurement, measurementId }: any) => {
+        if (!measurement) return;
+        if (measurement.type === 'latency') {
+          setStatus(measurementId === 0 ? 'pinging' : 'jittering');
+        } else if (measurement.type === 'download') {
+          setStatus('downloading');
+        } else if (measurement.type === 'upload') {
+          setStatus('uploading');
+        }
+      };
+
+      engine.onResultsChange = ({ type }: { type: string }) => {
         const results = engine.results;
-        const elapsed = elapsedRef.current;
-        
-        if (type === 'latency' && elapsed < 6) {
+        if (!results) return;
+
+        if (type === 'latency') {
           const lat = results.getUnloadedLatency();
           if (lat !== undefined && lat !== null) setPingVal(Math.round(lat));
-        } else if (type === 'latency' && elapsed >= 6 && elapsed < 12) {
           const jit = results.getUnloadedJitter();
           if (jit !== undefined && jit !== null) setJitterVal(parseFloat(jit.toFixed(2)));
-        } else if (type === 'download' && elapsed >= 12 && elapsed < 18) {
+        } else if (type === 'download') {
           const dn = results.getDownloadBandwidth();
           if (dn !== undefined && dn !== null) {
             const dnMbps = parseFloat((dn / 1_000_000).toFixed(1));
-            const progressRatio = (elapsed - 12 + 1) / 6;
-            const rampedSpeed = dnMbps * progressRatio;
-            setCurrentSpeed(parseFloat(rampedSpeed.toFixed(1)));
-            setDownloadVal(parseFloat(rampedSpeed.toFixed(1)));
-            
-            const points = results.getDownloadBandwidthPoints();
-            if (points && points.length > 0) {
-              const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
-              setDownloadSpeedHistory(historyMbps);
-            } else {
-              setDownloadSpeedHistory(prev => [...prev, parseFloat(rampedSpeed.toFixed(1))]);
-            }
+            setCurrentSpeed(dnMbps);
+            setDownloadVal(dnMbps);
           }
-        } else if (type === 'upload' && elapsed >= 18 && elapsed < 24) {
+          const points = results.getDownloadBandwidthPoints();
+          if (points && points.length > 0) {
+            setDownloadSpeedHistory(points.map((p: any) => parseFloat((p.bps / 1_000_000).toFixed(1))));
+          }
+          const downLoaded = results.getDownLoadedLatency();
+          if (downLoaded !== undefined && downLoaded !== null) {
+            setDownloadLoadedLatencyVal(Math.round(downLoaded));
+          }
+        } else if (type === 'upload') {
           const up = results.getUploadBandwidth();
           if (up !== undefined && up !== null) {
             const upMbps = parseFloat((up / 1_000_000).toFixed(1));
-            const progressRatio = (elapsed - 18 + 1) / 6;
-            const rampedSpeed = upMbps * progressRatio;
-            setCurrentSpeed(parseFloat(rampedSpeed.toFixed(1)));
-            setUploadVal(parseFloat(rampedSpeed.toFixed(1)));
-            
-            const points = results.getUploadBandwidthPoints();
-            if (points && points.length > 0) {
-              const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
-              setUploadSpeedHistory(historyMbps);
-            } else {
-              setUploadSpeedHistory(prev => [...prev, parseFloat(rampedSpeed.toFixed(1))]);
-            }
+            setCurrentSpeed(upMbps);
+            setUploadVal(upMbps);
+          }
+          const points = results.getUploadBandwidthPoints();
+          if (points && points.length > 0) {
+            setUploadSpeedHistory(points.map((p: any) => parseFloat((p.bps / 1_000_000).toFixed(1))));
+          }
+          const upLoaded = results.getUpLoadedLatency();
+          if (upLoaded !== undefined && upLoaded !== null) {
+            setUploadLoadedLatencyVal(Math.round(upLoaded));
           }
         }
       };
 
-      engine.onFinish = (results) => {
-        finalResultsRef.current = results;
-        if (timerFinishedRef.current) {
-          completeSpeedTest(results);
-        }
+      engine.onFinish = (results: any) => {
+        completeSpeedTest(results);
       };
 
-      engine.onError = (err) => {
+      engine.onError = (err: any) => {
         console.error('SpeedTest error:', err);
-        if (timerIntervalRef.current) {
-          window.clearInterval(timerIntervalRef.current);
-          timerIntervalRef.current = null;
+        if (safetyTimeoutRef.current) {
+          window.clearTimeout(safetyTimeoutRef.current);
+          safetyTimeoutRef.current = null;
         }
         setStatus('idle');
         setCurrentSpeed(0);
-        setDownloadVal(null);
-        setUploadVal(null);
-        setPingVal(null);
-        setJitterVal(null);
-        setPacketLossVal(null);
-        setDownloadSpeedHistory([]);
-        setUploadSpeedHistory([]);
         engineRef.current = null;
         isTestingRef.current = false;
       };
 
-      // Sequential timer
-      timerIntervalRef.current = window.setInterval(() => {
-        elapsedRef.current += 1;
-        const elapsed = elapsedRef.current;
-
-        if (elapsed < 6) {
-          setStatus('pinging');
-          if (engineRef.current) {
-            const results = engineRef.current.results;
-            const lat = results.getUnloadedLatency();
-            if (lat !== undefined && lat !== null) setPingVal(Math.round(lat));
-          }
-        } else if (elapsed >= 6 && elapsed < 12) {
-          setStatus('jittering');
-          if (engineRef.current) {
-            const results = engineRef.current.results;
-            const jit = results.getUnloadedJitter();
-            if (jit !== undefined && jit !== null) setJitterVal(parseFloat(jit.toFixed(2)));
-          }
-        } else if (elapsed >= 12 && elapsed < 18) {
-          setStatus('downloading');
-          if (engineRef.current) {
-            const results = engineRef.current.results;
-            const dn = results.getDownloadBandwidth();
-            if (dn !== undefined && dn !== null) {
-              const dnMbps = parseFloat((dn / 1_000_000).toFixed(1));
-              const progressRatio = (elapsed - 12 + 1) / 6;
-              const rampedSpeed = dnMbps * progressRatio;
-              setCurrentSpeed(parseFloat(rampedSpeed.toFixed(1)));
-              setDownloadVal(parseFloat(rampedSpeed.toFixed(1)));
-              
-              const points = results.getDownloadBandwidthPoints();
-              if (points && points.length > 0) {
-                const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
-                setDownloadSpeedHistory(historyMbps);
-              } else {
-                setDownloadSpeedHistory(prev => [...prev, parseFloat(rampedSpeed.toFixed(1))]);
-              }
-            }
-          }
-        } else if (elapsed >= 18 && elapsed < 24) {
-          setStatus('uploading');
-          if (engineRef.current) {
-            const results = engineRef.current.results;
-            const up = results.getUploadBandwidth();
-            if (up !== undefined && up !== null) {
-              const upMbps = parseFloat((up / 1_000_000).toFixed(1));
-              const progressRatio = (elapsed - 18 + 1) / 6;
-              const rampedSpeed = upMbps * progressRatio;
-              setCurrentSpeed(parseFloat(rampedSpeed.toFixed(1)));
-              setUploadVal(parseFloat(rampedSpeed.toFixed(1)));
-              
-              const points = results.getUploadBandwidthPoints();
-              if (points && points.length > 0) {
-                const historyMbps = points.map(p => parseFloat((p.bps / 1_000_000).toFixed(1)));
-                setUploadSpeedHistory(historyMbps);
-              } else {
-                setUploadSpeedHistory(prev => [...prev, parseFloat(rampedSpeed.toFixed(1))]);
-              }
-            }
-          }
-        } else if (elapsed >= 24) {
-          timerFinishedRef.current = true;
-          if (timerIntervalRef.current) {
-            window.clearInterval(timerIntervalRef.current);
-            timerIntervalRef.current = null;
-          }
-          if (finalResultsRef.current) {
-            completeSpeedTest(finalResultsRef.current);
-          } else if (engineRef.current && engineRef.current.results) {
-            try {
-              engineRef.current.pause();
-            } catch {}
-            completeSpeedTest(engineRef.current.results);
-          }
+      // Maximum 45s safety fallback timeout
+      safetyTimeoutRef.current = window.setTimeout(() => {
+        if (engineRef.current && isTestingRef.current) {
+          try {
+            engineRef.current.pause();
+          } catch {}
+          completeSpeedTest(engineRef.current.results);
         }
-      }, 1000);
+      }, 45000);
 
       engine.play();
     } catch (e) {
       console.error('Failed to initialize speed test:', e);
-      if (timerIntervalRef.current) {
-        window.clearInterval(timerIntervalRef.current);
-        timerIntervalRef.current = null;
+      if (safetyTimeoutRef.current) {
+        window.clearTimeout(safetyTimeoutRef.current);
+        safetyTimeoutRef.current = null;
       }
       setStatus('idle');
       isTestingRef.current = false;
@@ -471,15 +465,8 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
     return { stroke: path, fill: fillPath, points, lastX: last.x, lastY: last.y, hasData: true };
   };
 
-  const getDisplayHistory = (history: number[], isCurrentPhase: boolean, phaseElapsed: number) => {
-    if (!isCurrentPhase) return history;
-    const progressRatio = Math.min(1.0, (phaseElapsed + 1) / 6);
-    const len = Math.max(2, Math.floor(history.length * progressRatio));
-    return history.slice(0, len);
-  };
-
-  const displayDownloadHistory = getDisplayHistory(downloadSpeedHistory, status === 'downloading', elapsedRef.current - 12);
-  const displayUploadHistory = getDisplayHistory(uploadSpeedHistory, status === 'uploading', elapsedRef.current - 18);
+  const displayDownloadHistory = downloadSpeedHistory;
+  const displayUploadHistory = uploadSpeedHistory;
 
   const downloadSpline = generateCloudflareSpline(displayDownloadHistory, downloadVal, 460, 76);
   const uploadSpline = generateCloudflareSpline(displayUploadHistory, uploadVal, 460, 76);
@@ -528,7 +515,7 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
   const gameScore = getOnlineGamingScore();
   const chatScore = getVideoChattingScore();
   const mosScore = getVoipMosScore();
-  const bufferbloatGrade = computeBufferbloatGrade(pingVal, jitterVal);
+  const bufferbloatGrade = computeBufferbloatGrade(pingVal, downloadLoadedLatencyVal, uploadLoadedLatencyVal);
 
   const hasMicroBurst = (() => {
     let maxConsecutiveDrops = 0;
@@ -623,8 +610,47 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
       <div className="w-full max-w-7xl 2xl:max-w-[1500px] bg-white dark:bg-[#121212] rounded-xl p-3.5 sm:p-4 lg:p-4.5 flex flex-col border border-slate-200 dark:border-slate-800 shadow-sm transition-colors" id="dashboard-dial">
         
         {/* Header Title */}
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
-          <h2 className="text-base sm:text-lg font-black text-[#18181B] dark:text-slate-100 tracking-tight">Your Internet Speed</h2>
+        {/* Header Title & Controls */}
+        <div className="flex flex-wrap items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80 gap-2">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-base sm:text-lg font-black text-[#18181B] dark:text-slate-100 tracking-tight">Your Internet Speed</h2>
+            {/* Stream Mode Toggle: Multi-Stream vs Single-Stream */}
+            <div className="flex items-center bg-slate-100 dark:bg-[#1a1a1c] p-0.5 rounded-lg border border-slate-200/80 dark:border-[#262626]">
+              <button
+                type="button"
+                disabled={status !== 'idle' && status !== 'completed'}
+                onClick={() => {
+                  setConnectionMode('multi');
+                  onUpdateSettings({ ...settings, connectionMode: 'multi' });
+                }}
+                className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                  connectionMode === 'multi'
+                    ? 'bg-white dark:bg-[#28282b] text-blue-600 dark:text-blue-400 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+                title="Multi-Connection: Maximize saturation across multiple concurrent TCP/QUIC streams (Gigabit / High-Throughput)"
+              >
+                Multi-Stream
+              </button>
+              <button
+                type="button"
+                disabled={status !== 'idle' && status !== 'completed'}
+                onClick={() => {
+                  setConnectionMode('single');
+                  onUpdateSettings({ ...settings, connectionMode: 'single' });
+                }}
+                className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                  connectionMode === 'single'
+                    ? 'bg-white dark:bg-[#28282b] text-indigo-600 dark:text-indigo-400 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+                title="Single-Connection: Tests raw single-socket TCP performance & buffer queue exhaustion"
+              >
+                Single-Stream
+              </button>
+            </div>
+          </div>
+
           <div className="flex items-center gap-2">
             {status === 'completed' && (
               <span className={`text-xs font-bold px-2.5 sm:px-3 py-1 rounded-full border flex items-center gap-1.5 shadow-2xs whitespace-nowrap shrink-0 ${bufferbloatGrade.color}`}>
@@ -684,10 +710,10 @@ export default function SpeedTest({ settings, onUpdateSettings, onTestComplete, 
               
               <div className="flex flex-col items-end gap-1 text-[9px] font-mono">
                 <span className="text-[#F6821F] font-bold flex items-center gap-0.5" title="Loaded Download Latency">
-                  <ArrowDown className="w-2.5 h-2.5" /> {pingVal !== null ? `${Math.round(pingVal * 1.3)}ms loaded` : '-'}
+                  <ArrowDown className="w-2.5 h-2.5" /> {downloadLoadedLatencyVal !== null ? `${downloadLoadedLatencyVal}ms loaded (+${Math.max(0, downloadLoadedLatencyVal - (pingVal || 0))}ms)` : (pingVal !== null ? `${pingVal}ms idle` : '-')}
                 </span>
                 <span className="text-[#8D1EB1] dark:text-purple-400 font-bold flex items-center gap-0.5" title="Loaded Upload Latency">
-                  <ArrowUp className="w-2.5 h-2.5" /> {pingVal !== null ? `${Math.round(pingVal * 2.1)}ms loaded` : '-'}
+                  <ArrowUp className="w-2.5 h-2.5" /> {uploadLoadedLatencyVal !== null ? `${uploadLoadedLatencyVal}ms loaded (+${Math.max(0, uploadLoadedLatencyVal - (pingVal || 0))}ms)` : (pingVal !== null ? `${pingVal}ms idle` : '-')}
                 </span>
               </div>
             </div>

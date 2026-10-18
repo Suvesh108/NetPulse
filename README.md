@@ -5,9 +5,9 @@
 # ⚡ NetPulse
 ### Enterprise-Grade Edge Network Telemetry & Real-Time Bandwidth Engine
 
-[![Version](https://img.shields.io/badge/Release-v1.0-059669?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v1.0)
-[![Windows App](https://img.shields.io/badge/Windows_Desktop-v1.0-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-Windows-v1.0.zip)
-[![Android APK](https://img.shields.io/badge/Android_APK-v1.0-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk)
+[![Version](https://img.shields.io/badge/Release-v1.1-059669?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v1.1)
+[![Windows App](https://img.shields.io/badge/Windows_Desktop-v1.1-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-Windows-v1.1.zip)
+[![Android APK](https://img.shields.io/badge/Android_APK-v1.1-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk)
 [![Live Web App](https://img.shields.io/badge/Live_Web_App-net--pulse-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://net-pulse-iota.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 
@@ -21,8 +21,8 @@
 <br />
 
 **[ 🌐 Launch Live Web App ](https://net-pulse-iota.vercel.app/)** &nbsp;•&nbsp;
-**[ 💻 Download Windows App (v1.0) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-Windows-v1.0.zip)** &nbsp;•&nbsp;
-**[ 📱 Download Android APK (v1.0) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk)** &nbsp;•&nbsp;
+**[ 💻 Download Windows App (v1.1) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-Windows-v1.1.zip)** &nbsp;•&nbsp;
+**[ 📱 Download Android APK (v1.1) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk)** &nbsp;•&nbsp;
 **[ 📦 GitHub Releases ](https://github.com/Suvesh108/NetPulse/releases)** &nbsp;•&nbsp;
 **[ 📄 MIT License ](LICENSE)**
 
@@ -81,7 +81,7 @@ Whether diagnosing high-speed Gigabit fiber broadband, ultra-dense 5G NR carrier
 
 ---
 
-## 🚀 The 8 Professional Network Diagnostic Features (v0.9)
+## 🚀 Enterprise Edge Diagnostics & Telemetry Suite (v1.1)
 
 ### 🌟 1. Bufferbloat Letter Grade (A+ to F)
 - **Loaded Latency Delta**: Automatically compares idle unloaded latency against active saturation delay during download/upload phases.
@@ -150,10 +150,10 @@ Whether diagnosing high-speed Gigabit fiber broadband, ultra-dense 5G NR carrier
 
 ---
 
-## 📦 Native Android & Desktop Packages (v1.0)
+## 📦 Native Android & Desktop Packages (v1.1)
 
-* **Direct Android APK**: [NetPulse-v1.0.apk (GitHub Release v1.0)](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk)
-* **Windows Installer**: [NetPulse-v1.0-Setup.exe (GitHub Release v1.0)](https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0-Setup.exe)
+* **Direct Android APK**: [NetPulse-v1.1.apk (GitHub Release v1.1)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk)
+* **Windows Installer**: [NetPulse-v1.1-Setup.exe (GitHub Release v1.1)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1-Setup.exe)
 * **All Releases & Assets**: [GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
 * **Package Name**: `com.netpulse.speedtest`
 * **Target Android Version**: Android 15 (API Level 35)

@@ -3,16 +3,17 @@ import {
   ToggleLeft, ToggleRight, Globe, Download, Upload, Server, ShieldCheck, 
   Cpu, Network, Radio, Zap, Check, ChevronDown, ChevronUp, Sliders, Activity, Sparkles
 } from 'lucide-react';
-import { SimulationSettings, EngineBackend, RoutingProtocol } from '../types';
+import { SimulationSettings, EngineBackend, RoutingProtocol, SpeedTestResult } from '../types';
 import InAppUpdater from './InAppUpdater';
 import ScheduledTests from './ScheduledTests';
 
 interface SettingsPanelProps {
   settings: SimulationSettings;
   onUpdateSettings: (settings: SimulationSettings) => void;
+  onScheduledResult?: (result: SpeedTestResult) => void;
 }
 
-export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPanelProps) {
+export default function SettingsPanel({ settings, onUpdateSettings, onScheduledResult }: SettingsPanelProps) {
   const [backendDropdownOpen, setBackendDropdownOpen] = useState(false);
   const [protocolDropdownOpen, setProtocolDropdownOpen] = useState(false);
 
@@ -389,7 +390,7 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Active Configuration</span>
               </div>
-              <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500">v1.0.0</span>
+              <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500">v1.1.0</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
@@ -423,7 +424,7 @@ export default function SettingsPanel({ settings, onUpdateSettings }: SettingsPa
           <InAppUpdater />
 
           {/* Card 2: Automated Scheduled Tests & Alerts */}
-          <ScheduledTests />
+          <ScheduledTests onScheduledResult={onScheduledResult} />
 
         </div>
 

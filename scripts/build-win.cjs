@@ -2,7 +2,7 @@ const { packager } = require('@electron/packager');
 const path = require('path');
 
 async function build() {
-  console.log('Starting NetPulse Windows v1.0 packaging...');
+  console.log('Starting NetPulse Windows v1.1 packaging...');
   
   const appPaths = await packager({
     dir: path.resolve(__dirname, '..'),
@@ -13,8 +13,8 @@ async function build() {
     icon: path.resolve(__dirname, '../public/favicon.ico'),
     overwrite: true,
     prune: true,
-    appVersion: '1.0.0',
-    buildVersion: '1.0.0',
+    appVersion: '1.1.0',
+    buildVersion: '1.1.0',
     appCopyright: 'Copyright (C) 2026 NetPulse Engineering',
     ignore: [
       /^\/android($|\/)/,
