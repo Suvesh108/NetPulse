@@ -11,7 +11,7 @@ interface ProbeTarget {
 }
 
 const PROBE_TARGETS: ProbeTarget[] = [
-  { id: 'cloudflare', name: 'Cloudflare Edge', host: '1.1.1.1', url: 'https://1.1.1.1/cdn-cgi/trace' },
+  { id: 'cloudflare', name: 'Cloudflare Edge', host: '1.1.1.1', url: 'https://speed.cloudflare.com/__down?bytes=0' },
   { id: 'google', name: 'Google Anycast', host: '8.8.8.8', url: 'https://dns.google/resolve?name=example.com' },
   { id: 'quad9', name: 'Quad9 Secure', host: '9.9.9.9', url: 'https://dns.quad9.net/dns-query?name=example.com' },
 ];
@@ -58,7 +58,10 @@ export default function PingOscilloscope() {
         try {
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), Math.min(2000, intervalMs * 3));
-          await fetch(`${activeTarget.url}&_r=${Date.now()}`, { 
+          const sep = activeTarget.url.includes('?') ? '&' : '?';
+          await fetch(`${activeTarget.url}${sep}_r=${Date.now()}`, { 
+            method: 'GET',
+            mode: 'no-cors',
             cache: 'no-store', 
             signal: controller.signal 
           });

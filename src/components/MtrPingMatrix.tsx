@@ -23,7 +23,7 @@ const INITIAL_TARGETS: MtrTarget[] = [
     id: 'cloudflare',
     name: 'Cloudflare Anycast Fabric',
     ip: '1.1.1.1',
-    url: 'https://1.1.1.1/cdn-cgi/trace',
+    url: 'https://speed.cloudflare.com/__down?bytes=0',
     color: '#00D2FF',
     history: [],
     sent: 0,
@@ -53,7 +53,7 @@ const INITIAL_TARGETS: MtrTarget[] = [
     id: 'quad9',
     name: 'Quad9 Security Edge',
     ip: '9.9.9.9',
-    url: 'https://dns.quad9.net/dns-query?name=quad9.net&type=A',
+    url: 'https://dns.quad9.net/dns-query?name=example.com',
     color: '#A855F7',
     history: [],
     sent: 0,
@@ -92,9 +92,11 @@ export default function MtrPingMatrix() {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 1800);
+      const sep = target.url.includes('?') ? '&' : '?';
 
-      const res = await fetch(`${target.url}?_r=${Date.now()}_${Math.random()}`, {
-        method: 'HEAD',
+      await fetch(`${target.url}${sep}_r=${Date.now()}_${Math.random()}`, {
+        method: 'GET',
+        mode: 'no-cors',
         cache: 'no-store',
         signal: controller.signal,
       });
@@ -103,18 +105,7 @@ export default function MtrPingMatrix() {
       const rtt = Math.max(2, Math.round(performance.now() - start));
       return { rtt };
     } catch {
-      // Retry via GET fallback if HEAD was not accepted
-      try {
-        const start2 = performance.now();
-        const res2 = await fetch(`${target.url}?_r=${Date.now()}_${Math.random()}`, {
-          cache: 'no-store',
-          signal: AbortSignal.timeout(1800),
-        });
-        const rtt2 = Math.max(2, Math.round(performance.now() - start2));
-        return { rtt: rtt2 };
-      } catch {
-        return { rtt: null };
-      }
+      return { rtt: null };
     }
   };
 
