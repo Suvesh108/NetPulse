@@ -3,6 +3,8 @@ import {
   X, Download, Copy, Check, ShieldCheck, Zap, 
   Tv, Gamepad2, Video, Globe, ArrowDown, ArrowUp, CheckCircle2
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { springs, modalVariants, backdropVariants } from '../lib/motion';
 import { SpeedTestResult } from '../types';
 
 interface SpeedCertificateModalProps {
@@ -50,7 +52,7 @@ export default function SpeedCertificateModal({
   const [downloading, setDownloading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  if (!isOpen || !result) return null;
+  if (!result) return null;
 
   const factor = unit === 'MB/s' ? 8 : 1;
   const downloadSpeed = result.downloadSpeed ?? result.downloadMbps ?? 0;
@@ -409,23 +411,44 @@ export default function SpeedCertificateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-hud-in select-none">
-      <div className="hud-panel w-full max-w-2xl rounded-3xl p-5 sm:p-6 flex flex-col gap-5 relative shadow-2xl border border-white/[0.1] bg-[#0A0C14]">
-        
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/[0.08] text-slate-400 hover:text-white transition-colors cursor-pointer"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="cert-backdrop"
+          variants={backdropVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 0.2 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md select-none"
         >
-          <X className="w-5 h-5" />
-        </button>
+          <motion.div
+            key="cert-dialog"
+            variants={modalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={springs.smooth}
+            className="hud-panel w-full max-w-2xl rounded-3xl p-5 sm:p-6 flex flex-col gap-5 relative shadow-2xl border border-white/[0.1] bg-[#0A0C14]"
+          >
+            {/* Close Button */}
+            <motion.button
+              whileTap={{ scale: 0.92 }}
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/[0.08] text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </motion.button>
 
-        {/* Certificate Card Body Preview */}
-        <div ref={cardRef} className="p-5 sm:p-6 rounded-2xl bg-[#0D101A] text-white border border-white/[0.08] shadow-2xl flex flex-col gap-5 relative overflow-hidden">
-          
-          {/* Ambient Lighting Orbs inside Card */}
-          <div className="absolute -top-24 -left-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            {/* Certificate Card Body Preview */}
+            <div ref={cardRef} className="p-5 sm:p-6 rounded-2xl bg-[#0D101A] text-white border border-white/[0.08] shadow-2xl flex flex-col gap-5 relative overflow-hidden">
+              
+              {/* Ambient Lighting Orbs inside Card */}
+              <div className="absolute -top-24 -left-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
           {/* Top Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/[0.06] relative z-10">
@@ -562,26 +585,30 @@ export default function SpeedCertificateModal({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3 pt-1">
-          <button
+          <motion.button
+            whileTap={{ scale: 0.98 }}
             onClick={handleDownloadPng}
             disabled={downloading}
-            className="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer hud-btn"
+            className="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer hud-btn"
           >
             <Download className="w-4 h-4" />
             <span>{downloading ? 'RENDERING PNG...' : 'DOWNLOAD HIGH-RES CERTIFICATE (PNG)'}</span>
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
+            whileTap={{ scale: 0.98 }}
             onClick={handleCopyReport}
-            className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-zinc-300 hover:text-white font-mono font-bold text-xs uppercase tracking-wider border border-white/[0.08] active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer hud-btn"
+            className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-zinc-300 hover:text-white font-mono font-bold text-xs uppercase tracking-wider border border-white/[0.08] transition-all flex items-center justify-center gap-2 cursor-pointer hud-btn"
             title="Copy Report to Clipboard"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
             <span>{copied ? 'COPIED!' : 'COPY REPORT'}</span>
-          </button>
+          </motion.button>
         </div>
 
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

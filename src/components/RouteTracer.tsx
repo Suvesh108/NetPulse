@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Globe, ShieldCheck, RefreshCw, MapPin, Zap, Layers, ArrowRight
 } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface TraceData {
   clientIp: string;
@@ -180,15 +181,16 @@ export default function RouteTracer() {
           </span>
         </div>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={runRouteTrace}
           disabled={loading}
           className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-indigo-500' : 'text-slate-400'}`} />
           <span>{loading ? 'TRACING...' : 'RE-TRACE'}</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Overview Telemetry Ribbon */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Wifi, RefreshCw, Radio } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export default function WifiAnalyzer() {
   const [connectionInfo, setConnectionInfo] = useState<{
@@ -75,7 +76,7 @@ export default function WifiAnalyzer() {
   const signalPercentage = Math.max(5, Math.min(100, Math.round(((rssi - (-90)) / (-30 - (-90))) * 100)));
 
   return (
-    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4 min-w-0">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-4 h-full min-w-0">
       
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06] gap-2 min-w-0">
@@ -89,15 +90,16 @@ export default function WifiAnalyzer() {
           </span>
         </div>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={analyzeConnection}
           disabled={analyzing}
           className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${analyzing ? 'animate-spin text-cyan-500' : 'text-slate-400'}`} />
           <span>{analyzing ? 'SCANNING...' : 'RE-SCAN'}</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* RF Signal Meter Section */}

@@ -8,6 +8,8 @@ import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
 import RollingCounter from './reactbits/RollingCounter';
 import { CustomGauge } from './CustomGauge';
+import { motion } from 'motion/react';
+import { springs } from '../lib/motion';
 
 interface ProbeRecord {
   id: number;
@@ -546,40 +548,56 @@ export default function SpeedTest({
           </div>
         </div>
 
-        {/* Center: Stream Connection Mode (Multi vs Single Stream) */}
-        <div className="flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] shrink-0">
-          <button
+        {/* Center: Stream Connection Mode (Multi vs Single Stream) with FLIP Indicator */}
+        <div className="relative flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] shrink-0">
+          <motion.button
             type="button"
             disabled={status !== 'idle' && status !== 'completed'}
             onClick={() => {
               setConnectionMode('multi');
               onUpdateSettings({ ...settings, connectionMode: 'multi' });
             }}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+            whileTap={{ scale: 0.95 }}
+            className={`relative z-10 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
               connectionMode === 'multi'
-                ? 'bg-white dark:bg-[#1C202E] text-blue-600 dark:text-blue-400 shadow-xs border border-slate-200/60 dark:border-white/[0.1]'
+                ? 'text-blue-600 dark:text-blue-400'
                 : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Multi-Stream: Saturated concurrent streams for maximum broadband capacity testing"
           >
-            Multi-Stream
-          </button>
-          <button
+            {connectionMode === 'multi' && (
+              <motion.div
+                layoutId="stream-mode-pill"
+                className="absolute inset-0 rounded-lg bg-white dark:bg-[#1C202E] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
+                transition={springs.snappy}
+              />
+            )}
+            <span className="relative z-10">Multi-Stream</span>
+          </motion.button>
+          <motion.button
             type="button"
             disabled={status !== 'idle' && status !== 'completed'}
             onClick={() => {
               setConnectionMode('single');
               onUpdateSettings({ ...settings, connectionMode: 'single' });
             }}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+            whileTap={{ scale: 0.95 }}
+            className={`relative z-10 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
               connectionMode === 'single'
-                ? 'bg-white dark:bg-[#1C202E] text-indigo-600 dark:text-indigo-400 shadow-xs border border-slate-200/60 dark:border-white/[0.1]'
+                ? 'text-indigo-600 dark:text-indigo-400'
                 : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Single-Stream: Evaluates single socket TCP throughput and router queue congestion"
           >
-            Single-Stream
-          </button>
+            {connectionMode === 'single' && (
+              <motion.div
+                layoutId="stream-mode-pill"
+                className="absolute inset-0 rounded-lg bg-white dark:bg-[#1C202E] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
+                transition={springs.snappy}
+              />
+            )}
+            <span className="relative z-10">Single-Stream</span>
+          </motion.button>
         </div>
 
         {/* Right: Active Test Phase Status Badge */}
@@ -606,13 +624,13 @@ export default function SpeedTest({
       </div>
 
       {/* 2. Main Avionics Stage (Gauge + 4 Precision Telemetry Modules) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch min-w-0">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-stretch min-w-0">
         
         {/* Left Column (5 Cols): The Precision Speedtest-Grade Vector Gauge */}
-        <div className="lg:col-span-5 hud-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-3 min-w-0 relative overflow-hidden">
+        <div className="lg:col-span-5 hud-panel rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between gap-2.5 min-w-0 relative overflow-hidden">
           
           {/* Top Row: Ping ms Header (Idle, Loaded Down, Loaded Up) */}
-          <div className="w-full flex items-center justify-between text-xs font-mono border-b border-slate-100 dark:border-white/[0.06] pb-2.5">
+          <div className="w-full flex items-center justify-between text-xs font-mono border-b border-slate-100 dark:border-white/[0.06] pb-2">
             <span className="text-slate-400 dark:text-zinc-400 font-bold uppercase tracking-wider text-[11px]">
               Ping ms
             </span>
@@ -721,7 +739,7 @@ export default function SpeedTest({
           </div>
 
           {/* The Speedometer Gauge Arena */}
-          <div className="relative w-full max-w-[340px] sm:max-w-[360px] mx-auto flex flex-col items-center justify-center py-1">
+          <div className="relative w-full max-w-[240px] sm:max-w-[260px] mx-auto flex flex-col items-center justify-center">
             <CustomGauge
               value={status === 'idle' ? 0 : Math.round(displaySpeedNumeric)}
               unit={unit}
@@ -748,13 +766,16 @@ export default function SpeedTest({
           </div>
 
           {/* Primary Mechanical Launch Trigger */}
-          <div className="w-full flex flex-col gap-2 pt-2">
-            <button
+          <div className="w-full flex flex-col gap-1.5 pt-1">
+            <motion.button
               id="dial-go-button"
               type="button"
               onClick={handleStartTest}
               disabled={status !== 'idle' && status !== 'completed'}
-              className={`w-full py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hud-btn cursor-pointer shadow-sm ${
+              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: (status === 'idle' || status === 'completed') ? 1.008 : 1 }}
+              transition={springs.snappy}
+              className={`w-full py-2.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
                 status === 'idle' || status === 'completed'
                   ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/20'
                   : 'bg-slate-100 dark:bg-white/[0.05] text-slate-400 dark:text-zinc-500 cursor-not-allowed border border-slate-200 dark:border-white/[0.06]'
@@ -771,7 +792,7 @@ export default function SpeedTest({
                   <span>{status === 'idle' ? 'START SPEED TEST' : 'MEASURING...'}</span>
                 </>
               )}
-            </button>
+            </motion.button>
 
             <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 dark:text-zinc-500 px-1">
               <span>Press [Space] to run</span>
@@ -785,11 +806,11 @@ export default function SpeedTest({
         </div>
 
         {/* Right Column (7 Cols): 4 Integrated Telemetry Quadrants */}
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
           
           {/* QUADRANT 1: LATENCY & BUFFERBLOAT */}
-          <div className="hud-panel rounded-2xl p-4 flex flex-col justify-between gap-3 min-w-0">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-2">
+          <div className="hud-panel rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 min-w-0">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-1.5">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-amber-500" />
                 <span className="text-xs font-bold text-slate-900 dark:text-white">Latency & Bloat</span>
@@ -800,11 +821,11 @@ export default function SpeedTest({
             </div>
 
             {/* Latency Values */}
-            <div className="flex items-baseline justify-between py-1">
+            <div className="flex items-baseline justify-between py-0.5">
               <div>
                 <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 block">UNLOADED IDLE</span>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-mono text-2xl font-black text-slate-900 dark:text-white tabular-nums">
+                  <span className="font-mono text-xl sm:text-2xl font-black text-slate-900 dark:text-white tabular-nums">
                     {pingVal !== null ? pingVal : '--'}
                   </span>
                   <span className="text-xs font-mono text-slate-400">ms</span>
@@ -814,7 +835,7 @@ export default function SpeedTest({
               <div className="text-right">
                 <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 block">JITTER STABILITY</span>
                 <div className="flex items-baseline gap-1 mt-0.5 justify-end">
-                  <span className="font-mono text-lg font-bold text-slate-700 dark:text-zinc-300 tabular-nums">
+                  <span className="font-mono text-base sm:text-lg font-bold text-slate-700 dark:text-zinc-300 tabular-nums">
                     {jitterVal !== null ? `±${jitterVal}` : '--'}
                   </span>
                   <span className="text-xs font-mono text-slate-400">ms</span>
@@ -823,7 +844,7 @@ export default function SpeedTest({
             </div>
 
             {/* Loaded Latency Delta Details */}
-            <div className="hud-subpanel rounded-xl p-2.5 flex items-center justify-between text-[11px] font-mono">
+            <div className="hud-subpanel rounded-xl p-2 sm:p-2.5 flex items-center justify-between text-[11px] font-mono">
               <div className="flex items-center gap-1.5 text-orange-500">
                 <ArrowDown className="w-3 h-3" />
                 <span>Down: {downloadLoadedLatencyVal ? `${downloadLoadedLatencyVal}ms (+${Math.max(0, downloadLoadedLatencyVal - (pingVal || 0))}ms)` : 'Active delta'}</span>
@@ -836,8 +857,8 @@ export default function SpeedTest({
           </div>
 
           {/* QUADRANT 2: DOWNLOAD THROUGHPUT */}
-          <div className="hud-panel rounded-2xl p-4 flex flex-col justify-between gap-3 min-w-0">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-2">
+          <div className="hud-panel rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 min-w-0">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-1.5">
               <div className="flex items-center gap-2">
                 <ArrowDown className="w-4 h-4 text-orange-500" />
                 <span className="text-xs font-bold text-slate-900 dark:text-white">Download</span>
@@ -847,11 +868,11 @@ export default function SpeedTest({
               </span>
             </div>
 
-            <div className="flex items-baseline justify-between py-1">
+            <div className="flex items-baseline justify-between py-0.5">
               <div>
                 <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 block">INBOUND RATE</span>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-mono text-2xl font-black text-slate-900 dark:text-white tabular-nums">
+                  <span className="font-mono text-xl sm:text-2xl font-black text-slate-900 dark:text-white tabular-nums">
                     {displayDownload}
                   </span>
                   <span className="text-xs font-mono text-slate-400">{unit}</span>
@@ -864,7 +885,7 @@ export default function SpeedTest({
             </div>
 
             {/* Responsive Spline Graph Container (Zero Overflow) */}
-            <div className="w-full h-12 rounded-lg hud-subpanel overflow-hidden relative p-0.5 flex flex-col justify-end">
+            <div className="w-full h-14 sm:h-16 rounded-lg hud-subpanel overflow-hidden relative p-0.5 flex flex-col justify-end">
               <svg 
                 viewBox="0 0 300 50" 
                 preserveAspectRatio="none" 
@@ -883,8 +904,8 @@ export default function SpeedTest({
           </div>
 
           {/* QUADRANT 3: UPLOAD THROUGHPUT */}
-          <div className="hud-panel rounded-2xl p-4 flex flex-col justify-between gap-3 min-w-0">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-2">
+          <div className="hud-panel rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 min-w-0">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-1.5">
               <div className="flex items-center gap-2">
                 <ArrowUp className="w-4 h-4 text-purple-400" />
                 <span className="text-xs font-bold text-slate-900 dark:text-white">Upload</span>
@@ -894,11 +915,11 @@ export default function SpeedTest({
               </span>
             </div>
 
-            <div className="flex items-baseline justify-between py-1">
+            <div className="flex items-baseline justify-between py-0.5">
               <div>
                 <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 block">OUTBOUND RATE</span>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-mono text-2xl font-black text-slate-900 dark:text-white tabular-nums">
+                  <span className="font-mono text-xl sm:text-2xl font-black text-slate-900 dark:text-white tabular-nums">
                     {displayUpload}
                   </span>
                   <span className="text-xs font-mono text-slate-400">{unit}</span>
@@ -911,7 +932,7 @@ export default function SpeedTest({
             </div>
 
             {/* Responsive Spline Graph Container (Zero Overflow) */}
-            <div className="w-full h-12 rounded-lg hud-subpanel overflow-hidden relative p-0.5 flex flex-col justify-end">
+            <div className="w-full h-14 sm:h-16 rounded-lg hud-subpanel overflow-hidden relative p-0.5 flex flex-col justify-end">
               <svg 
                 viewBox="0 0 300 50" 
                 preserveAspectRatio="none" 
@@ -930,8 +951,8 @@ export default function SpeedTest({
           </div>
 
           {/* QUADRANT 4: PACKET INTEGRITY & VOIP MOS */}
-          <div className="hud-panel rounded-2xl p-4 flex flex-col justify-between gap-3 min-w-0">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-2">
+          <div className="hud-panel rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 min-w-0">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-1.5">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
                 <span className="text-xs font-bold text-slate-900 dark:text-white">Packet Delivery</span>
@@ -942,13 +963,13 @@ export default function SpeedTest({
             </div>
 
             {/* 25-Probe Timeline Strip */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 py-0.5">
               <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
                 <span>Micro-Burst Tracker</span>
                 <span>{packetsReceived}/{packetsTotal || 25} ACK</span>
               </div>
               <div 
-                className="grid gap-0.5 h-3 w-full rounded overflow-hidden"
+                className="grid gap-0.5 h-3.5 w-full rounded overflow-hidden"
                 style={{ gridTemplateColumns: 'repeat(25, minmax(0, 1fr))' }}
               >
                 {Array.from({ length: 25 }).map((_, idx) => {
@@ -973,7 +994,7 @@ export default function SpeedTest({
             </div>
 
             {/* VoIP MOS Audio Score */}
-            <div className="hud-subpanel rounded-xl p-2.5 flex items-center justify-between text-[11px] font-mono">
+            <div className="hud-subpanel rounded-xl p-2 sm:p-2.5 flex items-center justify-between text-[11px] font-mono">
               <div className="flex items-center gap-1.5 text-cyan-400">
                 <Headphones className="w-3.5 h-3.5" />
                 <span>WebRTC MOS:</span>
@@ -1013,14 +1034,15 @@ export default function SpeedTest({
 
         {/* Share Action Button */}
         <div className="flex items-center gap-2">
-          <button
+          <motion.button
             type="button"
             onClick={handleCopyLink}
+            whileTap={{ scale: 0.95 }}
             className="px-3 py-1.5 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
           >
             {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
             <span>{copiedLink ? 'COPIED LINK' : 'SHARE TELEMETRY'}</span>
-          </button>
+          </motion.button>
         </div>
 
       </div>

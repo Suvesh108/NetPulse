@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Network, Play, RotateCcw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface MtuBoundary {
   size: number;
@@ -74,7 +75,7 @@ export default function MtuAnalyzer() {
   };
 
   return (
-    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4 min-w-0">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-4 h-full min-w-0">
       
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06] gap-2 min-w-0">
@@ -88,8 +89,9 @@ export default function MtuAnalyzer() {
           </span>
         </div>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={runMtuAnalysis}
           disabled={isTesting}
           className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
@@ -100,7 +102,7 @@ export default function MtuAnalyzer() {
             <Play className="w-3.5 h-3.5 fill-current text-amber-500" />
           )}
           <span>{isTesting ? 'PROBING...' : 'ANALYZE MTU'}</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Detected MTU Banner */}

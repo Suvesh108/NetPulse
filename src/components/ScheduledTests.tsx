@@ -5,6 +5,8 @@ import {
   Activity, ArrowDown, Radio
 } from 'lucide-react';
 import { SpeedTestResult } from '../types';
+import { motion } from 'motion/react';
+import { springs } from '../lib/motion';
 
 interface ScheduledTestsProps {
   onScheduledResult?: (result: SpeedTestResult) => void;
@@ -212,18 +214,26 @@ export default function ScheduledTests({ onScheduledResult }: ScheduledTestsProp
           </div>
         </div>
 
-        <button
+        {/* Tactile Spring Toggle Switch */}
+        <motion.button
           type="button"
+          role="switch"
+          aria-checked={enabled}
           onClick={toggleScheduled}
-          className="cursor-pointer focus:outline-none"
+          whileTap={{ scale: 0.94 }}
+          className={`w-11 h-6 rounded-full p-0.5 transition-colors cursor-pointer flex items-center ${
+            enabled 
+              ? 'bg-amber-500 justify-end' 
+              : 'bg-slate-300 dark:bg-white/15 justify-start'
+          }`}
           title={enabled ? 'Disable Watchdog' : 'Enable Watchdog'}
         >
-          {enabled ? (
-            <ToggleRight className="w-9 h-9 text-amber-500" />
-          ) : (
-            <ToggleLeft className="w-9 h-9 text-slate-300 dark:text-slate-700" />
-          )}
-        </button>
+          <motion.div
+            layout
+            transition={springs.snappy}
+            className="w-5 h-5 rounded-full bg-white shadow-sm"
+          />
+        </motion.button>
       </div>
 
       {/* Settings Grid */}
@@ -235,19 +245,27 @@ export default function ScheduledTests({ onScheduledResult }: ScheduledTestsProp
             <span className="text-slate-700 dark:text-slate-300">Test Interval</span>
             <span className="font-mono text-amber-600">Every {intervalHours} hr{intervalHours > 1 ? 's' : ''}</span>
           </div>
-          <div className="flex items-center gap-1.5 pt-1">
+          <div className="relative flex items-center gap-1.5 pt-1">
             {[1, 6, 12, 24].map((hr) => (
-              <button
+              <motion.button
                 key={hr}
                 onClick={() => handleIntervalChange(hr)}
-                className={`flex-1 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                whileTap={{ scale: 0.94 }}
+                className={`relative flex-1 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
                   intervalHours === hr
-                    ? 'bg-amber-500 text-white shadow-xs'
+                    ? 'text-white'
                     : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                 }`}
               >
-                {hr}h
-              </button>
+                {intervalHours === hr && (
+                  <motion.div
+                    layoutId="watchdog-interval-pill"
+                    className="absolute inset-0 rounded-lg bg-amber-500 shadow-xs"
+                    transition={springs.snappy}
+                  />
+                )}
+                <span className="relative z-10">{hr}h</span>
+              </motion.button>
             ))}
           </div>
         </div>
@@ -288,14 +306,15 @@ export default function ScheduledTests({ onScheduledResult }: ScheduledTestsProp
           </div>
         </div>
 
-        <button
+        <motion.button
           onClick={() => runWatchdogAudit(true)}
           disabled={isAuditing}
-          className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 shrink-0"
+          whileTap={{ scale: 0.95 }}
+          className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0"
         >
           {isAuditing ? <RotateCcw className="w-3 h-3 animate-spin shrink-0" /> : <Play className="w-3 h-3 fill-current shrink-0" />}
           <span>{isAuditing ? 'Auditing...' : 'Test Watchdog'}</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Notification status */}

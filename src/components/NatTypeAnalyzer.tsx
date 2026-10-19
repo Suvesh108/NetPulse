@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Play, RotateCcw, AlertTriangle, CheckCircle2, Globe, Cpu, Radio, Network } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface IceCandidateInfo {
   type: 'host' | 'srflx' | 'relay' | 'unknown';
@@ -156,7 +157,7 @@ export default function NatTypeAnalyzer() {
   const badge = getNatBadge(natType);
 
   return (
-    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4 min-w-0">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-4 h-full min-w-0">
       
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06] gap-2 min-w-0">
@@ -170,8 +171,9 @@ export default function NatTypeAnalyzer() {
           </span>
         </div>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={analyzeNatType}
           disabled={isTesting}
           className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
@@ -182,7 +184,7 @@ export default function NatTypeAnalyzer() {
             <Play className="w-3.5 h-3.5 fill-current text-cyan-500" />
           )}
           <span>{isTesting ? 'GATHERING...' : 'ANALYZE NAT'}</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Primary NAT Status Badge Banner */}

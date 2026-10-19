@@ -6,6 +6,8 @@ import {
 import { SimulationSettings, EngineBackend, RoutingProtocol, SpeedTestResult } from '../types';
 import InAppUpdater from './InAppUpdater';
 import ScheduledTests from './ScheduledTests';
+import { motion, AnimatePresence } from 'motion/react';
+import { springs } from '../lib/motion';
 
 interface SettingsPanelProps {
   settings: SimulationSettings;
@@ -350,17 +352,24 @@ export default function SettingsPanel({ settings, onUpdateSettings, onScheduledR
                 <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Download Loaded Latency</span>
               </div>
-              <button
+              <motion.button
                 type="button"
+                role="switch"
+                aria-checked={settings.measureDownloadLoadedLatency}
                 onClick={() => handleUpdateField('measureDownloadLoadedLatency', !settings.measureDownloadLoadedLatency)}
-                className="cursor-pointer focus:outline-none"
+                whileTap={{ scale: 0.94 }}
+                className={`w-11 h-6 rounded-full p-0.5 transition-colors cursor-pointer flex items-center ${
+                  settings.measureDownloadLoadedLatency 
+                    ? 'bg-emerald-500 justify-end' 
+                    : 'bg-slate-300 dark:bg-white/15 justify-start'
+                }`}
               >
-                {settings.measureDownloadLoadedLatency ? (
-                  <ToggleRight className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-                ) : (
-                  <ToggleLeft className="w-8 h-8 text-slate-300 dark:text-slate-700" />
-                )}
-              </button>
+                <motion.div
+                  layout
+                  transition={springs.snappy}
+                  className="w-5 h-5 rounded-full bg-white shadow-sm"
+                />
+              </motion.button>
             </div>
 
             {/* Upload Toggle */}
@@ -369,17 +378,24 @@ export default function SettingsPanel({ settings, onUpdateSettings, onScheduledR
                 <Upload className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Upload Loaded Latency</span>
               </div>
-              <button
+              <motion.button
                 type="button"
+                role="switch"
+                aria-checked={settings.measureUploadLoadedLatency}
                 onClick={() => handleUpdateField('measureUploadLoadedLatency', !settings.measureUploadLoadedLatency)}
-                className="cursor-pointer focus:outline-none"
+                whileTap={{ scale: 0.94 }}
+                className={`w-11 h-6 rounded-full p-0.5 transition-colors cursor-pointer flex items-center ${
+                  settings.measureUploadLoadedLatency 
+                    ? 'bg-violet-500 justify-end' 
+                    : 'bg-slate-300 dark:bg-white/15 justify-start'
+                }`}
               >
-                {settings.measureUploadLoadedLatency ? (
-                  <ToggleRight className="w-8 h-8 text-violet-600 dark:text-violet-400" />
-                ) : (
-                  <ToggleLeft className="w-8 h-8 text-slate-300 dark:text-slate-700" />
-                )}
-              </button>
+                <motion.div
+                  layout
+                  transition={springs.snappy}
+                  className="w-5 h-5 rounded-full bg-white shadow-sm"
+                />
+              </motion.button>
             </div>
           </div>
 

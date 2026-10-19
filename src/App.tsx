@@ -3,6 +3,8 @@ import {
   Zap, Activity, History, Settings, Sun, Moon, 
   ShieldCheck, Globe, Wifi, Award
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { springs, pageTransitionVariants } from './lib/motion';
 import SpeedTest from './components/SpeedTest';
 import HistoryList from './components/HistoryList';
 import SettingsPanel from './components/SettingsPanel';
@@ -112,8 +114,9 @@ function MainApp() {
         <div className="w-full max-w-7xl mx-auto h-13 px-3 sm:px-6 flex items-center justify-between gap-3">
           
           {/* Brand Logo & Version Identity */}
-          <div 
+          <motion.div 
             onClick={() => setActiveTab('speed')}
+            whileTap={{ scale: 0.96 }}
             className="flex items-center gap-2.5 cursor-pointer group shrink-0 select-none"
             title="NetPulse Telemetry Suite"
           >
@@ -132,37 +135,47 @@ function MainApp() {
                 v1.1
               </span>
             </div>
-          </div>
+          </motion.div>
 
           {/* Desktop Navigation Segmented Pill */}
-          <nav className="hidden md:flex items-center p-1 rounded-xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.08]">
+          <nav className="hidden md:flex items-center p-1 rounded-xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.08] relative">
             {navItems.map((item) => {
               const IconComp = item.icon;
               const isActive = activeTab === item.id;
               
               return (
-                <button
+                <motion.button
                   key={item.id}
                   id={`nav-desktop-${item.id}`}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer select-none ${
+                  whileTap={{ scale: 0.96 }}
+                  className={`relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150 cursor-pointer select-none ${
                     isActive 
-                      ? 'bg-white dark:bg-[#151824] text-slate-950 dark:text-white shadow-xs border border-slate-200/60 dark:border-white/[0.1]' 
+                      ? 'text-slate-950 dark:text-white' 
                       : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100'
                   }`}
                 >
-                  <IconComp className={`w-3.5 h-3.5 ${
-                    isActive 
-                      ? (item.id === 'speed' ? 'text-blue-500' : item.id === 'diagnostics' ? 'text-cyan-400' : item.id === 'history' ? 'text-indigo-400' : 'text-slate-400')
-                      : 'text-slate-400 dark:text-zinc-500'
-                  }`} />
-                  <span>{item.label}</span>
-                  {item.badge !== undefined && (
-                    <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                      {item.badge}
-                    </span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-desktop-nav-pill"
+                      className="absolute inset-0 rounded-lg bg-white dark:bg-[#151824] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
+                      transition={springs.snappy}
+                    />
                   )}
-                </button>
+                  <span className="relative z-10 flex items-center gap-2">
+                    <IconComp className={`w-3.5 h-3.5 ${
+                      isActive 
+                        ? (item.id === 'speed' ? 'text-blue-500' : item.id === 'diagnostics' ? 'text-cyan-400' : item.id === 'history' ? 'text-indigo-400' : 'text-slate-400')
+                        : 'text-slate-400 dark:text-zinc-500'
+                    }`} />
+                    <span>{item.label}</span>
+                    {item.badge !== undefined && (
+                      <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                        {item.badge}
+                      </span>
+                    )}
+                  </span>
+                </motion.button>
               );
             })}
           </nav>
@@ -176,49 +189,67 @@ function MainApp() {
               <span>Cloudflare Anycast</span>
             </div>
 
-            {/* Throughput Unit Toggle (Mbps / MB/s) */}
-            <div className="flex items-center p-0.5 rounded-lg bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] shrink-0">
-              <button
+            {/* Throughput Unit Toggle (Mbps / MB/s) with sliding FLIP pill */}
+            <div className="relative flex items-center p-0.5 rounded-lg bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] shrink-0">
+              <motion.button
                 type="button"
                 onClick={() => setUnit('Mbps')}
-                className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-bold transition-colors cursor-pointer ${
+                whileTap={{ scale: 0.94 }}
+                className={`relative z-10 px-2 py-0.5 rounded-md text-[11px] font-mono font-bold transition-colors cursor-pointer ${
                   unit === 'Mbps'
-                    ? 'bg-white dark:bg-[#151824] text-blue-600 dark:text-blue-400 shadow-xs'
+                    ? 'text-blue-600 dark:text-blue-400'
                     : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
                 title="Megabits per second (standard broadband telecom unit)"
               >
-                Mbps
-              </button>
-              <button
+                {unit === 'Mbps' && (
+                  <motion.div
+                    layoutId="unit-toggle-pill"
+                    className="absolute inset-0 rounded-md bg-white dark:bg-[#151824] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
+                    transition={springs.snappy}
+                  />
+                )}
+                <span className="relative z-10">Mbps</span>
+              </motion.button>
+              <motion.button
                 type="button"
                 onClick={() => setUnit('MB/s')}
-                className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-bold transition-colors cursor-pointer ${
+                whileTap={{ scale: 0.94 }}
+                className={`relative z-10 px-2 py-0.5 rounded-md text-[11px] font-mono font-bold transition-colors cursor-pointer ${
                   unit === 'MB/s'
-                    ? 'bg-white dark:bg-[#151824] text-blue-600 dark:text-blue-400 shadow-xs'
+                    ? 'text-blue-600 dark:text-blue-400'
                     : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
                 title="Megabytes per second (actual file download transfer rate)"
               >
-                MB/s
-              </button>
+                {unit === 'MB/s' && (
+                  <motion.div
+                    layoutId="unit-toggle-pill"
+                    className="absolute inset-0 rounded-md bg-white dark:bg-[#151824] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
+                    transition={springs.snappy}
+                  />
+                )}
+                <span className="relative z-10">MB/s</span>
+              </motion.button>
             </div>
 
             {/* Verified Certificate Quick Launch (When Available) */}
             {latestResult && (
-              <button
+              <motion.button
                 onClick={() => setCertificateModalOpen(true)}
+                whileTap={{ scale: 0.95 }}
                 title="View Verified Speed Certificate"
                 className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-xs font-bold transition-colors hover:bg-blue-100 dark:hover:bg-blue-900/60 cursor-pointer"
               >
                 <Award className="w-3.5 h-3.5" />
                 <span>Certificate</span>
-              </button>
+              </motion.button>
             )}
 
             {/* Dark / Light Mode Switch */}
-            <button
+            <motion.button
               onClick={toggleTheme}
+              whileTap={{ scale: 0.90 }}
               title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} theme`}
               className="p-1.5 rounded-lg border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-white/[0.04] text-slate-700 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
               aria-label="Toggle visual theme"
@@ -228,79 +259,106 @@ function MainApp() {
               ) : (
                 <Sun className="w-4 h-4 text-amber-400" />
               )}
-            </button>
+            </motion.button>
 
           </div>
 
         </div>
       </header>
 
-      {/* Main Responsive Content Arena */}
+      {/* Main Responsive Content Arena with Spring Page Transitions */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 py-4 flex flex-col min-w-0">
-        <div key={activeTab} className="animate-hud-in w-full min-w-0">
-          {activeTab === 'speed' && (
-            <SpeedTest 
-              settings={settings} 
-              onUpdateSettings={setSettings} 
-              onTestComplete={handleTestComplete}
-              onTestingStateChange={setIsTesting}
-              unit={unit}
-            />
-          )}
-
-          {activeTab === 'diagnostics' && (
-            <div className="w-full flex flex-col gap-4 pb-20 md:pb-6 min-w-0">
-              {/* Full Width Multi-Target MTR Live Matrix */}
-              <div className="w-full min-w-0">
-                <MtrPingMatrix />
-              </div>
-
-              {/* Full Width Hop-by-Hop Edge Route Trace */}
-              <div className="w-full min-w-0">
-                <RouteTracer />
-              </div>
-
-              {/* 2-Column Balanced Diagnostics Bento */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start min-w-0">
-                <div className="flex flex-col gap-4 min-w-0">
-                  <NatTypeAnalyzer />
-                  <DnsBenchmark />
-                  <MtuAnalyzer />
-                </div>
-                <div className="flex flex-col gap-4 min-w-0">
-                  <CdnBenchmark />
-                  <DualStackBenchmark />
-                  <WifiAnalyzer />
-                  <PingOscilloscope />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'history' && (
-            <div className="w-full pb-20 md:pb-6 min-w-0">
-              <HistoryList 
-                results={historyResults} 
-                onDeleteResult={handleDeleteResult}
-                onClearAll={handleClearAllHistory}
-                unit={unit}
-              />
-            </div>
-          )}
-
-          {activeTab === 'settings' && (
-            <div className="w-full pb-20 md:pb-6 min-w-0">
-              <SettingsPanel 
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            variants={pageTransitionVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={springs.interactive}
+            className="w-full min-w-0"
+          >
+            {activeTab === 'speed' && (
+              <SpeedTest 
                 settings={settings} 
                 onUpdateSettings={setSettings} 
-                onScheduledResult={handleTestComplete} 
+                onTestComplete={handleTestComplete}
+                onTestingStateChange={setIsTesting}
+                unit={unit}
               />
-            </div>
-          )}
-        </div>
+            )}
+
+            {activeTab === 'diagnostics' && (
+              <div className="w-full flex flex-col gap-4 pb-20 md:pb-6 min-w-0">
+                {/* Full Width Multi-Target MTR Live Matrix */}
+                <div className="w-full min-w-0">
+                  <MtrPingMatrix />
+                </div>
+
+                {/* Full Width Hop-by-Hop Edge Route Trace */}
+                <div className="w-full min-w-0">
+                  <RouteTracer />
+                </div>
+
+                {/* Harmonized 3-Tier Symmetrical Bento Grid (Zero Blank Space) */}
+                {/* Tier 1: Link & Physical Layer (NAT Firewall + Wi-Fi RF Link) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch min-w-0">
+                  <div className="h-full flex flex-col min-w-0">
+                    <NatTypeAnalyzer />
+                  </div>
+                  <div className="h-full flex flex-col min-w-0">
+                    <WifiAnalyzer />
+                  </div>
+                </div>
+
+                {/* Tier 2: Resolvers & Endpoints (DNS Shootout + CDN & Dual-Stack) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch min-w-0">
+                  <div className="h-full flex flex-col min-w-0">
+                    <DnsBenchmark />
+                  </div>
+                  <div className="h-full flex flex-col gap-4 min-w-0">
+                    <CdnBenchmark />
+                    <DualStackBenchmark />
+                  </div>
+                </div>
+
+                {/* Tier 3: Packet Layer & Waveforms (Path MTU + Live Ping Oscilloscope) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch min-w-0">
+                  <div className="h-full flex flex-col min-w-0">
+                    <MtuAnalyzer />
+                  </div>
+                  <div className="h-full flex flex-col min-w-0">
+                    <PingOscilloscope />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'history' && (
+              <div className="w-full pb-20 md:pb-6 min-w-0">
+                <HistoryList 
+                  results={historyResults} 
+                  onDeleteResult={handleDeleteResult}
+                  onClearAll={handleClearAllHistory}
+                  unit={unit}
+                />
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
+              <div className="w-full pb-20 md:pb-6 min-w-0">
+                <SettingsPanel 
+                  settings={settings} 
+                  onUpdateSettings={setSettings} 
+                  onScheduledResult={handleTestComplete} 
+                />
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      {/* Mobile Ergonomic Bottom Command Dock */}
+      {/* Mobile Ergonomic Bottom Command Dock with FLIP Indicator */}
       <nav 
         aria-label="Mobile Navigation"
         className="md:hidden fixed bottom-2 inset-x-2 z-50 pointer-events-none"
@@ -311,32 +369,40 @@ function MainApp() {
             const isActive = activeTab === item.id;
             
             return (
-              <button
+              <motion.button
                 key={item.id}
                 id={`nav-mobile-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-xl transition-all cursor-pointer relative select-none ${
+                whileTap={{ scale: 0.94 }}
+                className={`relative flex-1 flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-xl transition-colors cursor-pointer select-none ${
                   isActive 
                     ? 'text-slate-900 dark:text-white font-bold' 
                     : 'text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300'
                 }`}
               >
-                <div className={`p-1.5 rounded-lg transition-colors ${
-                  isActive 
-                    ? (item.id === 'speed' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : item.id === 'diagnostics' ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' : item.id === 'history' ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : 'bg-slate-200/60 dark:bg-white/[0.08] text-slate-800 dark:text-zinc-200')
-                    : 'bg-transparent'
-                }`}>
-                  <IconComp className="w-4 h-4 shrink-0" />
+                {isActive && (
+                  <motion.div
+                    layoutId="active-mobile-nav-pill"
+                    className="absolute inset-0 rounded-xl bg-blue-500/10 dark:bg-white/[0.08]"
+                    transition={springs.snappy}
+                  />
+                )}
+                <div className="relative z-10 p-1 rounded-lg">
+                  <IconComp className={`w-4 h-4 shrink-0 ${
+                    isActive 
+                      ? (item.id === 'speed' ? 'text-blue-600 dark:text-blue-400' : item.id === 'diagnostics' ? 'text-cyan-600 dark:text-cyan-400' : item.id === 'history' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-zinc-200')
+                      : ''
+                  }`} />
                 </div>
-                <span className="text-[9px] font-semibold tracking-tight">
+                <span className="relative z-10 text-[9px] font-semibold tracking-tight">
                   {item.label.split(' ')[0]}
                 </span>
                 {item.badge !== undefined && (
-                  <span className="absolute top-1 right-2 min-w-4 h-4 px-1 rounded-full bg-blue-600 text-[8px] font-bold text-white flex items-center justify-center font-mono">
+                  <span className="absolute top-1 right-2 min-w-4 h-4 px-1 rounded-full bg-blue-600 text-[8px] font-bold text-white flex items-center justify-center font-mono z-20">
                     {item.badge}
                   </span>
                 )}
-              </button>
+              </motion.button>
             );
           })}
         </div>

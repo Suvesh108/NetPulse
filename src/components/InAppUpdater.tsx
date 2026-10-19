@@ -93,7 +93,7 @@ export default function InAppUpdater() {
 
   // Perform Android Native internal background APK download & installation
   const handleAndroidInternalUpdate = async () => {
-    const targetUrl = release?.apkUrl || 'https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk';
+    const targetUrl = release?.apkUrl || 'https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk';
     setIsUpdating(true);
     setDownloadProgress(5);
     setStatusMessage('Downloading internal update package...');
@@ -409,7 +409,7 @@ export default function InAppUpdater() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Download Android APK (v1.0)
+                  Download Android APK (v1.1)
                 </span>
                 <span className="text-[9px] text-slate-400">
                   Install NetPulse on your mobile phone or tablet (~5.5 MB)
@@ -418,8 +418,8 @@ export default function InAppUpdater() {
             </div>
 
             <a
-              href={release?.apkUrl || "https://github.com/Suvesh108/NetPulse/releases/download/v1.0/NetPulse-v1.0.apk"}
-              download="NetPulse-v1.0.apk"
+              href={release?.apkUrl || "https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk"}
+              download="NetPulse-v1.1.apk"
               className="px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
             >
               <Download className="w-3 h-3" />

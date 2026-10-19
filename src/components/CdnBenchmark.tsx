@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Play, RotateCcw, Award, Globe } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface CdnResult {
   id: string;
@@ -185,8 +186,9 @@ export default function CdnBenchmark() {
           </span>
         </div>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={runBenchmark}
           disabled={isRunning}
           className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
@@ -197,7 +199,7 @@ export default function CdnBenchmark() {
             <Play className="w-3.5 h-3.5 fill-current text-cyan-500" />
           )}
           <span>{isRunning ? 'PROBING...' : 'BENCHMARK'}</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* 3 CDN Cards */}

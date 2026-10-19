@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Activity, Play, Square, RotateCcw, AlertTriangle, CheckCircle2, Globe, Server, ShieldCheck, Zap } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface MtrTarget {
   id: string;
@@ -220,8 +221,9 @@ export default function MtrPingMatrix() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.95 }}
             onClick={toggleRun}
             className={`px-3 py-1 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
               isRunning
@@ -240,17 +242,18 @@ export default function MtrPingMatrix() {
                 <span>START MTR</span>
               </>
             )}
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.90 }}
             onClick={resetMatrix}
             disabled={isRunning}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
             title="Reset matrix counters"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-          </button>
+          </motion.button>
         </div>
       </div>
 

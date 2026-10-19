@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Globe, Check, AlertTriangle, Play, RotateCcw } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface ProtocolResult {
   supported: boolean | null;
@@ -118,8 +119,9 @@ export default function DualStackBenchmark() {
           </span>
         </div>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={runDualStackTest}
           disabled={isTesting}
           className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
@@ -130,7 +132,7 @@ export default function DualStackBenchmark() {
             <Play className="w-3.5 h-3.5 fill-current text-blue-500" />
           )}
           <span>{isTesting ? 'PROBING...' : 'COMPARE STACKS'}</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Duel Arena 2 Cards */}

@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { SpeedTestResult } from '../types';
 import SpeedCertificateModal from './SpeedCertificateModal';
+import { motion } from 'motion/react';
+import { springs } from '../lib/motion';
 
 interface HistoryListProps {
   results: SpeedTestResult[];
@@ -230,7 +232,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
       </div>
 
       {/* 2. SEARCH & CONTROL TOOLBAR */}
-      <div className="flex flex-col sm:flex-row gap-2.5 items-center justify-between bg-white dark:bg-[#121212] p-2.5 sm:p-3 rounded-xl border border-slate-200 dark:border-[#262626] shadow-xs shrink-0 transition-colors">
+      <div className="flex flex-col sm:flex-row gap-2.5 items-center justify-between hud-panel p-2.5 sm:p-3 rounded-2xl shadow-xs shrink-0 transition-colors">
         <div className="relative w-full sm:w-80">
           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -239,51 +241,55 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
             placeholder="Filter by server, protocol, or grade..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-slate-50 dark:bg-[#161618] text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 border border-slate-200 dark:border-[#262626] rounded-lg pl-8 pr-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-sans"
+            className="w-full hud-subpanel text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 rounded-xl pl-8 pr-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-sans"
           />
         </div>
 
         {totalTests > 0 && (
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <button
+            <motion.button
               id="export-csv-btn"
               onClick={handleExportData}
-              className="flex items-center gap-1.5 bg-white dark:bg-[#161618] hover:bg-slate-50 dark:hover:bg-[#262626] text-slate-800 dark:text-slate-200 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[#262626] transition-all cursor-pointer shadow-xs active:scale-95"
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 hud-subpanel hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-800 dark:text-slate-200 text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-xs"
             >
               <Download className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>Export JSON</span>
-            </button>
+            </motion.button>
             
             {!showConfirmClear ? (
-              <button
+              <motion.button
                 id="clear-all-trigger"
                 onClick={() => setShowConfirmClear(true)}
-                className="flex items-center gap-1.5 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-rose-200/80 dark:border-rose-900/60 transition-all cursor-pointer active:scale-95"
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-1.5 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-400 text-xs font-bold px-3 py-1.5 rounded-xl border border-rose-200/80 dark:border-rose-900/60 transition-all cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Clear All</span>
-              </button>
+              </motion.button>
             ) : (
               <div className="flex items-center gap-1.5 animate-fade-in bg-white dark:bg-[#161618] border border-rose-200 dark:border-rose-900/60 p-0.5 rounded-lg shadow-xs">
                 <span className="text-[10px] text-rose-600 dark:text-rose-400 font-semibold px-1.5 flex items-center gap-1">
                   <AlertTriangle className="w-3 h-3 shrink-0 text-rose-600" /> Clear?
                 </span>
-                <button
+                <motion.button
                   id="confirm-clear-btn"
                   onClick={() => {
                     onClearAll();
                     setShowConfirmClear(false);
                   }}
+                  whileTap={{ scale: 0.95 }}
                   className="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold px-2 py-1 rounded cursor-pointer"
                 >
                   Yes
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={() => setShowConfirmClear(false)}
+                  whileTap={{ scale: 0.95 }}
                   className="bg-slate-100 dark:bg-[#262626] hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2 py-1 rounded cursor-pointer"
                 >
                   No
-                </button>
+                </motion.button>
               </div>
             )}
           </div>
@@ -291,10 +297,10 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
       </div>
 
       {/* 3. HIGH-DENSITY ENTERPRISE TELEMETRY TABLE */}
-      <div className="bg-white dark:bg-[#121212] rounded-xl shadow-xs flex-1 min-h-0 flex flex-col border border-slate-200 dark:border-[#262626] overflow-hidden transition-colors" id="history-list-container">
+      <div className="hud-panel rounded-2xl shadow-xs flex-1 min-h-0 flex flex-col overflow-hidden transition-colors" id="history-list-container">
         {filteredResults.length === 0 ? (
           <div className="px-6 py-12 flex flex-col items-center justify-center text-center gap-2 text-slate-400">
-            <div className="p-3 bg-slate-100 dark:bg-[#161618] rounded-xl border border-slate-200/80 dark:border-[#262626] text-blue-600 dark:text-blue-400 shadow-inner">
+            <div className="p-3 hud-subpanel rounded-xl text-blue-600 dark:text-blue-400 shadow-inner">
               <Calendar className="w-6 h-6" />
             </div>
             <h3 className="font-sans font-bold text-sm text-slate-800 dark:text-slate-200">No test records found</h3>
