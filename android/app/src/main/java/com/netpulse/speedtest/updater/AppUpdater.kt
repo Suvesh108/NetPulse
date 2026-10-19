@@ -34,7 +34,7 @@ object AppUpdater {
 
     private val gson = Gson()
 
-    suspend fun checkForUpdate(currentVersion: String = "v1.1"): UpdateInfo = withContext(Dispatchers.IO) {
+    suspend fun checkForUpdate(currentVersion: String = "v1.2"): UpdateInfo = withContext(Dispatchers.IO) {
         try {
             val req = Request.Builder()
                 .url("https://api.github.com/repos/Suvesh108/NetPulse/releases/latest")
@@ -47,7 +47,7 @@ object AppUpdater {
 
             if (resp.isSuccessful && body != null) {
                 val json = gson.fromJson(body, JsonObject::class.java)
-                val latestTag = json.get("tag_name")?.asString ?: "v1.1"
+                val latestTag = json.get("tag_name")?.asString ?: "v1.2"
                 val bodyText = json.get("body")?.asString ?: "Latest carrier-grade engine release"
 
                 var apkUrl = "https://github.com/Suvesh108/NetPulse/releases/download/$latestTag/NetPulse-$latestTag.apk"

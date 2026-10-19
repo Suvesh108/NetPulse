@@ -6,9 +6,9 @@
 
 ### Carrier-Grade Edge Network Telemetry & Real-Time Bandwidth Engine
 
-[![Version](https://img.shields.io/badge/Release-v1.1-06b6d4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v1.1)
-[![Android APK](https://img.shields.io/badge/Android_APK-v1.1_Kotlin-3DDC84?style=for-the-badge&logo=android&logoColor=white)](release/NetPulse-v1.1.apk)
-[![Windows App](https://img.shields.io/badge/Windows_Desktop-v1.1-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-Windows-v1.1.zip)
+[![Version](https://img.shields.io/badge/Release-v1.2-06b6d4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v1.2)
+[![Android APK](https://img.shields.io/badge/Android_APK-v1.2_Kotlin-3DDC84?style=for-the-badge&logo=android&logoColor=white)](release/NetPulse-v1.2.apk)
+[![Windows App](https://img.shields.io/badge/Windows_Desktop-v1.2-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.2/NetPulse-Windows-v1.2.zip)
 [![Live Web App](https://img.shields.io/badge/Live_Web_App-net--pulse-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://net-pulse-iota.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 
@@ -26,8 +26,8 @@
 <br />
 
 **[ 🌐 Launch Web App ](https://net-pulse-iota.vercel.app/)** &nbsp;•&nbsp;
-**[ 📱 Download Android APK (v1.1) ](release/NetPulse-v1.1.apk)** &nbsp;•&nbsp;
-**[ 💻 Download Windows Desktop (v1.1) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-Windows-v1.1.zip)** &nbsp;•&nbsp;
+**[ 📱 Download Android APK (v1.2) ](release/NetPulse-v1.2.apk)** &nbsp;•&nbsp;
+**[ 💻 Download Windows Desktop (v1.2) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.2/NetPulse-Windows-v1.2.zip)** &nbsp;•&nbsp;
 **[ 📦 GitHub Releases ](https://github.com/Suvesh108/NetPulse/releases)** &nbsp;•&nbsp;
 **[ 📄 MIT License ](LICENSE)**
 
@@ -103,13 +103,13 @@ The Android application is written in **100% idiomatic Kotlin** using modern **J
 
 ### Direct Download
 The latest official release APK is kept organized in the dedicated [`release/`](release/) directory:
-* **[Download NetPulse-v1.1.apk](release/NetPulse-v1.1.apk)** (~13 MB)
+* **[Download NetPulse-v1.2.apk](release/NetPulse-v1.2.apk)** (~13 MB)
 
 ---
 
 ## 📊 Feature Comparison
 
-| Capability | Legacy Tools (Ookla / Fast) | NetPulse v1.1 |
+| Capability | Legacy Tools (Ookla / Fast) | NetPulse v1.2 |
 | :--- | :---: | :---: |
 | **Telemetry Backbone** | Third-party sponsored proxy nodes | **Direct Cloudflare Anycast HTTP/3 Edge** |
 | **Ads & Trackers** | ❌ Banner ads, tracking scripts, bloat | **✅ 100% Zero Ads & Zero Tracking** |

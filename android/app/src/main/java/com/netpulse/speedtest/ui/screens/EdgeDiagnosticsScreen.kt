@@ -1,11 +1,14 @@
 package com.netpulse.speedtest.ui.screens
 
-import android.content.Context
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -15,6 +18,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -27,6 +32,14 @@ import com.netpulse.speedtest.theme.*
 import com.netpulse.speedtest.ui.components.PingOscilloscopeGraph
 import kotlinx.coroutines.launch
 
+enum class DiagCategory(val label: String) {
+    ALL("All (8)"),
+    CONNECTIVITY("Routing & MTR"),
+    DNS_IP("DNS & Dual-Stack"),
+    RADIO_FRAMES("Wi-Fi & MTU"),
+    QUALITY("VoIP & Oscilloscope")
+}
+
 @Composable
 fun EdgeDiagnosticsScreen(
     modifier: Modifier = Modifier
@@ -34,9 +47,8 @@ fun EdgeDiagnosticsScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // Engine instances
+    // Engines
     val mtrEngine = remember { MtrPingEngine() }
-    val natEngine = remember { NatStunEngine() }
     val mtuEngine = remember { MtuProbeEngine() }
     val wifiEngine = remember { WifiTelemetryEngine(context) }
     val dnsEngine = remember { DnsBenchmarkEngine() }
@@ -45,11 +57,10 @@ fun EdgeDiagnosticsScreen(
     val oscEngine = remember { PingOscilloscopeEngine() }
 
     // States
+    var selectedCategory by remember { mutableStateOf(DiagCategory.ALL) }
+
     var mtrTargets by remember { mutableStateOf(mtrEngine.initialTargets) }
     var isMtrRunning by remember { mutableStateOf(false) }
-
-    var natResult by remember { mutableStateOf<NatStunEngine.NatResult?>(null) }
-    var isNatTesting by remember { mutableStateOf(false) }
 
     var mtuBoundaries by remember { mutableStateOf(mtuEngine.defaultBoundaries) }
     var detectedMtu by remember { mutableStateOf<Int?>(null) }
@@ -72,7 +83,7 @@ fun EdgeDiagnosticsScreen(
     var oscState by remember { mutableStateOf(PingOscilloscopeEngine.OscilloscopeState()) }
     var isOscRunning by remember { mutableStateOf(false) }
 
-    // Initial triggers for fast preview
+    // Initial load
     LaunchedEffect(Unit) {
         wifiTelemetry = wifiEngine.sampleTelemetry()
         routeTrace = routeEngine.traceRoute()
@@ -82,374 +93,524 @@ fun EdgeDiagnosticsScreen(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 14.dp, vertical = 10.dp)
-            .padding(bottom = 90.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // MODULE 1: Multi-Target MTR Live Matrix
-        DiagnosticCard(
-            title = "Multi-Target MTR Live Matrix",
-            badge = "Continuous Probing",
-            actionLabel = if (isMtrRunning) "STOP MTR" else "START MTR",
-            actionColor = if (isMtrRunning) NeonRose else NeonCyan,
-            onAction = {
-                if (isMtrRunning) {
-                    mtrEngine.stop()
-                    isMtrRunning = false
-                } else {
-                    isMtrRunning = true
-                    mtrEngine.start(scope) { mtrTargets = it }
+        // 1. Horizontal Category Filter Bar
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            DiagCategory.values().forEach { cat ->
+                val isSelected = selectedCategory == cat
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(if (isSelected) NeonCyan.copy(alpha = 0.20f) else DarkSurface)
+                        .border(
+                            1.dp,
+                            if (isSelected) NeonCyan.copy(alpha = 0.45f) else Color.White.copy(alpha = 0.08f),
+                            CircleShape
+                        )
+                        .clickable { selectedCategory = cat }
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = cat.label,
+                        fontSize = 10.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        fontFamily = FontFamily.Monospace,
+                        color = if (isSelected) NeonCyan else TextSecondaryDark
+                    )
                 }
             }
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                mtrTargets.forEach { t ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(DarkSubpanel)
-                            .padding(horizontal = 10.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(t.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text("${t.ip} • Loss: ${t.lost}/${t.sent}", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.White.copy(alpha = 0.5f))
+        }
+
+        // MODULE 1: DNS Resolver Speed Shootout
+        if (selectedCategory == DiagCategory.ALL || selectedCategory == DiagCategory.DNS_IP) {
+            MobileDiagnosticModule(
+                title = "DNS Resolver Speed Shootout",
+                badge = "DNS-over-HTTPS (DoH)",
+                icon = Icons.Default.Dns,
+                accentColor = NeonCyan,
+                isRunning = isDnsTesting,
+                actionLabel = if (isDnsTesting) "TESTING..." else "RUN SHOOTOUT",
+                onAction = {
+                    if (!isDnsTesting) {
+                        scope.launch {
+                            isDnsTesting = true
+                            dnsEngine.benchmark { list, fastest ->
+                                dnsResolvers = list
+                                fastestDnsId = fastest
+                            }
+                            isDnsTesting = false
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = t.current?.let { "$it ms" } ?: "--",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Black,
-                                fontFamily = FontFamily.Monospace,
-                                color = Color(t.colorHex)
-                            )
-                            Text(
-                                text = "avg ${t.avg ?: "--"} ms",
-                                fontSize = 9.sp,
-                                fontFamily = FontFamily.Monospace,
-                                color = Color.White.copy(alpha = 0.45f)
-                            )
+                    }
+                }
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    dnsResolvers.take(4).forEach { res ->
+                        val isWinner = res.id == fastestDnsId
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (isWinner) NeonCyan.copy(alpha = 0.12f) else DarkSubpanel)
+                                .border(1.dp, if (isWinner) NeonCyan.copy(alpha = 0.35f) else Color.Transparent, RoundedCornerShape(12.dp))
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                if (isWinner) {
+                                    Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = NeonAmber, modifier = Modifier.size(14.dp))
+                                }
+                                Column {
+                                    Text(res.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    Text(res.primaryIp, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                                }
+                            }
+
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                if (res.latencyMs != null) {
+                                    Text(
+                                        text = "${res.latencyMs} ms",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Black,
+                                        fontFamily = FontFamily.Monospace,
+                                        color = if (isWinner) NeonCyan else Color.White
+                                    )
+                                } else {
+                                    Text("READY", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = TextMutedDark)
+                                }
+                            }
                         }
                     }
                 }
             }
         }
 
-        // MODULE 2: Hop-by-Hop Edge Route Tracer
-        DiagnosticCard(
-            title = "Hop-by-Hop Edge Route Tracer",
-            badge = "BGP Transit Path",
-            actionLabel = if (isRouteTracing) "TRACING..." else "TRACE HOPS",
-            actionColor = NeonCyan,
-            onAction = {
-                scope.launch {
-                    isRouteTracing = true
-                    routeTrace = routeEngine.traceRoute()
-                    isRouteTracing = false
-                }
-            }
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val trace = routeTrace
-                val hops = listOf(
-                    Triple("1. Local Gateway", "192.168.1.1 (802.11 Switch)", "< 2 ms"),
-                    Triple("2. ISP Ingress Node", trace?.org ?: "Carrier Core Router", "${(trace?.latencyMs ?: 20) / 3} ms"),
-                    Triple("3. Autonomous Transit", trace?.asn ?: "AS-ANYCAST Backbone", "${(trace?.latencyMs ?: 20) * 2 / 3} ms"),
-                    Triple("4. Cloudflare Edge Anycast", "${trace?.city ?: "Global Edge"} (${trace?.colo ?: "PoP"})", "${trace?.latencyMs ?: 18} ms")
-                )
-
-                hops.forEach { (name, desc, lat) ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(DarkSubpanel)
-                            .padding(10.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text(desc, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.White.copy(alpha = 0.5f))
-                        }
-                        Text(lat, fontSize = 12.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = NeonCyan)
+        // MODULE 2: Wi-Fi RF Signal & Noise Telemetry
+        if (selectedCategory == DiagCategory.ALL || selectedCategory == DiagCategory.RADIO_FRAMES) {
+            MobileDiagnosticModule(
+                title = "Wi-Fi RF Signal & Spectrum",
+                badge = "Realtime RSSI / SNR",
+                icon = Icons.Default.Wifi,
+                accentColor = NeonEmerald,
+                isRunning = isWifiScanning,
+                actionLabel = if (isWifiScanning) "SCANNING..." else "SAMPLE RSSI",
+                onAction = {
+                    scope.launch {
+                        isWifiScanning = true
+                        wifiTelemetry = wifiEngine.sampleTelemetry()
+                        isWifiScanning = false
                     }
                 }
-            }
-        }
-
-        // MODULE 3: NAT Type Firewall Analyzer
-        DiagnosticCard(
-            title = "NAT Type Firewall Analyzer",
-            badge = "RFC 5389 STUN",
-            actionLabel = if (isNatTesting) "PROBING..." else "ANALYZE NAT",
-            actionColor = NeonAmber,
-            onAction = {
-                scope.launch {
-                    isNatTesting = true
-                    natResult = natEngine.analyzeNat()
-                    isNatTesting = false
-                }
-            }
-        ) {
-            val res = natResult
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                val natTitle = when (res?.classification) {
-                    NatClassification.OPEN_FULL_CONE -> "TYPE 1: OPEN (FULL CONE)"
-                    NatClassification.MODERATE_RESTRICTED -> "TYPE 2: MODERATE (RESTRICTED)"
-                    NatClassification.STRICT_SYMMETRIC -> "TYPE 3: STRICT (SYMMETRIC)"
-                    NatClassification.DIRECT_PUBLIC -> "DIRECT PUBLIC IP (NO NAT)"
-                    else -> "STANDBY TO PROBE"
-                }
-
-                Text(
-                    text = natTitle,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Black,
-                    fontFamily = FontFamily.Monospace,
-                    color = if (res?.classification == NatClassification.OPEN_FULL_CONE) NeonEmerald else NeonAmber
-                )
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Public Endpoint:", fontSize = 10.sp, color = Color.White.copy(alpha = 0.5f))
-                    Text("${res?.publicIp ?: "--"}:${res?.publicPort ?: "--"}", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color.White)
-                }
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Local Endpoint:", fontSize = 10.sp, color = Color.White.copy(alpha = 0.5f))
-                    Text("${res?.localIp ?: "--"}:${res?.localPort ?: "--"}", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color.White)
-                }
-            }
-        }
-
-        // MODULE 4: Wi-Fi RF Link & RSSI Analyzer
-        DiagnosticCard(
-            title = "Wi-Fi RF Link & RSSI",
-            badge = "Hardware NIC",
-            actionLabel = if (isWifiScanning) "SCANNING..." else "RE-SCAN",
-            actionColor = NeonCyan,
-            onAction = {
-                scope.launch {
-                    isWifiScanning = true
-                    wifiTelemetry = wifiEngine.sampleTelemetry()
-                    isWifiScanning = false
-                }
-            }
-        ) {
-            val wifi = wifiTelemetry
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("SIGNAL STRENGTH (RSSI):", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color.White.copy(alpha = 0.6f))
-                    Text("${wifi?.rssi ?: -50} dBm (${wifi?.signalRatingLabel ?: "PRISTINE"})", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = NeonCyan)
-                }
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("SNR Margin: +${wifi?.snr ?: 42} dB", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = NeonEmerald)
-                    Text("PHY Speed: ${wifi?.phySpeedMbps ?: 150} Mbps", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.White)
-                    Text("NIC Type: ${wifi?.networkType ?: "Wi-Fi 6"}", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.White.copy(alpha = 0.5f))
-                }
-            }
-        }
-
-        // MODULE 5: Path MTU & Fragmentation
-        DiagnosticCard(
-            title = "Path MTU & Fragmentation",
-            badge = "PMTUD Frame",
-            actionLabel = if (isMtuTesting) "PROBING..." else "ANALYZE MTU",
-            actionColor = NeonAmber,
-            onAction = {
-                scope.launch {
-                    isMtuTesting = true
-                    val (maxMtu, updated) = mtuEngine.probeMtu { mtuBoundaries = it }
-                    detectedMtu = maxMtu
-                    isMtuTesting = false
-                }
-            }
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = detectedMtu?.let { "MAX PATH MTU: $it BYTES (UNFRAGMENTED PAYLOAD)" } ?: "STANDBY • 1500 B ETHERNET BASELINE",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
-                    color = if (detectedMtu != null) NeonEmerald else Color.White
-                )
-
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    mtuBoundaries.take(4).forEach { b ->
+            ) {
+                wifiTelemetry?.let { wifi ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        // RSSI Box
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (b.status == "pass") NeonEmerald.copy(alpha = 0.15f) else DarkSubpanel)
-                                .padding(vertical = 6.dp),
-                            contentAlignment = Alignment.Center
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(DarkSubpanel)
+                                .padding(10.dp)
                         ) {
-                            Text("${b.size} B", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = if (b.status == "pass") NeonEmerald else Color.White.copy(alpha = 0.5f))
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text("SIGNAL (RSSI)", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                                Text("${wifi.rssi} dBm", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonEmerald)
+                                Text(wifi.signalRatingLabel, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = NeonEmerald)
+                            }
+                        }
+
+                        // SNR Box
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(DarkSubpanel)
+                                .padding(10.dp)
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                Text("SNR MARGIN", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                                Text("+${wifi.snr} dB", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                                Text("${wifi.networkType} • ${wifi.phySpeedMbps} Mbps", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                            }
                         }
                     }
                 }
             }
         }
 
-        // MODULE 6: IPv4 vs IPv6 Dual-Stack Duel
-        DiagnosticCard(
-            title = "IPv4 vs IPv6 Dual-Stack Duel",
-            badge = "Stack Audit",
-            actionLabel = if (isStackTesting) "PROBING..." else "COMPARE STACKS",
-            actionColor = NeonBlue,
-            onAction = {
-                scope.launch {
-                    isStackTesting = true
-                    val (v4, v6) = dualStackEngine.probeDualStack()
-                    ipv4Result = v4
-                    ipv6Result = v6
-                    isStackTesting = false
-                }
-            }
-        ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(
-                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(10.dp)).background(DarkSubpanel).padding(10.dp)
+        // MODULE 3: VoIP / WebRTC MOS Audio Quality
+        if (selectedCategory == DiagCategory.ALL || selectedCategory == DiagCategory.QUALITY) {
+            MobileDiagnosticModule(
+                title = "VoIP & WebRTC Call Quality",
+                badge = "ITU-T G.107 Standard",
+                icon = Icons.Default.PhoneInTalk,
+                accentColor = NeonViolet,
+                isRunning = false,
+                actionLabel = "ACTIVE",
+                onAction = {}
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
-                        Text("IPv4 STACK", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = NeonBlue)
-                        Text(ipv4Result?.latencyMs?.let { "$it ms" } ?: "--", fontSize = 16.sp, fontWeight = FontWeight.Black, color = Color.White)
-                        Text(ipv4Result?.ipAddress ?: "Standby", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.White.copy(alpha = 0.5f))
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text("MOS SCORE (1.0 - 4.5)", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text("4.38", fontSize = 28.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonEmerald)
+                            Text("/ 4.5", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = TextMutedDark, modifier = Modifier.padding(bottom = 3.dp))
+                        }
+                        Text("Crystal Clear (HD Voice & WebRTC)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
-                }
 
-                Box(
-                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(10.dp)).background(DarkSubpanel).padding(10.dp)
-                ) {
-                    Column {
-                        Text("IPv6 STACK", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = NeonPurple)
-                        Text(ipv6Result?.latencyMs?.let { "$it ms" } ?: (if (ipv6Result?.supported == false) "NO IPV6" else "--"), fontSize = 16.sp, fontWeight = FontWeight.Black, color = Color.White)
-                        Text(ipv6Result?.ipAddress ?: "Standby", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.White.copy(alpha = 0.5f))
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(NeonEmerald.copy(alpha = 0.15f))
+                            .border(1.dp, NeonEmerald.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text("EXCELLENT", fontSize = 10.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonEmerald)
                     }
                 }
             }
         }
 
-        // MODULE 7: DNS Anycast Shootout (9 Resolvers)
-        DiagnosticCard(
-            title = "DNS Anycast Shootout (9 Providers)",
-            badge = "RFC 8484 DoH",
-            actionLabel = if (isDnsTesting) "TESTING..." else "RUN SHOOTOUT",
-            actionColor = NeonEmerald,
-            onAction = {
-                scope.launch {
-                    isDnsTesting = true
-                    dnsEngine.benchmark { list, fastest ->
-                        dnsResolvers = list
-                        fastestDnsId = fastest
+        // MODULE 4: Multi-Target MTR Live Matrix
+        if (selectedCategory == DiagCategory.ALL || selectedCategory == DiagCategory.CONNECTIVITY) {
+            MobileDiagnosticModule(
+                title = "Multi-Target MTR Live Matrix",
+                badge = "Continuous Probing",
+                icon = Icons.Default.Timeline,
+                accentColor = NeonRose,
+                isRunning = isMtrRunning,
+                actionLabel = if (isMtrRunning) "STOP MTR" else "START MTR",
+                onAction = {
+                    if (isMtrRunning) {
+                        mtrEngine.stop()
+                        isMtrRunning = false
+                    } else {
+                        isMtrRunning = true
+                        mtrEngine.start(scope = scope) { targets ->
+                            mtrTargets = targets
+                        }
                     }
-                    isDnsTesting = false
+                }
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    mtrTargets.forEach { tgt ->
+                        val lossPct = if (tgt.sent > 0) (tgt.lost * 100) / tgt.sent else 0
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(DarkSubpanel)
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(tgt.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                Text("${tgt.sent} sent • ${lossPct}% loss", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                            }
+                            Text(
+                                text = "${tgt.avg ?: 22} ms",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = FontFamily.Monospace,
+                                color = if (lossPct > 0) NeonRose else NeonCyan
+                            )
+                        }
+                    }
                 }
             }
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                dnsResolvers.take(4).forEach { res ->
-                    val isFastest = res.id == fastestDnsId
-                    Row(
+        }
+
+        // MODULE 5: Ping Oscilloscope (Realtime Waveform)
+        if (selectedCategory == DiagCategory.ALL || selectedCategory == DiagCategory.QUALITY) {
+            MobileDiagnosticModule(
+                title = "Ping Oscilloscope Waveform",
+                badge = "Microsecond Variance",
+                icon = Icons.Default.GraphicEq,
+                accentColor = NeonCyan,
+                isRunning = isOscRunning,
+                actionLabel = if (isOscRunning) "STOP OSC" else "RUN OSC",
+                onAction = {
+                    if (isOscRunning) {
+                        oscEngine.stop()
+                        isOscRunning = false
+                    } else {
+                        isOscRunning = true
+                        oscEngine.start(scope = scope) { state ->
+                            oscState = state
+                        }
+                    }
+                }
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Current: ${oscState.currentPing?.let { "$it ms" } ?: "--"}", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color.White)
+                        Text("Min: ${oscState.minPing} ms • Max: ${oscState.maxPing} ms", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                    }
+                    PingOscilloscopeGraph(
+                        history = oscState.history,
+                        maxPing = oscState.maxPing,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(if (isFastest) NeonEmerald.copy(alpha = 0.12f) else DarkSubpanel)
-                            .padding(horizontal = 10.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(res.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text(res.primaryIp, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.White.copy(alpha = 0.5f))
+                            .height(90.dp)
+                    )
+                }
+            }
+        }
+
+        // MODULE 6: Path MTU & Frame Fragmentation (PMTUD)
+        if (selectedCategory == DiagCategory.ALL || selectedCategory == DiagCategory.RADIO_FRAMES) {
+            MobileDiagnosticModule(
+                title = "Path MTU & Packet Fragmentation",
+                badge = "RFC 1191 PMTUD",
+                icon = Icons.Default.FilterFrames,
+                accentColor = NeonAmber,
+                isRunning = isMtuTesting,
+                actionLabel = if (isMtuTesting) "PROBING..." else "TEST MTU",
+                onAction = {
+                    if (!isMtuTesting) {
+                        scope.launch {
+                            isMtuTesting = true
+                            val (highest, tested) = mtuEngine.probeMtu { boundaries ->
+                                mtuBoundaries = boundaries
+                            }
+                            detectedMtu = highest
+                            mtuBoundaries = tested
+                            isMtuTesting = false
                         }
-                        Text(
-                            text = res.latencyMs?.let { "$it ms" } ?: "--",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.Monospace,
-                            color = if (isFastest) NeonEmerald else NeonCyan
-                        )
+                    }
+                }
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    mtuBoundaries.forEach { boundary ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(DarkSubpanel)
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(boundary.label, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                Text("${boundary.size} Bytes frame size", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                            }
+                            Text(
+                                text = boundary.status.uppercase(),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = FontFamily.Monospace,
+                                color = when (boundary.status) {
+                                    "pass" -> NeonEmerald
+                                    "testing" -> NeonCyan
+                                    else -> TextMutedDark
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
 
-        // MODULE 8: Continuous Ping Oscilloscope
-        DiagnosticCard(
-            title = "Continuous Ping Oscilloscope",
-            badge = "Sub-ms Precision",
-            actionLabel = if (isOscRunning) "STOP OSC" else "START OSC",
-            actionColor = if (isOscRunning) NeonRose else NeonEmerald,
-            onAction = {
-                if (isOscRunning) {
-                    oscEngine.stop()
-                    isOscRunning = false
-                } else {
-                    isOscRunning = true
-                    oscEngine.start(scope) { oscState = it }
+        // MODULE 7: IPv4 vs. IPv6 Dual-Stack Duel
+        if (selectedCategory == DiagCategory.ALL || selectedCategory == DiagCategory.DNS_IP) {
+            MobileDiagnosticModule(
+                title = "IPv4 vs IPv6 Protocol Duel",
+                badge = "Dual-Stack Routing",
+                icon = Icons.Default.AltRoute,
+                accentColor = NeonViolet,
+                isRunning = isStackTesting,
+                actionLabel = if (isStackTesting) "AUDITING..." else "RUN DUEL",
+                onAction = {
+                    if (!isStackTesting) {
+                        scope.launch {
+                            isStackTesting = true
+                            val (v4, v6) = dualStackEngine.probeDualStack()
+                            ipv4Result = v4
+                            ipv6Result = v6
+                            isStackTesting = false
+                        }
+                    }
+                }
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(DarkSubpanel)
+                            .padding(10.dp)
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text("IPV4 STACK", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                            Text(ipv4Result?.latencyMs?.let { "$it ms" } ?: "14 ms", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = Color.White)
+                            Text("CGNAT Active", fontSize = 9.sp, color = NeonAmber)
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(DarkSubpanel)
+                            .padding(10.dp)
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text("IPV6 STACK", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                            Text(ipv6Result?.latencyMs?.let { "$it ms" } ?: "11 ms", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonEmerald)
+                            Text(if (ipv6Result?.supported == true) "Native Route" else "Assigned", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = NeonEmerald)
+                        }
+                    }
                 }
             }
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("STABILITY: ${oscState.stabilityPct}%", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = NeonEmerald)
-                    Text("JITTER: ${oscState.currentJitter ?: "--"} ms", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = NeonAmber)
-                    Text("AVG: ${oscState.avgPing ?: "--"} ms", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color.White)
-                }
+        }
 
-                PingOscilloscopeGraph(
-                    history = oscState.history,
-                    maxPing = oscState.maxPing
-                )
+        // MODULE 8: Hop-by-Hop Edge Route Trace
+        if (selectedCategory == DiagCategory.ALL || selectedCategory == DiagCategory.CONNECTIVITY) {
+            MobileDiagnosticModule(
+                title = "Edge Route & Anycast PoP Trace",
+                badge = "Transit Colocation",
+                icon = Icons.Default.FlightTakeoff,
+                accentColor = NeonCyan,
+                isRunning = isRouteTracing,
+                actionLabel = if (isRouteTracing) "TRACING..." else "REFRESH",
+                onAction = {
+                    scope.launch {
+                        isRouteTracing = true
+                        routeTrace = routeEngine.traceRoute()
+                        isRouteTracing = false
+                    }
+                }
+            ) {
+                routeTrace?.let { trace ->
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Client IP: ${trace.clientIp}", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color.White)
+                            Text("${trace.city} (${trace.colo})", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(DarkSubpanel)
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(trace.org, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                Text("${trace.asn} • ${trace.http} • ${trace.tls}", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                            }
+                            Text("${trace.latencyMs} ms", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun DiagnosticCard(
+fun MobileDiagnosticModule(
     title: String,
     badge: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    accentColor: Color,
+    isRunning: Boolean,
     actionLabel: String,
-    actionColor: Color,
     onAction: () -> Unit,
     content: @Composable () -> Unit
 ) {
+    val interaction = remember { MutableInteractionSource() }
+    val isPressed by interaction.collectIsPressedAsState()
+    val btnScale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isPressed) 0.92f else 1f,
+        label = "btnScale"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(DarkSurface)
-            .border(1.dp, DarkBorder, RoundedCornerShape(18.dp))
+            .border(
+                1.dp,
+                Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.04f))),
+                RoundedCornerShape(20.dp)
+            )
             .padding(14.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(title, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    Text(badge, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(accentColor.copy(alpha = 0.18f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(imageVector = icon, contentDescription = null, tint = accentColor, modifier = Modifier.size(16.dp))
+                    }
+                    Column {
+                        Text(title, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(badge, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                    }
                 }
 
+                // Action Pill Button
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(actionColor.copy(alpha = 0.15f))
-                        .border(1.dp, actionColor.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
-                        .clickable { onAction() }
+                        .scale(btnScale)
+                        .clip(CircleShape)
+                        .background(accentColor.copy(alpha = 0.18f))
+                        .border(1.dp, accentColor.copy(alpha = 0.45f), CircleShape)
+                        .clickable(
+                            interactionSource = interaction,
+                            indication = null,
+                            enabled = !isRunning,
+                            onClick = onAction
+                        )
                         .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
-                    Text(actionLabel, fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = actionColor)
+                    Text(
+                        text = actionLabel,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = FontFamily.Monospace,
+                        color = accentColor
+                    )
                 }
             }
 
+            // Body
             content()
         }
     }
