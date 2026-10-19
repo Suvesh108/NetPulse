@@ -164,7 +164,7 @@ export default function SettingsPanel({ settings, onUpdateSettings, onScheduledR
         <div className="flex flex-col gap-3.5 sm:gap-4">
           
           {/* Card 1: Network & Engine Topology */}
-          <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-4 transition-colors">
+          <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-4">
             
             <div>
               <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800/80 mb-3.5">
@@ -331,8 +331,8 @@ export default function SettingsPanel({ settings, onUpdateSettings, onScheduledR
           </div>
 
           {/* Card 2: Bufferbloat / Loaded Latency Toggles */}
-          <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2.5 transition-colors">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">
+          <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06]">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
                   <Activity className="w-3.5 h-3.5" />
@@ -345,7 +345,7 @@ export default function SettingsPanel({ settings, onUpdateSettings, onScheduledR
             </div>
 
             {/* Download Toggle */}
-            <div className="flex items-center justify-between p-2.5 bg-slate-50/80 dark:bg-slate-900/80 rounded-xl border border-slate-200/80 dark:border-slate-800">
+            <div className="flex items-center justify-between p-2.5 hud-subpanel rounded-xl">
               <div className="flex items-center gap-2">
                 <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Download Loaded Latency</span>
@@ -364,7 +364,7 @@ export default function SettingsPanel({ settings, onUpdateSettings, onScheduledR
             </div>
 
             {/* Upload Toggle */}
-            <div className="flex items-center justify-between p-2.5 bg-slate-50/80 dark:bg-slate-900/80 rounded-xl border border-slate-200/80 dark:border-slate-800">
+            <div className="flex items-center justify-between p-2.5 hud-subpanel rounded-xl">
               <div className="flex items-center gap-2">
                 <Upload className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Upload Loaded Latency</span>
@@ -384,8 +384,8 @@ export default function SettingsPanel({ settings, onUpdateSettings, onScheduledR
           </div>
 
           {/* Card 3: Engine Diagnostic Output Matrix */}
-          <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2 transition-colors">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
+          <div className="hud-panel rounded-2xl p-3.5 sm:p-4 flex flex-col gap-2">
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-white/[0.06]">
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Active Configuration</span>

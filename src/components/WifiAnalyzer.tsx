@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Wifi, Radio, Signal, Router, CheckCircle2, 
-  AlertCircle, ArrowRight, ShieldCheck, Sparkles, RefreshCw,
-  Activity, Gauge, Zap
-} from 'lucide-react';
+import { Wifi, RefreshCw, Radio } from 'lucide-react';
 
 export default function WifiAnalyzer() {
   const [connectionInfo, setConnectionInfo] = useState<{
@@ -20,8 +16,8 @@ export default function WifiAnalyzer() {
     type: 'Wi-Fi 6 (802.11ax)'
   });
 
-  const [rssi, setRssi] = useState(-48); // in -dBm
-  const [noiseFloor] = useState(-92); // typical ambient noise floor in dBm
+  const [rssi, setRssi] = useState(-48);
+  const [noiseFloor] = useState(-92);
   const [analyzing, setAnalyzing] = useState(false);
 
   const analyzeConnection = () => {
@@ -37,147 +33,97 @@ export default function WifiAnalyzer() {
           type: conn.type || 'Wi-Fi 6 (802.11ax)'
         });
       }
-      // Calculate realistic RSSI based on downlink and local latency
       const simulatedRssi = Math.min(-38, Math.max(-82, -35 - Math.round((conn?.rtt || 20) * 0.8)));
       setRssi(simulatedRssi);
       setAnalyzing(false);
-    }, 600);
+    }, 500);
   };
 
   useEffect(() => {
     analyzeConnection();
   }, []);
 
-  const snr = rssi - noiseFloor; // Signal to Noise Ratio
+  const snr = rssi - noiseFloor;
 
   const getSignalRating = (val: number) => {
-    if (val >= -50) return { label: 'Excellent', color: 'text-emerald-500', bar: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' };
-    if (val >= -65) return { label: 'Very Good', color: 'text-cyan-500', bar: 'bg-cyan-500', badge: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20' };
-    if (val >= -75) return { label: 'Fair / Normal', color: 'text-amber-500', bar: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-500 border-amber-500/20' };
-    return { label: 'Weak Signal', color: 'text-rose-500', bar: 'bg-rose-500', badge: 'bg-rose-500/10 text-rose-500 border-rose-500/20' };
+    if (val >= -50) return { label: 'PRISTINE', color: 'text-emerald-500', bar: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' };
+    if (val >= -65) return { label: 'GOOD', color: 'text-cyan-500', bar: 'bg-cyan-500', badge: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20' };
+    if (val >= -75) return { label: 'FAIR', color: 'text-amber-500', bar: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-500 border-amber-500/20' };
+    return { label: 'WEAK', color: 'text-rose-500', bar: 'bg-rose-500', badge: 'bg-rose-500/10 text-rose-500 border-rose-500/20' };
   };
 
   const rating = getSignalRating(rssi);
-
-  // Percentage for progress meter: -90 dBm (0%) to -30 dBm (100%)
   const signalPercentage = Math.max(5, Math.min(100, Math.round(((rssi - (-90)) / (-30 - (-90))) * 100)));
 
   return (
-    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-4 transition-colors">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4 min-w-0">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80 gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-cyan-600 text-white flex items-center justify-center shadow-sm shrink-0">
-            <Wifi className="w-3.5 h-3.5" />
-          </div>
-          <div className="flex items-center gap-2 min-w-0">
-            <h3 className="font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
-              Wi-Fi RF Link
-            </h3>
-            <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full font-extrabold border shrink-0 ${rating.badge}`}>
-              {rating.label}
-            </span>
-          </div>
+      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06] gap-2 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Wifi className="w-4 h-4 text-cyan-500 shrink-0" />
+          <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+            Wi-Fi RF Link & RSSI
+          </h3>
+          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border shrink-0 ${rating.badge}`}>
+            {rating.label}
+          </span>
         </div>
 
         <button
+          type="button"
           onClick={analyzeConnection}
           disabled={analyzing}
-          className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+          className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
         >
-          <RefreshCw className={`w-3.5 h-3.5 shrink-0 ${analyzing ? 'animate-spin text-cyan-600' : 'text-slate-500'}`} />
-          <span>{analyzing ? 'Scanning...' : 'Re-Scan'}</span>
+          <RefreshCw className={`w-3.5 h-3.5 ${analyzing ? 'animate-spin text-cyan-500' : 'text-slate-400'}`} />
+          <span>{analyzing ? 'SCANNING...' : 'RE-SCAN'}</span>
         </button>
       </div>
 
       {/* RF Signal Meter Section */}
-      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 flex flex-col gap-2.5">
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <Radio className="w-4 h-4 text-cyan-500" />
-            <span className="font-bold text-slate-800 dark:text-slate-200">Received Signal Strength (RSSI)</span>
+      <div className="hud-subpanel rounded-xl p-3.5 flex flex-col gap-2.5 min-w-0">
+        <div className="flex items-center justify-between text-xs font-mono min-w-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <Radio className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
+            <span className="font-bold text-slate-900 dark:text-white truncate">SIGNAL STRENGTH (RSSI)</span>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="font-mono font-black text-base text-slate-900 dark:text-slate-100">{rssi}</span>
-            <span className="text-[10px] text-slate-400 font-mono">dBm</span>
-          </div>
+          <span className="font-bold text-cyan-500 shrink-0">{rssi} dBm</span>
         </div>
 
-        {/* Progress Bar with dBm ticks */}
-        <div className="space-y-1">
-          <div className="h-2.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden p-0.5">
-            <div 
-              className={`h-full rounded-full transition-all duration-500 ${rating.bar}`}
-              style={{ width: `${signalPercentage}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[8px] font-mono text-slate-400 px-0.5">
-            <span>-90 dBm (Weak)</span>
-            <span>-70 dBm (Good)</span>
-            <span>-50 dBm</span>
-            <span>-30 dBm (Max)</span>
-          </div>
+        {/* Progress bar */}
+        <div className="w-full bg-slate-200 dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
+          <div 
+            className={`h-full rounded-full transition-all duration-300 ${rating.bar}`}
+            style={{ width: `${signalPercentage}%` }}
+          />
         </div>
 
-        {/* SNR & Radio Specs */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-200/50 dark:border-slate-800 text-xs">
-          <div>
-            <span className="text-[9px] text-slate-400 uppercase font-mono block">SNR Ratio</span>
-            <span className="font-mono font-bold text-slate-900 dark:text-slate-100">+{snr} dB</span>
-            <span className="text-[8px] text-emerald-500 block font-bold">Pristine Margin</span>
-          </div>
-          <div>
-            <span className="text-[9px] text-slate-400 uppercase font-mono block">Noise Floor</span>
-            <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{noiseFloor} dBm</span>
-            <span className="text-[8px] text-slate-400 block font-mono">Ambient RF</span>
-          </div>
-          <div>
-            <span className="text-[9px] text-slate-400 uppercase font-mono block">Channel Band</span>
-            <span className="font-mono font-bold text-slate-900 dark:text-slate-100">5 GHz (HE80)</span>
-            <span className="text-[8px] text-cyan-500 block font-bold">Low Congestion</span>
-          </div>
-          <div>
-            <span className="text-[9px] text-slate-400 uppercase font-mono block">Standard</span>
-            <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{connectionInfo.type}</span>
-            <span className="text-[8px] text-indigo-500 block font-bold">OFDMA Ready</span>
-          </div>
+        <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 dark:text-zinc-500">
+          <span>-90 dBm (Weak)</span>
+          <span>-60 dBm (Avg)</span>
+          <span>-30 dBm (Pristine)</span>
         </div>
       </div>
 
-      {/* 3 Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-[10px]">
-            <span className="text-slate-400 uppercase font-extrabold font-mono">Radio Quality</span>
-            <Signal className="w-3.5 h-3.5 text-cyan-500" />
-          </div>
-          <div className="my-1">
-            <span className="font-black text-sm text-slate-900 dark:text-slate-100">{signalPercentage}% Quality</span>
-            <span className="block text-[9px] text-emerald-600 font-bold">High Modulation (1024-QAM)</span>
-          </div>
+      {/* SNR & Link Metrics 3 Sub-Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 min-w-0 text-xs font-mono">
+        <div className="hud-subpanel rounded-xl p-2.5 flex flex-col justify-between gap-1 min-w-0">
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">SNR MARGIN</span>
+          <span className="font-bold text-slate-900 dark:text-white text-base">+{snr} dB</span>
+          <span className="text-[9px] text-emerald-500 font-bold">Clear Channel</span>
         </div>
 
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-[10px]">
-            <span className="text-slate-400 uppercase font-extrabold font-mono">Link Speed</span>
-            <Radio className="w-3.5 h-3.5 text-blue-500" />
-          </div>
-          <div className="my-1">
-            <span className="font-black text-sm text-slate-900 dark:text-slate-100">~{connectionInfo.downlink * 8} Mbps</span>
-            <span className="block text-[9px] text-blue-600 font-bold">Full Local PHY Rate</span>
-          </div>
+        <div className="hud-subpanel rounded-xl p-2.5 flex flex-col justify-between gap-1 min-w-0">
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">PHY LINK SPEED</span>
+          <span className="font-bold text-slate-900 dark:text-white text-base">{connectionInfo.downlink * 8} Mbps</span>
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">Local NIC Interface</span>
         </div>
 
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-[10px]">
-            <span className="text-slate-400 uppercase font-extrabold font-mono">Gateway RTT</span>
-            <Router className="w-3.5 h-3.5 text-indigo-500" />
-          </div>
-          <div className="my-1">
-            <span className="font-black text-sm text-slate-900 dark:text-slate-100">{connectionInfo.rtt} ms</span>
-            <span className="block text-[9px] text-emerald-600 font-bold">Zero AP Congestion</span>
-          </div>
+        <div className="hud-subpanel rounded-xl p-2.5 flex flex-col justify-between gap-1 min-w-0">
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">GATEWAY RTT</span>
+          <span className="font-bold text-slate-900 dark:text-white text-base">{connectionInfo.rtt} ms</span>
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">First Hop Delay</span>
         </div>
       </div>
 

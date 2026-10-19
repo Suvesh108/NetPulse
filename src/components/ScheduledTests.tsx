@@ -188,7 +188,7 @@ export default function ScheduledTests({ onScheduledResult }: ScheduledTestsProp
   }, [enabled, intervalHours, minSpeedThreshold]);
 
   return (
-    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-3 transition-colors">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
       
       {/* Header */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80">

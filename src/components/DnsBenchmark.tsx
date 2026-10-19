@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Server, ShieldCheck, Zap, Globe, ArrowRight, 
-  RotateCcw, Play, CheckCircle2, Award, Clock
-} from 'lucide-react';
+import { Server, Play, RotateCcw, Award } from 'lucide-react';
 
 interface DnsResolver {
   id: string;
@@ -67,8 +64,6 @@ export default function DnsBenchmark() {
   const runBenchmark = async () => {
     setIsTesting(true);
     setFastestId(null);
-
-    // Reset status
     setResolvers(prev => prev.map(r => ({ ...r, latencyMs: null, status: 'testing', dnssec: false })));
 
     const testDomain = 'wikipedia.org';
@@ -92,7 +87,7 @@ export default function DnsBenchmark() {
         if (res.ok) {
           const data = await res.json();
           const ipResolved = data.Answer?.[0]?.data || '103.102.166.224';
-          const isDnssec = !!(data.AD || (data.Answer && data.Answer.some((a: any) => a.type === 46))); // 46 is RRSIG
+          const isDnssec = !!(data.AD || (data.Answer && data.Answer.some((a: any) => a.type === 46)));
           const updated = {
             ...resolver,
             latencyMs: duration,
@@ -103,26 +98,21 @@ export default function DnsBenchmark() {
           updatedResolvers.push(updated);
           setResolvers(prev => prev.map(r => r.id === resolver.id ? updated : r));
         } else {
-          throw new Error('HTTP failure');
+          throw new Error('Non-200');
         }
       } catch {
-        // Fallback realistic simulation for network environments blocking external UDP/DoH
-        const simLatency = resolver.id === 'cloudflare' ? 18 : (resolver.id === 'google' ? 24 : (resolver.id === 'adguard' ? 36 : 42));
-        const updated = {
+        const failed = {
           ...resolver,
-          latencyMs: simLatency,
-          status: 'success' as const,
-          ipResolved: '103.102.166.224',
-          dnssec: true
+          latencyMs: null,
+          status: 'failed' as const
         };
-        updatedResolvers.push(updated);
-        setResolvers(prev => prev.map(r => r.id === resolver.id ? updated : r));
+        updatedResolvers.push(failed);
+        setResolvers(prev => prev.map(r => r.id === resolver.id ? failed : r));
       }
 
-      await new Promise(r => setTimeout(r, 80));
+      await new Promise(r => setTimeout(r, 60));
     }
 
-    // Determine fastest resolver
     const successful = updatedResolvers.filter(r => r.latencyMs !== null);
     if (successful.length > 0) {
       successful.sort((a, b) => (a.latencyMs || 999) - (b.latencyMs || 999));
@@ -133,85 +123,82 @@ export default function DnsBenchmark() {
   };
 
   return (
-    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-4 transition-colors">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4 min-w-0">
       
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800/80">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800 shrink-0">
-            <Server className="w-4 h-4" />
-          </div>
-          <div className="flex items-center gap-2 min-w-0">
-            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
-              DNS Shootout
-            </h3>
-            <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 shrink-0">
-              DoH
-            </span>
-          </div>
+      <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-white/[0.06] min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Server className="w-4 h-4 text-blue-500 shrink-0" />
+          <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+            DNS Resolver Shootout
+          </h3>
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 shrink-0">
+            DoH Query
+          </span>
         </div>
 
         <button
+          type="button"
           onClick={runBenchmark}
           disabled={isTesting}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0 whitespace-nowrap ${
-            isTesting 
-              ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' 
-              : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'
-          }`}
+          className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
         >
-          {isTesting ? <RotateCcw className="w-3.5 h-3.5 animate-spin shrink-0" /> : <Play className="w-3.5 h-3.5 fill-current shrink-0" />}
-          <span>{isTesting ? 'Resolving...' : 'Run Shootout'}</span>
+          {isTesting ? (
+            <RotateCcw className="w-3.5 h-3.5 animate-spin text-blue-500" />
+          ) : (
+            <Play className="w-3.5 h-3.5 fill-current text-blue-500" />
+          )}
+          <span>{isTesting ? 'QUERYING...' : 'RUN SHOOTOUT'}</span>
         </button>
       </div>
 
-      {/* Resolvers Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Resolvers Grid (2x2 Balanced for Subcolumn) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-w-0">
         {resolvers.map((r) => {
           const isWinner = fastestId === r.id;
           return (
             <div 
               key={r.id}
-              className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between gap-3 relative ${
+              className={`p-3 rounded-xl border transition-all flex flex-col justify-between gap-2.5 min-w-0 ${
                 isWinner 
-                  ? 'border-emerald-500/60 dark:border-emerald-500/50 bg-emerald-50/40 dark:bg-emerald-950/20 shadow-sm' 
-                  : 'border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40'
+                  ? 'bg-emerald-500/[0.08] border-emerald-500/40 shadow-xs' 
+                  : 'hud-subpanel hover:border-slate-300 dark:hover:border-white/[0.14]'
               }`}
             >
-              {isWinner && (
-                <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-black tracking-wider uppercase flex items-center gap-1 shadow-sm">
-                  <Award className="w-2.5 h-2.5" />
-                  <span>Fastest</span>
+              <div className="flex items-center justify-between min-w-0">
+                <span className="font-mono text-xs font-bold text-slate-900 dark:text-white truncate">
+                  {r.primaryIp}
+                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  {r.dnssec && (
+                    <span className="text-[8px] font-mono font-bold px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
+                      DNSSEC
+                    </span>
+                  )}
+                  {isWinner && (
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500 text-white flex items-center gap-0.5 shadow-xs">
+                      <Award className="w-2.5 h-2.5" />
+                      <span>FASTEST</span>
+                    </span>
+                  )}
                 </div>
-              )}
-
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-xs font-black text-slate-900 dark:text-white">
-                    {r.primaryIp}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {r.dnssec && (
-                      <span className="text-[8px] font-mono font-bold px-1.5 py-0.2 rounded bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800">
-                        DNSSEC
-                      </span>
-                    )}
-                    <span className="text-[10px] font-mono text-slate-400">DoH</span>
-                  </div>
-                </div>
-                <h4 className="font-bold text-xs text-slate-800 dark:text-slate-200">
-                  {r.name}
-                </h4>
               </div>
 
-              <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
-                <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
-                  Query Time:
-                </span>
-                <span className={`font-mono text-sm font-black ${
+              <div className="min-w-0">
+                <h4 className="font-bold text-xs text-slate-800 dark:text-zinc-200 truncate">
+                  {r.name}
+                </h4>
+                <p className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 truncate mt-0.5">
+                  {r.provider}
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200/60 dark:border-white/[0.06] flex items-center justify-between text-xs font-mono">
+                <span className="text-slate-400 dark:text-zinc-500 text-[10px]">Lookup RTT:</span>
+                <span className={`font-black ${
                   r.latencyMs !== null 
-                    ? (isWinner ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100')
-                    : 'text-slate-400'
+                    ? (isWinner ? 'text-emerald-500 font-bold' : 'text-slate-900 dark:text-white')
+                    : 'text-slate-400 dark:text-zinc-500'
                 }`}>
                   {r.latencyMs !== null ? `${r.latencyMs} ms` : (r.status === 'testing' ? '...' : '--')}
                 </span>

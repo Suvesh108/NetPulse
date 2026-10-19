@@ -144,26 +144,28 @@ export default function SpeedCertificateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
-      <div className="bg-white dark:bg-[#121212] w-full max-w-xl rounded-3xl p-6 border border-slate-200 dark:border-[#262626] shadow-2xl flex flex-col gap-4 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-hud-in">
+      <div className="hud-panel w-full max-w-xl rounded-3xl p-6 flex flex-col gap-4 relative shadow-2xl">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-[#222222] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Certificate Card Body */}
-        <div ref={cardRef} className="p-5 rounded-2xl bg-gradient-to-br from-black via-zinc-950 to-neutral-900 text-white border border-neutral-800 shadow-xl flex flex-col gap-4">
+        <div ref={cardRef} className="p-5 rounded-2xl bg-[#090A0F] text-white border border-white/[0.1] shadow-xl flex flex-col gap-4">
           
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-cyan-400" />
+          <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+            <div className="flex items-center gap-2.5">
+              <img src="/favicon.png" alt="NetPulse Logo" className="w-7 h-7 object-contain rounded" />
               <div>
-                <h4 className="font-black text-sm tracking-tight text-white">NETPULSE VERIFIED SPEED CERTIFICATE</h4>
-                <span className="text-[10px] text-slate-400 font-mono">{activeServerName}</span>
+                <h4 className="font-sans font-black text-xs sm:text-sm tracking-tight text-white uppercase">
+                  NetPulse Verified Certificate
+                </h4>
+                <span className="text-[10px] text-zinc-400 font-mono">{activeServerName}</span>
               </div>
             </div>
             <div className="flex items-center gap-2">

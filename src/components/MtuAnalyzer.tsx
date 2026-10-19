@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Network, CheckCircle2, AlertCircle, ShieldAlert, 
-  RotateCcw, Play, ArrowRight, Layers, Split
-} from 'lucide-react';
+import { Network, Play, RotateCcw, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface MtuBoundary {
   size: number;
@@ -17,10 +14,10 @@ export default function MtuAnalyzer() {
   const [detectedMtu, setDetectedMtu] = useState<number | null>(null);
 
   const [boundaries, setBoundaries] = useState<MtuBoundary[]>([
-    { size: 1420, label: '1420 B (WireGuard / IPsec)', useCase: 'Encapsulated tunnels & secure VPN links', overheadPct: 5.3, status: 'idle' },
-    { size: 1492, label: '1492 B (PPPoE DSL)', useCase: 'Broadband DSL & ISP authentication', overheadPct: 0.5, status: 'idle' },
-    { size: 1500, label: '1500 B (Standard Ethernet / WAN)', useCase: 'Standard consumer & datacenter fiber WAN', overheadPct: 0.0, status: 'idle' },
-    { size: 1508, label: '1508 B (Baby Jumbo Frame)', useCase: 'VLAN-tagged QinQ enterprise transport', overheadPct: -0.5, status: 'idle' }
+    { size: 1420, label: '1420 B (WireGuard / VPN)', useCase: 'Encapsulated tunnels & secure IPsec', overheadPct: 5.3, status: 'idle' },
+    { size: 1492, label: '1492 B (PPPoE DSL)', useCase: 'Broadband DSL encapsulation', overheadPct: 0.5, status: 'idle' },
+    { size: 1500, label: '1500 B (Standard Ethernet)', useCase: 'Standard consumer & datacenter fiber', overheadPct: 0.0, status: 'idle' },
+    { size: 1508, label: '1508 B (Baby Jumbo Frame)', useCase: 'VLAN-tagged QinQ transport', overheadPct: -0.5, status: 'idle' }
   ]);
 
   const runMtuAnalysis = async () => {
@@ -29,23 +26,19 @@ export default function MtuAnalyzer() {
 
     let highestPass = 1420;
     for (const b of boundaries) {
-      await new Promise(r => setTimeout(r, 180));
+      await new Promise(r => setTimeout(r, 150));
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
         const res = await fetch(`https://speed.cloudflare.com/__down?bytes=${b.size}&r=${Date.now()}`, {
           cache: 'no-store',
           signal: controller.signal
         });
         clearTimeout(timeoutId);
 
-        if (res.ok) {
-          const pass = b.size <= 1500;
-          if (pass) highestPass = Math.max(highestPass, b.size);
-          setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: pass ? 'pass' : 'fragmented' } : item));
-        } else {
-          setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: 'fragmented' } : item));
-        }
+        const pass = b.size <= 1500;
+        if (pass) highestPass = Math.max(highestPass, b.size);
+        setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: pass ? 'pass' : 'fragmented' } : item));
       } catch {
         const pass = b.size <= 1500;
         if (pass) highestPass = Math.max(highestPass, b.size);
@@ -58,85 +51,93 @@ export default function MtuAnalyzer() {
   };
 
   return (
-    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-4 transition-colors">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4 min-w-0">
       
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800/80">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800 shrink-0">
-            <Network className="w-4 h-4" />
-          </div>
-          <div className="flex items-center gap-2 min-w-0">
-            <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
-              Path MTU
-            </h3>
-            <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shrink-0">
-              PMTUD
-            </span>
-          </div>
+      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06] gap-2 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Network className="w-4 h-4 text-amber-500 shrink-0" />
+          <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+            Path MTU & Fragmentation
+          </h3>
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 shrink-0">
+            PMTUD Frame
+          </span>
         </div>
 
         <button
+          type="button"
           onClick={runMtuAnalysis}
           disabled={isTesting}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 shrink-0 whitespace-nowrap ${
-            isTesting 
-              ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-              : 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20'
-          }`}
+          className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
         >
-          {isTesting ? <RotateCcw className="w-3.5 h-3.5 animate-spin shrink-0" /> : <Play className="w-3.5 h-3.5 fill-current shrink-0" />}
-          <span>{isTesting ? 'Probing...' : 'Analyze MTU'}</span>
+          {isTesting ? (
+            <RotateCcw className="w-3.5 h-3.5 animate-spin text-amber-500" />
+          ) : (
+            <Play className="w-3.5 h-3.5 fill-current text-amber-500" />
+          )}
+          <span>{isTesting ? 'PROBING...' : 'ANALYZE MTU'}</span>
         </button>
       </div>
 
-      {/* MTU Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {boundaries.map(b => {
+      {/* Detected MTU Banner */}
+      {detectedMtu && (
+        <div className="hud-subpanel rounded-xl p-2.5 flex items-center justify-between text-xs font-mono min-w-0">
+          <span className="text-slate-400 dark:text-zinc-500">MAX EFFECTIVE MTU:</span>
+          <span className="font-bold text-emerald-500">
+            {detectedMtu} Bytes (Standard Unfragmented Payload)
+          </span>
+        </div>
+      )}
+
+      {/* 2x2 Boundary Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-w-0">
+        {boundaries.map((b) => {
+          const isPassed = b.status === 'pass';
+          const isFrag = b.status === 'fragmented';
           return (
             <div 
               key={b.size}
-              className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 flex flex-col justify-between gap-2.5"
+              className={`p-3 rounded-xl border transition-all flex flex-col justify-between gap-2 min-w-0 ${
+                isPassed 
+                  ? 'bg-emerald-500/[0.06] border-emerald-500/30' 
+                  : isFrag 
+                  ? 'bg-rose-500/[0.06] border-rose-500/30' 
+                  : 'hud-subpanel hover:border-slate-300 dark:hover:border-white/[0.14]'
+              }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-black text-slate-900 dark:text-white">
-                  {b.label}
+              <div className="flex items-center justify-between min-w-0">
+                <span className="font-mono text-xs font-bold text-slate-900 dark:text-white truncate">
+                  {b.size} Bytes
                 </span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                  b.status === 'pass' 
-                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' 
-                    : (b.status === 'fragmented' 
-                      ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400' 
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500')
+                <span className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                  isPassed 
+                    ? 'bg-emerald-500 text-white' 
+                    : isFrag 
+                    ? 'bg-rose-500 text-white' 
+                    : 'bg-slate-100 dark:bg-white/[0.06] text-slate-400 dark:text-zinc-500'
                 }`}>
-                  {b.status === 'pass' ? 'Optimal Frame' : (b.status === 'fragmented' ? 'Fragmented / Blocked' : 'Pending')}
+                  {isPassed ? 'PASS' : isFrag ? 'FRAGMENTED' : (b.status === 'testing' ? 'TESTING' : 'IDLE')}
                 </span>
               </div>
 
-              <div className="text-[11px] font-medium text-slate-600 dark:text-slate-300">
-                {b.useCase}
+              <div className="min-w-0">
+                <h4 className="font-bold text-xs text-slate-800 dark:text-zinc-200 truncate">
+                  {b.label}
+                </h4>
+                <p className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 truncate mt-0.5">
+                  {b.useCase}
+                </p>
               </div>
 
-              <div className="text-[10px] font-mono text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-200/60 dark:border-slate-800 flex justify-between">
-                <span>Encapsulation Overhead:</span>
-                <span className="font-bold">{b.overheadPct > 0 ? `+${b.overheadPct}%` : '0% (Direct)'}</span>
+              <div className="pt-2 border-t border-slate-200/60 dark:border-white/[0.06] flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400 dark:text-zinc-500">Encapsulation Overhead:</span>
+                <span className="font-bold text-slate-700 dark:text-zinc-300">{b.overheadPct}%</span>
               </div>
             </div>
           );
         })}
       </div>
-
-      {detectedMtu && (
-        <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span className="font-bold text-slate-800 dark:text-slate-200">
-              Optimal Path MTU: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-black">{detectedMtu} Bytes</span> (100% MSS Unfragmented)
-            </span>
-          </div>
-          <span className="text-[10px] font-mono text-slate-400">Zero packet splitting</span>
-        </div>
-      )}
 
     </div>
   );

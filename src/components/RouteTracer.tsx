@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Network, Globe, Server, ArrowRight, ShieldCheck, 
-  RefreshCw, CheckCircle2, MapPin, Zap, Radio, Layers
+  Globe, ShieldCheck, RefreshCw, MapPin, Zap, Layers, ArrowRight
 } from 'lucide-react';
 
 interface TraceData {
@@ -48,7 +47,6 @@ export default function RouteTracer() {
     setLoading(true);
     const start = performance.now();
     try {
-      // 1. Fetch Cloudflare edge trace
       const cfRes = await fetch('https://1.1.1.1/cdn-cgi/trace', { cache: 'no-store' });
       const cfText = await cfRes.text();
       const latency = Math.round(performance.now() - start);
@@ -59,7 +57,6 @@ export default function RouteTracer() {
         if (k && v) parsed[k.trim()] = v.trim();
       });
 
-      // 2. Fetch ISP / ASN info
       let org = 'Tier-1 Internet Transit';
       let asn = 'AS-ANYCAST';
       let city = parsed.loc || 'Global Edge';
@@ -72,9 +69,7 @@ export default function RouteTracer() {
           if (ipData.asn) asn = ipData.asn;
           if (ipData.city) city = `${ipData.city}, ${ipData.country_code}`;
         }
-      } catch {
-        // Fallback gracefully
-      }
+      } catch {}
 
       setTrace({
         clientIp: parsed.ip || 'Client Host',
@@ -88,7 +83,6 @@ export default function RouteTracer() {
         latencyMs: latency
       });
     } catch {
-      // Offline or blocked fallback
       setTrace({
         clientIp: '192.168.1.104',
         colo: 'DEL',
@@ -96,7 +90,7 @@ export default function RouteTracer() {
         tls: 'TLSv1.3',
         http: 'http/2',
         asn: 'AS55836',
-        org: 'Broadband / Cellular Carrier',
+        org: 'Broadband Carrier Transit',
         city: 'Edge Gateway',
         latencyMs: 24
       });
@@ -113,167 +107,161 @@ export default function RouteTracer() {
     {
       id: 1,
       title: 'Local Gateway',
-      subtitle: '802.11 / Ethernet LAN',
+      subtitle: '802.11 / LAN Router',
       target: '192.168.1.1',
       latency: '< 2 ms',
       type: 'LAN',
-      color: 'cyan',
-      description: 'First physical link between client device and local home/office router switch.'
+      description: 'First physical link between client device and local home/office switch.'
     },
     {
       id: 2,
       title: 'ISP Ingress Node',
-      subtitle: trace?.org || 'Broadband Provider Core',
+      subtitle: trace?.org || 'Broadband Carrier Core',
       target: trace?.asn || 'BGP Carrier',
       latency: `${Math.max(4, Math.round((trace?.latencyMs || 25) * 0.35))} ms`,
       type: 'BGP POP',
-      color: 'blue',
-      description: `Carrier routing gateway managed by ${trace?.org || 'Local ISP'}, routing across autonomous systems.`
+      description: `Carrier routing gateway managed by ${trace?.org || 'Local ISP'}.`
     },
     {
       id: 3,
-      title: 'Metro Internet Exchange',
-      subtitle: `${trace?.city || 'Regional'} IXP Peering`,
-      target: 'BGP Layer-2 / Anycast Fabric',
+      title: 'Metro Peering IXP',
+      subtitle: `${trace?.city || 'Regional'} IXP Fabric`,
+      target: 'BGP Layer-2 / Anycast',
       latency: `${Math.max(8, Math.round((trace?.latencyMs || 25) * 0.65))} ms`,
       type: 'IXP CORE',
-      color: 'indigo',
       description: 'Carrier-neutral peering exchange forwarding IP packets across transcontinental fiber.'
     },
     {
       id: 4,
       title: 'Cloudflare Edge PoP',
       subtitle: AIRPORT_NAMES[trace?.colo || ''] || `Airport Edge ${trace?.colo || 'Anycast'}`,
-      target: `colo=${trace?.colo || 'AUTO'} · ${trace?.tls} / ${trace?.http}`,
+      target: `colo=${trace?.colo || 'AUTO'} · ${trace?.tls}`,
       latency: `${trace?.latencyMs || 22} ms`,
       type: 'EDGE CLOUD',
-      color: 'emerald',
-      description: `Anycast Tier-1 edge data center terminating TLS/HTTP traffic with lowest physical propagation distance.`
+      description: 'Anycast Tier-1 edge data center terminating TLS/HTTP traffic with lowest physical propagation distance.'
     }
   ];
 
   return (
-    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-4 transition-colors">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4 min-w-0">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80 gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-sm shrink-0">
-            <Layers className="w-3.5 h-3.5" />
-          </div>
-          <div className="flex items-center gap-2 min-w-0">
-            <h3 className="font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
-              Route Trace
-            </h3>
-            <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold border border-indigo-200 dark:border-indigo-800 shrink-0">
-              PoP Edge
-            </span>
-          </div>
+      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06] gap-2 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Layers className="w-4 h-4 text-indigo-500 shrink-0" />
+          <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+            Edge Colocation & Hop Route Trace
+          </h3>
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 shrink-0">
+            BGP PoP
+          </span>
         </div>
 
         <button
+          type="button"
           onClick={runRouteTrace}
           disabled={loading}
-          className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+          className="px-2.5 py-1 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
         >
-          <RefreshCw className={`w-3.5 h-3.5 shrink-0 ${loading ? 'animate-spin text-indigo-600' : 'text-slate-500'}`} />
-          <span>{loading ? 'Tracing...' : 'Re-Trace'}</span>
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-indigo-500' : 'text-slate-400'}`} />
+          <span>{loading ? 'TRACING...' : 'RE-TRACE'}</span>
         </button>
       </div>
 
-      {/* Overview Badges */}
+      {/* Overview Telemetry Ribbon */}
       {trace && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
-            <span className="text-[9px] text-slate-400 font-mono uppercase font-bold block">Edge Colocation</span>
-            <div className="flex items-center gap-1.5 mt-1 font-bold text-slate-900 dark:text-slate-100">
-              <MapPin className="w-3.5 h-3.5 text-indigo-500" />
-              <span className="font-mono text-xs">{trace.colo} ({trace.loc})</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono min-w-0">
+          <div className="p-2.5 rounded-xl hud-subpanel min-w-0">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 uppercase block font-bold">Colocation</span>
+            <div className="flex items-center gap-1 mt-1 font-bold text-slate-900 dark:text-white truncate">
+              <MapPin className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+              <span className="truncate">{trace.colo} ({trace.loc})</span>
             </div>
-            <span className="text-[9px] text-slate-500 truncate block mt-0.5">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 truncate block mt-0.5">
               {AIRPORT_NAMES[trace.colo] || 'Global Edge Data Center'}
             </span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
-            <span className="text-[9px] text-slate-400 font-mono uppercase font-bold block">Carrier ASN</span>
-            <div className="flex items-center gap-1.5 mt-1 font-bold text-slate-900 dark:text-slate-100">
-              <Globe className="w-3.5 h-3.5 text-blue-500" />
-              <span className="font-mono text-xs truncate">{trace.asn}</span>
+          <div className="p-2.5 rounded-xl hud-subpanel min-w-0">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 uppercase block font-bold">Transit ASN</span>
+            <div className="flex items-center gap-1 mt-1 font-bold text-slate-900 dark:text-white truncate">
+              <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+              <span className="truncate">{trace.asn}</span>
             </div>
-            <span className="text-[9px] text-slate-500 truncate block mt-0.5">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 truncate block mt-0.5">
               {trace.org}
             </span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
-            <span className="text-[9px] text-slate-400 font-mono uppercase font-bold block">Security Protocol</span>
-            <div className="flex items-center gap-1.5 mt-1 font-bold text-emerald-600 dark:text-emerald-400">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span className="font-mono text-xs">{trace.tls}</span>
+          <div className="p-2.5 rounded-xl hud-subpanel min-w-0">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 uppercase block font-bold">Transport Layer</span>
+            <div className="flex items-center gap-1 mt-1 font-bold text-emerald-500 truncate">
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{trace.tls}</span>
             </div>
-            <span className="text-[9px] text-slate-500 truncate block mt-0.5 font-mono">
-              Transport: {trace.http}
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 truncate block mt-0.5">
+              Protocol: {trace.http}
             </span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
-            <span className="text-[9px] text-slate-400 font-mono uppercase font-bold block">RTT Propagation</span>
-            <div className="flex items-center gap-1.5 mt-1 font-bold text-slate-900 dark:text-slate-100">
-              <Zap className="w-3.5 h-3.5 text-amber-500" />
-              <span className="font-mono text-xs">{trace.latencyMs} ms</span>
+          <div className="p-2.5 rounded-xl hud-subpanel min-w-0">
+            <span className="text-[9px] text-slate-400 dark:text-zinc-500 uppercase block font-bold">Propagation RTT</span>
+            <div className="flex items-center gap-1 mt-1 font-bold text-amber-500 truncate">
+              <Zap className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{trace.latencyMs} ms</span>
             </div>
-            <span className="text-[9px] text-emerald-500 font-bold block mt-0.5">
-              Direct Route Active
+            <span className="text-[9px] text-emerald-500 font-bold block mt-0.5 truncate">
+              Optimal Anycast
             </span>
           </div>
         </div>
       )}
 
-      {/* Visual Hop Pipeline */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 relative">
-        {hops.map((hop) => (
-          <div 
-            key={hop.id}
-            onClick={() => setSelectedHop(selectedHop === hop.id ? null : hop.id)}
-            className={`p-3 rounded-xl border transition-all cursor-pointer relative flex flex-col justify-between ${
-              selectedHop === hop.id 
-                ? 'bg-indigo-50/50 dark:bg-indigo-950/30 border-indigo-500 ring-2 ring-indigo-500/20 shadow-sm'
-                : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200/70 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-[10px] font-black flex items-center justify-center">
-                {hop.id}
-              </span>
-              <span className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${
-                hop.id === 4 ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-              }`}>
-                {hop.type}
-              </span>
-            </div>
-
-            <div className="mb-2">
-              <h4 className="font-sans font-bold text-xs text-slate-900 dark:text-slate-100">
-                {hop.title}
-              </h4>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                {hop.subtitle}
-              </p>
-            </div>
-
-            <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-[10px] font-mono">
-              <span className="text-slate-400 truncate max-w-[110px]">{hop.target}</span>
-              <span className="font-bold text-indigo-600 dark:text-indigo-400 shrink-0">{hop.latency}</span>
-            </div>
-
-            {selectedHop === hop.id && (
-              <div className="mt-2 pt-2 border-t border-indigo-200/50 dark:border-indigo-800/50 text-[10px] text-slate-600 dark:text-slate-300 animate-in fade-in">
-                {hop.description}
+      {/* 4-Hop Pipeline Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 min-w-0">
+        {hops.map((hop) => {
+          const isSelected = selectedHop === hop.id;
+          return (
+            <div 
+              key={hop.id}
+              onClick={() => setSelectedHop(isSelected ? null : hop.id)}
+              className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 min-w-0 ${
+                isSelected 
+                  ? 'bg-indigo-500/[0.08] border-indigo-500/50 shadow-xs' 
+                  : 'hud-subpanel hover:border-slate-300 dark:hover:border-white/[0.14]'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="w-5 h-5 rounded-full bg-slate-200 dark:bg-white/[0.08] text-slate-700 dark:text-zinc-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">
+                  {hop.id}
+                </span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/[0.05] text-slate-500 dark:text-zinc-400">
+                  {hop.type}
+                </span>
               </div>
-            )}
-          </div>
-        ))}
+
+              <div className="min-w-0">
+                <h4 className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                  {hop.title}
+                </h4>
+                <p className="text-[10px] text-slate-400 dark:text-zinc-500 truncate font-mono">
+                  {hop.subtitle}
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200/60 dark:border-white/[0.06] flex items-center justify-between text-[10px] font-mono">
+                <span className="text-slate-400 dark:text-zinc-500 truncate">{hop.target}</span>
+                <span className="font-bold text-indigo-500 shrink-0 ml-1">{hop.latency}</span>
+              </div>
+
+              {isSelected && (
+                <div className="mt-1 pt-1.5 border-t border-indigo-500/20 text-[10px] text-slate-600 dark:text-zinc-300 animate-hud-in">
+                  {hop.description}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
     </div>

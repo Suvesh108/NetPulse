@@ -126,7 +126,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 shrink-0">
         
         {/* CARD 1: Total Tests */}
-        <div className="premium-card bg-white dark:bg-[#121212] rounded-xl p-3 flex flex-col justify-between relative overflow-hidden border border-slate-200 dark:border-[#262626] shadow-xs transition-colors cursor-default">
+        <div className="hud-panel rounded-xl p-3 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
             <div className="flex flex-col">
               <span className="text-[10px] font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Total Tests</span>
@@ -143,7 +143,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
         </div>
 
         {/* CARD 2: Peak Download */}
-        <div className="premium-card bg-white dark:bg-[#121212] rounded-xl p-3 flex flex-col justify-between relative overflow-hidden border border-slate-200 dark:border-[#262626] shadow-xs transition-colors cursor-default">
+        <div className="hud-panel rounded-xl p-3 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
             <div className="flex flex-col">
               <span className="text-[10px] font-extrabold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">Peak Down</span>
@@ -160,7 +160,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
         </div>
 
         {/* CARD 3: Peak Upload */}
-        <div className="premium-card bg-white dark:bg-[#121212] rounded-xl p-3 flex flex-col justify-between relative overflow-hidden border border-slate-200 dark:border-[#262626] shadow-xs transition-colors cursor-default">
+        <div className="hud-panel rounded-xl p-3 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
             <div className="flex flex-col">
               <span className="text-[10px] font-extrabold text-purple-800 dark:text-purple-400 uppercase tracking-wider">Peak Up</span>
@@ -177,7 +177,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
         </div>
 
         {/* CARD 4: Avg Latency & Jitter */}
-        <div className="premium-card bg-white dark:bg-[#121212] rounded-xl p-3 flex flex-col justify-between relative overflow-hidden border border-slate-200 dark:border-[#262626] shadow-xs transition-colors cursor-default">
+        <div className="hud-panel rounded-xl p-3 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
             <div className="flex flex-col">
               <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-400 uppercase tracking-wider">Avg Latency</span>
@@ -194,7 +194,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
         </div>
 
         {/* CARD 5: Bufferbloat Rating */}
-        <div className="premium-card bg-white dark:bg-[#121212] rounded-xl p-3 flex flex-col justify-between relative overflow-hidden border border-slate-200 dark:border-[#262626] shadow-xs transition-colors cursor-default">
+        <div className="hud-panel rounded-xl p-3 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
             <div className="flex flex-col">
               <span className="text-[10px] font-extrabold text-cyan-800 dark:text-cyan-400 uppercase tracking-wider">Bufferbloat</span>
@@ -211,7 +211,7 @@ export default function HistoryList({ results, onDeleteResult, onClearAll, unit 
         </div>
 
         {/* CARD 6: VoIP MOS Rating */}
-        <div className="premium-card bg-white dark:bg-[#121212] rounded-xl p-3 flex flex-col justify-between relative overflow-hidden border border-slate-200 dark:border-[#262626] shadow-xs transition-colors cursor-default">
+        <div className="hud-panel rounded-xl p-3 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800/80">
             <div className="flex flex-col">
               <span className="text-[10px] font-extrabold text-indigo-800 dark:text-indigo-400 uppercase tracking-wider">VoIP MOS</span>

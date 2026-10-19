@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Gamepad2, Play, Square, Activity, AlertTriangle, 
-  CheckCircle2, Flame, ShieldAlert, Sparkles
-} from 'lucide-react';
+import { Play, Square, Activity, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 export default function PingOscilloscope() {
   const [isRunning, setIsRunning] = useState(false);
@@ -38,7 +35,6 @@ export default function PingOscilloscope() {
       timerRef.current = window.setInterval(async () => {
         const start = performance.now();
         try {
-          // Micro probe
           await fetch('https://speed.cloudflare.com/__down?bytes=0', { cache: 'no-store' });
           const latency = Math.round(performance.now() - start);
           
@@ -51,7 +47,6 @@ export default function PingOscilloscope() {
             const next = [...prev, latency];
             if (next.length > 25) next.shift();
             
-            // Calc jitter
             if (next.length > 1) {
               const diffs = [];
               for (let i = 1; i < next.length; i++) {
@@ -77,16 +72,14 @@ export default function PingOscilloscope() {
     };
   }, [isRunning]);
 
-  // Calculate Stability Grade
   const stabilityPct = totalSamples > 0 
     ? Math.max(0, 100 - (packetDrops / totalSamples) * 100 - ((currentJitter || 0) * 1.5)).toFixed(1)
     : '100.0';
 
-  // SVG Waveform generator for oscilloscope
   const width = 500;
-  const height = 100;
-  const padding = 10;
-  const maxScale = Math.max(80, maxPing + 10);
+  const height = 90;
+  const padding = 6;
+  const maxScale = Math.max(60, maxPing + 10);
 
   const points = pingHistory.map((val, idx) => {
     const x = padding + (idx / Math.max(1, pingHistory.length - 1)) * (width - padding * 2);
@@ -99,96 +92,109 @@ export default function PingOscilloscope() {
     : `M ${padding},${height / 2} L ${width - padding},${height / 2}`;
 
   return (
-    <div className="premium-card bg-white dark:bg-[#121212] rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-[#262626] shadow-sm flex flex-col gap-3 transition-colors">
+    <div className="hud-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4 min-w-0">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800/80 gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
-            <Gamepad2 className="w-3.5 h-3.5" />
-          </div>
-          <div className="flex items-center gap-2 min-w-0">
-            <h3 className="font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
-              Ping Oscilloscope
-            </h3>
-          </div>
+      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/[0.06] gap-2 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Activity className="w-4 h-4 text-emerald-500 shrink-0" />
+          <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+            Continuous Ping Oscilloscope
+          </h3>
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shrink-0">
+            Live Stream
+          </span>
         </div>
 
         <button
+          type="button"
           onClick={isRunning ? stopMonitoring : startMonitoring}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 whitespace-nowrap ${
+          className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 ${
             isRunning 
-              ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 border border-rose-200 dark:border-rose-800 active:scale-95'
-              : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white active:scale-95'
+              ? 'bg-rose-500 hover:bg-rose-600 text-white' 
+              : 'hud-subpanel hover:bg-slate-100 dark:hover:bg-white/[0.08]'
           }`}
         >
-          {isRunning ? <Square className="w-3 h-3 fill-rose-600 shrink-0" /> : <Play className="w-3 h-3 fill-white shrink-0" />}
-          <span>{isRunning ? 'Stop' : 'Start'}</span>
+          {isRunning ? (
+            <>
+              <Square className="w-3.5 h-3.5 fill-current" />
+              <span>STOP STREAM</span>
+            </>
+          ) : (
+            <>
+              <Play className="w-3.5 h-3.5 fill-current text-emerald-500" />
+              <span>START MONITOR</span>
+            </>
+          )}
         </button>
       </div>
 
-      {/* Main Oscilloscope Display */}
-      <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex flex-col gap-2 relative overflow-hidden font-mono">
-        
-        {/* Top Indicators */}
-        <div className="flex items-center justify-between text-[10px] text-slate-400 border-b border-slate-800/80 pb-1.5">
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 text-emerald-400 font-bold">
-              <span className={`w-2 h-2 rounded-full bg-emerald-400 ${isRunning ? 'animate-ping' : ''}`}></span>
-              {isRunning ? 'STREAMING ACTIVE' : 'STANDBY'}
-            </span>
-            <span>• Samples: {totalSamples}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span>Min: <b className="text-white">{minPing < 999 ? `${minPing}ms` : '--'}</b></span>
-            <span>Max: <b className="text-amber-400">{maxPing > 0 ? `${maxPing}ms` : '--'}</b></span>
-            <span>Jitter: <b className="text-purple-400">{currentJitter !== null ? `±${currentJitter}ms` : '--'}</b></span>
-          </div>
+      {/* Metrics Row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono min-w-0">
+        <div className="hud-subpanel rounded-xl p-2.5 flex flex-col min-w-0">
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">LIVE RTT</span>
+          <span className="text-lg font-black text-slate-900 dark:text-white tabular-nums">
+            {currentPing !== null ? `${currentPing} ms` : '--'}
+          </span>
+        </div>
+        <div className="hud-subpanel rounded-xl p-2.5 flex flex-col min-w-0">
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">JITTER DRIFT</span>
+          <span className="text-lg font-bold text-amber-500 tabular-nums">
+            {currentJitter !== null ? `±${currentJitter} ms` : '--'}
+          </span>
+        </div>
+        <div className="hud-subpanel rounded-xl p-2.5 flex flex-col min-w-0">
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">PEAK SPIKE</span>
+          <span className="text-lg font-bold text-rose-500 tabular-nums">
+            {maxPing > 0 ? `${maxPing} ms` : '--'}
+          </span>
+        </div>
+        <div className="hud-subpanel rounded-xl p-2.5 flex flex-col min-w-0">
+          <span className="text-[9px] text-slate-400 dark:text-zinc-500">STABILITY</span>
+          <span className="text-lg font-bold text-emerald-500 tabular-nums">
+            {totalSamples > 0 ? `${stabilityPct}%` : '100%'}
+          </span>
+        </div>
+      </div>
+
+      {/* Oscilloscope Canvas Viewport (Zero Overflow) */}
+      <div className="w-full h-24 rounded-xl hud-subpanel p-2 flex flex-col justify-between relative overflow-hidden">
+        {/* Background Grid Lines */}
+        <div className="absolute inset-0 flex flex-col justify-between p-2 pointer-events-none opacity-20">
+          <div className="border-b border-dashed border-slate-400 dark:border-white w-full"></div>
+          <div className="border-b border-dashed border-slate-400 dark:border-white w-full"></div>
+          <div className="border-b border-dashed border-slate-400 dark:border-white w-full"></div>
         </div>
 
-        {/* Live SVG Graph */}
-        <div className="w-full h-24 relative">
-          {/* Grid lines */}
-          <div className="absolute inset-0 grid grid-rows-3 grid-cols-6 pointer-events-none opacity-20 border border-emerald-500/20">
-            {Array.from({ length: 18 }).map((_, i) => (
-              <div key={i} className="border-b border-r border-emerald-500/20"></div>
-            ))}
-          </div>
-
-          <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="w-full h-full relative z-10">
-            <defs>
-              <linearGradient id="oscGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
-              </linearGradient>
-            </defs>
-
-            {points.length > 1 && (
-              <path 
-                d={`${pathD} L ${points[points.length - 1].x},${height} L ${points[0].x},${height} Z`} 
-                fill="url(#oscGrad)" 
-              />
-            )}
-
-            <path 
-              d={pathD} 
-              fill="none" 
-              stroke="#10B981" 
-              strokeWidth="2.5" 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
+        <svg 
+          viewBox={`0 0 ${width} ${height}`} 
+          preserveAspectRatio="none" 
+          className="w-full h-full relative z-10"
+        >
+          <path
+            d={pathD}
+            fill="none"
+            stroke="#10B981"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {points.map((p, idx) => (
+            <circle
+              key={idx}
+              cx={p.x}
+              cy={p.y}
+              r={idx === points.length - 1 ? 3.5 : 2}
+              fill="#10B981"
+              stroke="#FFFFFF"
+              strokeWidth={idx === points.length - 1 ? 1.5 : 0}
             />
+          ))}
+        </svg>
 
-            {points.map((p, i) => (
-              <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#34D399" />
-            ))}
-          </svg>
-        </div>
-
-        {/* Bottom Stability Bar */}
-        <div className="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[10px]">
-          <span className="text-slate-400">Competitive Gaming Stability:</span>
-          <span className="font-bold text-emerald-400">{stabilityPct}% (Ultra-Low Jitter)</span>
+        <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 dark:text-zinc-500 relative z-10 pt-1">
+          <span>{totalSamples} Samples logged</span>
+          <span>{packetDrops} Dropped</span>
         </div>
       </div>
 
