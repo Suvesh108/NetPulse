@@ -558,7 +558,7 @@ export default function SpeedTest({
 
 
   return (
-    <div className="w-full flex flex-col gap-3.5 sm:gap-4 min-w-0 select-none pb-2" id="speed-cockpit-arena">
+    <div className="w-full flex flex-col gap-4 sm:gap-5.5 min-w-0 select-none pb-2" id="speed-cockpit-arena">
       
       {/* 1. Cockpit Header Control Ribbon */}
       <div className="hud-panel rounded-2xl p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3 min-w-0">
@@ -655,10 +655,10 @@ export default function SpeedTest({
       </div>
 
       {/* 2. Main Avionics Stage (Gauge + 4 Precision Telemetry Modules) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-stretch min-w-0">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch min-w-0">
         
         {/* Left Column (5 Cols): The Precision Speedtest-Grade Vector Gauge */}
-        <div className="lg:col-span-5 hud-panel rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between gap-2.5 min-w-0 relative overflow-hidden">
+        <div className="lg:col-span-5 hud-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-3 min-w-0 relative overflow-hidden">
           
           {/* Top Row: Ping ms Header (Idle, Loaded Down, Loaded Up) */}
           <div className="w-full flex items-center justify-between text-xs font-mono border-b border-slate-100 dark:border-white/[0.06] pb-2">
@@ -837,10 +837,10 @@ export default function SpeedTest({
         </div>
 
         {/* Right Column (7 Cols): 4 Integrated Telemetry Quadrants */}
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
+        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4.5 min-w-0">
           
           {/* QUADRANT 1: LATENCY & BUFFERBLOAT */}
-          <div className="hud-panel rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 min-w-0">
+          <div className="hud-panel rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-3 min-w-0">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-1.5">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-amber-500" />
@@ -888,7 +888,7 @@ export default function SpeedTest({
           </div>
 
           {/* QUADRANT 2: DOWNLOAD THROUGHPUT */}
-          <div className="hud-panel rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 min-w-0">
+          <div className="hud-panel rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-3 min-w-0">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-1.5">
               <div className="flex items-center gap-2">
                 <ArrowDown className="w-4 h-4 text-orange-500" />
@@ -916,7 +916,7 @@ export default function SpeedTest({
             </div>
 
             {/* Responsive Spline Graph Container (Zero Overflow) */}
-            <div className="w-full h-14 sm:h-16 rounded-lg hud-subpanel overflow-hidden relative p-0.5 flex flex-col justify-end">
+            <div className="w-full h-16 sm:h-20 rounded-lg hud-subpanel overflow-hidden relative p-0.5 flex flex-col justify-end">
               <svg 
                 viewBox="0 0 300 50" 
                 preserveAspectRatio="none" 
@@ -935,7 +935,7 @@ export default function SpeedTest({
           </div>
 
           {/* QUADRANT 3: UPLOAD THROUGHPUT */}
-          <div className="hud-panel rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 min-w-0">
+          <div className="hud-panel rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-3 min-w-0">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-1.5">
               <div className="flex items-center gap-2">
                 <ArrowUp className="w-4 h-4 text-purple-400" />
@@ -963,7 +963,7 @@ export default function SpeedTest({
             </div>
 
             {/* Responsive Spline Graph Container (Zero Overflow) */}
-            <div className="w-full h-14 sm:h-16 rounded-lg hud-subpanel overflow-hidden relative p-0.5 flex flex-col justify-end">
+            <div className="w-full h-16 sm:h-20 rounded-lg hud-subpanel overflow-hidden relative p-0.5 flex flex-col justify-end">
               <svg 
                 viewBox="0 0 300 50" 
                 preserveAspectRatio="none" 
@@ -982,7 +982,7 @@ export default function SpeedTest({
           </div>
 
           {/* QUADRANT 4: PACKET INTEGRITY & VOIP MOS */}
-          <div className="hud-panel rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 min-w-0">
+          <div className="hud-panel rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-3 min-w-0">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] pb-1.5">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
@@ -1041,7 +1041,7 @@ export default function SpeedTest({
       </div>
 
       {/* 3. Real-World Capability Matrix & Action Toolbar (Zero Overflow) */}
-      <div className="hud-panel rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-3 min-w-0 overflow-hidden">
+      <div className="hud-panel rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3 min-w-0 overflow-hidden">
         
         {/* Left: 4 Pristine Capability Indicators */}
         <div className="flex items-center gap-2.5 sm:gap-4 flex-wrap sm:flex-nowrap text-xs font-mono min-w-0">
