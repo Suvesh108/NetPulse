@@ -18,6 +18,7 @@ export default function MtuAnalyzer() {
   const [boundaries, setBoundaries] = useState<MtuBoundary[]>([
     { size: 1280, label: '1280 B (IPv6 Minimum)', useCase: 'RFC 8200 minimum guaranteed path MTU', overheadPct: 14.6, status: 'idle' },
     { size: 1420, label: '1420 B (WireGuard / VPN)', useCase: 'Encapsulated tunnels & secure IPsec', overheadPct: 5.3, status: 'idle' },
+    { size: 1472, label: '1472 B (Max UDP Frame)', useCase: 'Optimal unfragmented packet payload (1500-28)', overheadPct: 1.8, status: 'idle' },
     { size: 1492, label: '1492 B (PPPoE DSL)', useCase: 'Broadband DSL encapsulation overhead', overheadPct: 0.5, status: 'idle' },
     { size: 1500, label: '1500 B (Standard Ethernet)', useCase: 'Standard consumer & datacenter fiber', overheadPct: 0.0, status: 'idle' },
     { size: 1508, label: '1508 B (Baby Jumbo Frame)', useCase: 'VLAN-tagged QinQ transport frame', overheadPct: -0.5, status: 'idle' }

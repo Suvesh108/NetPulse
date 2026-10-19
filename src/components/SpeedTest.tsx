@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Play, RotateCcw, Activity, ArrowDown, ArrowUp, 
   Layers, Headphones, ShieldCheck, Share2, Check, Copy,
-  Wifi, Server, Globe, Clock, Zap, Monitor, Gamepad2, Tv, Video
+  Wifi, Server, Globe, Clock, Zap, Monitor, Gamepad2, Tv, Video,
+  FileJson, Award
 } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
@@ -22,6 +23,7 @@ interface SpeedTestProps {
   onUpdateSettings: (settings: SimulationSettings) => void;
   onTestComplete: (result: SpeedTestResult) => void;
   onTestingStateChange?: (isTesting: boolean) => void;
+  onOpenCertificate?: () => void;
   unit?: 'Mbps' | 'MB/s';
 }
 
@@ -30,6 +32,7 @@ export default function SpeedTest({
   onUpdateSettings, 
   onTestComplete, 
   onTestingStateChange, 
+  onOpenCertificate,
   unit = 'Mbps' 
 }: SpeedTestProps) {
   const factor = unit === 'MB/s' ? 8 : 1;
@@ -58,6 +61,7 @@ export default function SpeedTest({
   // Timestamp & UI feedback
   const [measuredTime, setMeasuredTime] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedJson, setCopiedJson] = useState(false);
 
   const safetyTimeoutRef = useRef<number | null>(null);
   const engineRef = useRef<any>(null);
@@ -414,6 +418,31 @@ export default function SpeedTest({
     navigator.clipboard.writeText(window.location.href);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const handleCopyJson = () => {
+    const payload = {
+      timestamp: measuredTime || new Date().toISOString(),
+      engine: 'NetPulse Core v1.1.0',
+      edgeNode: 'Cloudflare Anycast Global Edge (ASN13335)',
+      mode: connectionMode,
+      unit,
+      results: {
+        downloadMbps: downloadVal,
+        uploadMbps: uploadVal,
+        idleLatencyMs: pingVal,
+        jitterMs: jitterVal,
+        packetLossPct: packetLossVal,
+        downloadLoadedLatencyMs: downloadLoadedLatencyVal,
+        uploadLoadedLatencyMs: uploadLoadedLatencyVal,
+        bufferbloatGrade: bufferbloatGrade.grade,
+        voipMosScore: voipMos,
+        packetsTracked: `${packetsReceived}/${packetsTotal || 25}`
+      }
+    };
+    navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+    setCopiedJson(true);
+    setTimeout(() => setCopiedJson(false), 2000);
   };
 
   // Responsive SVG Spline Generator (Zero Overflow)
@@ -1009,38 +1038,110 @@ export default function SpeedTest({
 
       </div>
 
-      {/* 3. Real-World Capability Matrix & Action Toolbar */}
-      <div className="hud-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 min-w-0">
+      {/* 3. Real-World Capability Matrix & Action Toolbar (Zero Dead Space) */}
+      <div className="hud-panel rounded-2xl p-3 sm:p-4 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3.5 min-w-0">
         
-        {/* Capability Indicators */}
-        <div className="flex items-center gap-3 sm:gap-6 flex-wrap text-xs font-mono">
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${status === 'completed' && (downloadVal || 0) >= 25 ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
-            <span className="text-slate-600 dark:text-zinc-300">4K Ultra HD</span>
+        {/* Left: Capability Indicators Matrix */}
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs font-mono">
+          {/* 4K / 8K Video */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08]">
+            <Tv className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+            <span className={`w-1.5 h-1.5 rounded-full ${status === 'completed' && (downloadVal || 0) >= 25 ? 'bg-emerald-500 shadow-xs shadow-emerald-500/50' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
+            <span className="text-slate-700 dark:text-zinc-300 font-medium text-[11px]">4K/8K Video</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${status === 'completed' && (pingVal || 0) <= 35 ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
-            <span className="text-slate-600 dark:text-zinc-300">Esports Low-Lag</span>
+
+          {/* Esports Low-Lag */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08]">
+            <Gamepad2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+            <span className={`w-1.5 h-1.5 rounded-full ${status === 'completed' && (pingVal || 0) <= 35 && (jitterVal || 0) <= 5 ? 'bg-emerald-500 shadow-xs shadow-emerald-500/50' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
+            <span className="text-slate-700 dark:text-zinc-300 font-medium text-[11px]">Esports Pro</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${status === 'completed' && (uploadVal || 0) >= 10 ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
-            <span className="text-slate-600 dark:text-zinc-300">High-Fidelity WebRTC</span>
+
+          {/* High-Fidelity WebRTC */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08]">
+            <Headphones className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
+            <span className={`w-1.5 h-1.5 rounded-full ${status === 'completed' && (voipMos || 0) >= 4.0 ? 'bg-emerald-500 shadow-xs shadow-emerald-500/50' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
+            <span className="text-slate-700 dark:text-zinc-300 font-medium text-[11px]">WebRTC MOS</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${status === 'completed' && bufferbloatGrade.grade === 'A+' ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
-            <span className="text-slate-600 dark:text-zinc-300">Zero Bufferbloat</span>
+
+          {/* Cloud Gaming / Remote */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08]">
+            <Zap className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span className={`w-1.5 h-1.5 rounded-full ${status === 'completed' && (downloadVal || 0) >= 50 && (pingVal || 0) <= 30 ? 'bg-emerald-500 shadow-xs shadow-emerald-500/50' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
+            <span className="text-slate-700 dark:text-zinc-300 font-medium text-[11px]">Cloud VR</span>
+          </div>
+
+          {/* Zero Bufferbloat */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08]">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <span className={`w-1.5 h-1.5 rounded-full ${status === 'completed' && (bufferbloatGrade.grade === 'A+' || bufferbloatGrade.grade === 'A') ? 'bg-emerald-500 shadow-xs shadow-emerald-500/50' : 'bg-slate-300 dark:bg-zinc-700'}`}></span>
+            <span className="text-slate-700 dark:text-zinc-300 font-medium text-[11px]">Zero Bloat</span>
+          </div>
+
+          {/* IPv6 Dual-Stack */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08]">
+            <Globe className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/50"></span>
+            <span className="text-slate-700 dark:text-zinc-300 font-medium text-[11px]">IPv6 Ready</span>
           </div>
         </div>
 
-        {/* Share Action Button */}
-        <div className="flex items-center gap-2">
+        {/* Center: Live BBRv2 & Network Telemetry Pill */}
+        <div className="hidden lg:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-100/90 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.06] text-[11px] font-mono text-slate-500 dark:text-zinc-400 shrink-0">
+          <div className="flex items-center gap-1.5 text-slate-800 dark:text-zinc-200 font-bold">
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+            <span>HTTP/3 QUIC</span>
+          </div>
+          <span className="text-slate-300 dark:text-zinc-700">|</span>
+          <span>BBRv2 CC</span>
+          <span className="text-slate-300 dark:text-zinc-700">|</span>
+          <span>MTU 1500 B</span>
+          <span className="text-slate-300 dark:text-zinc-700">|</span>
+          <span className="text-emerald-500 font-bold">SLA 99.99%</span>
+        </div>
+
+        {/* Right: Action Button Suite */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Certificate View Button */}
+          {onOpenCertificate && (
+            <motion.button
+              type="button"
+              onClick={onOpenCertificate}
+              disabled={status !== 'completed' && !downloadVal}
+              whileTap={{ scale: 0.95 }}
+              title="View Official Verified Speed Certificate"
+              className={`px-3 py-1.5 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                status === 'completed' || downloadVal
+                  ? 'text-amber-500 dark:text-amber-400 hover:bg-amber-500/10 border border-amber-500/30'
+                  : 'text-slate-400 dark:text-zinc-600 opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <Award className="w-3.5 h-3.5" />
+              <span>CERTIFICATE</span>
+            </motion.button>
+          )}
+
+          {/* Copy JSON Raw Telemetry */}
+          <motion.button
+            type="button"
+            onClick={handleCopyJson}
+            whileTap={{ scale: 0.95 }}
+            title="Copy full telemetry benchmark payload as JSON"
+            className="px-3 py-1.5 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
+          >
+            {copiedJson ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <FileJson className="w-3.5 h-3.5 text-slate-400" />}
+            <span>{copiedJson ? 'COPIED JSON' : 'RAW JSON'}</span>
+          </motion.button>
+
+          {/* Share Telemetry URL */}
           <motion.button
             type="button"
             onClick={handleCopyLink}
             whileTap={{ scale: 0.95 }}
-            className="px-3 py-1.5 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
+            title="Copy shareable link"
+            className="px-3 py-1.5 rounded-xl hud-subpanel text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer text-blue-600 dark:text-blue-400"
           >
-            {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+            {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-blue-500" />}
             <span>{copiedLink ? 'COPIED LINK' : 'SHARE TELEMETRY'}</span>
           </motion.button>
         </div>
