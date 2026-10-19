@@ -2,7 +2,7 @@
 
 <img src="public/favicon.png" width="92" height="92" alt="NetPulse Logo" style="border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);" />
 
-# ⚡ NetPulse
+# NetPulse
 ### Enterprise-Grade Edge Network Telemetry & Real-Time Bandwidth Engine
 
 [![Version](https://img.shields.io/badge/Release-v1.1-059669?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v1.1)
