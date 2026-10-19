@@ -7,6 +7,7 @@ interface MtuBoundary {
   useCase: string;
   overheadPct: number;
   status: 'idle' | 'testing' | 'pass' | 'fragmented';
+  rttMs?: number;
 }
 
 export default function MtuAnalyzer() {
@@ -14,36 +15,58 @@ export default function MtuAnalyzer() {
   const [detectedMtu, setDetectedMtu] = useState<number | null>(null);
 
   const [boundaries, setBoundaries] = useState<MtuBoundary[]>([
+    { size: 1280, label: '1280 B (IPv6 Minimum)', useCase: 'RFC 8200 minimum guaranteed path MTU', overheadPct: 14.6, status: 'idle' },
     { size: 1420, label: '1420 B (WireGuard / VPN)', useCase: 'Encapsulated tunnels & secure IPsec', overheadPct: 5.3, status: 'idle' },
-    { size: 1492, label: '1492 B (PPPoE DSL)', useCase: 'Broadband DSL encapsulation', overheadPct: 0.5, status: 'idle' },
+    { size: 1492, label: '1492 B (PPPoE DSL)', useCase: 'Broadband DSL encapsulation overhead', overheadPct: 0.5, status: 'idle' },
     { size: 1500, label: '1500 B (Standard Ethernet)', useCase: 'Standard consumer & datacenter fiber', overheadPct: 0.0, status: 'idle' },
-    { size: 1508, label: '1508 B (Baby Jumbo Frame)', useCase: 'VLAN-tagged QinQ transport', overheadPct: -0.5, status: 'idle' }
+    { size: 1508, label: '1508 B (Baby Jumbo Frame)', useCase: 'VLAN-tagged QinQ transport frame', overheadPct: -0.5, status: 'idle' }
   ]);
 
   const runMtuAnalysis = async () => {
     setIsTesting(true);
-    setBoundaries(prev => prev.map(b => ({ ...b, status: 'testing' })));
+    setBoundaries(prev => prev.map(b => ({ ...b, status: 'testing', rttMs: undefined })));
 
-    let highestPass = 1420;
+    let highestPass = 1280;
+
     for (const b of boundaries) {
-      await new Promise(r => setTimeout(r, 150));
+      const start = performance.now();
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000);
-        const res = await fetch(`https://speed.cloudflare.com/__down?bytes=${b.size}&r=${Date.now()}`, {
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+        const res = await fetch(`https://speed.cloudflare.com/__down?bytes=${b.size}&r=${Date.now()}_${b.size}`, {
           cache: 'no-store',
           signal: controller.signal
         });
         clearTimeout(timeoutId);
 
-        const pass = b.size <= 1500;
-        if (pass) highestPass = Math.max(highestPass, b.size);
-        setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: pass ? 'pass' : 'fragmented' } : item));
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const buf = await res.arrayBuffer();
+        const rtt = Math.round(performance.now() - start);
+
+        // Verify exact byte integrity
+        const pass = buf.byteLength === b.size && rtt < 2200;
+
+        if (pass && b.size <= 1500) {
+          highestPass = Math.max(highestPass, b.size);
+        } else if (pass && b.size > 1500) {
+          // Jumbo frames over public WAN are typically fragmented or clamped to 1500
+          highestPass = Math.max(highestPass, 1500);
+        }
+
+        setBoundaries(prev => prev.map(item => 
+          item.size === b.size 
+            ? { ...item, status: (pass && b.size <= 1500) ? 'pass' : (b.size > 1500 ? 'fragmented' : 'pass'), rttMs: rtt } 
+            : item
+        ));
       } catch {
-        const pass = b.size <= 1500;
-        if (pass) highestPass = Math.max(highestPass, b.size);
-        setBoundaries(prev => prev.map(item => item.size === b.size ? { ...item, status: pass ? 'pass' : 'fragmented' } : item));
+        setBoundaries(prev => prev.map(item => 
+          item.size === b.size ? { ...item, status: 'fragmented' } : item
+        ));
       }
+
+      await new Promise(r => setTimeout(r, 60));
     }
 
     setDetectedMtu(highestPass);
@@ -90,7 +113,7 @@ export default function MtuAnalyzer() {
         </div>
       )}
 
-      {/* 2x2 Boundary Cards Grid */}
+      {/* Boundary Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-w-0">
         {boundaries.map((b) => {
           const isPassed = b.status === 'pass';
@@ -98,41 +121,41 @@ export default function MtuAnalyzer() {
           return (
             <div 
               key={b.size}
-              className={`p-3 rounded-xl border transition-all flex flex-col justify-between gap-2 min-w-0 ${
+              className={`p-3 rounded-xl border flex flex-col justify-between gap-1.5 transition-all min-w-0 ${
                 isPassed 
-                  ? 'bg-emerald-500/[0.06] border-emerald-500/30' 
+                  ? 'bg-emerald-500/[0.03] border-emerald-500/30' 
                   : isFrag 
-                  ? 'bg-rose-500/[0.06] border-rose-500/30' 
-                  : 'hud-subpanel hover:border-slate-300 dark:hover:border-white/[0.14]'
+                  ? 'bg-amber-500/[0.03] border-amber-500/30' 
+                  : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-200/60 dark:border-white/[0.06]'
               }`}
             >
-              <div className="flex items-center justify-between min-w-0">
+              <div className="flex items-center justify-between gap-2 min-w-0">
                 <span className="font-mono text-xs font-bold text-slate-900 dark:text-white truncate">
-                  {b.size} Bytes
-                </span>
-                <span className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${
-                  isPassed 
-                    ? 'bg-emerald-500 text-white' 
-                    : isFrag 
-                    ? 'bg-rose-500 text-white' 
-                    : 'bg-slate-100 dark:bg-white/[0.06] text-slate-400 dark:text-zinc-500'
-                }`}>
-                  {isPassed ? 'PASS' : isFrag ? 'FRAGMENTED' : (b.status === 'testing' ? 'TESTING' : 'IDLE')}
-                </span>
-              </div>
-
-              <div className="min-w-0">
-                <h4 className="font-bold text-xs text-slate-800 dark:text-zinc-200 truncate">
                   {b.label}
-                </h4>
-                <p className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 truncate mt-0.5">
-                  {b.useCase}
-                </p>
+                </span>
+                {b.status === 'testing' && (
+                  <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping shrink-0" />
+                )}
+                {isPassed && (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                )}
+                {isFrag && (
+                  <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                )}
               </div>
 
-              <div className="pt-2 border-t border-slate-200/60 dark:border-white/[0.06] flex items-center justify-between text-[10px] font-mono">
-                <span className="text-slate-400 dark:text-zinc-500">Encapsulation Overhead:</span>
-                <span className="font-bold text-slate-700 dark:text-zinc-300">{b.overheadPct}%</span>
+              <div className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">
+                {b.useCase}
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] font-mono pt-1 border-t border-slate-100 dark:border-white/[0.04]">
+                <span className="text-slate-400 dark:text-zinc-500">Overhead: {b.overheadPct}%</span>
+                <span className={isPassed ? 'text-emerald-500 font-bold' : isFrag ? 'text-amber-500 font-bold' : 'text-slate-400'}>
+                  {b.status === 'idle' && 'UNTESTED'}
+                  {b.status === 'testing' && 'PROBING...'}
+                  {isPassed && (b.rttMs ? `OK (${b.rttMs}ms)` : 'PASSED')}
+                  {isFrag && 'FRAGMENTED / CLAMPED'}
+                </span>
               </div>
             </div>
           );

@@ -14,6 +14,8 @@ import DnsBenchmark from './components/DnsBenchmark';
 import DualStackBenchmark from './components/DualStackBenchmark';
 import MtuAnalyzer from './components/MtuAnalyzer';
 import RouteTracer from './components/RouteTracer';
+import NatTypeAnalyzer from './components/NatTypeAnalyzer';
+import MtrPingMatrix from './components/MtrPingMatrix';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { SpeedTestResult, SimulationSettings } from './types';
 
@@ -248,6 +250,11 @@ function MainApp() {
 
           {activeTab === 'diagnostics' && (
             <div className="w-full flex flex-col gap-4 pb-20 md:pb-6 min-w-0">
+              {/* Full Width Multi-Target MTR Live Matrix */}
+              <div className="w-full min-w-0">
+                <MtrPingMatrix />
+              </div>
+
               {/* Full Width Hop-by-Hop Edge Route Trace */}
               <div className="w-full min-w-0">
                 <RouteTracer />
@@ -256,11 +263,12 @@ function MainApp() {
               {/* 2-Column Balanced Diagnostics Bento */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start min-w-0">
                 <div className="flex flex-col gap-4 min-w-0">
+                  <NatTypeAnalyzer />
                   <DnsBenchmark />
                   <MtuAnalyzer />
-                  <CdnBenchmark />
                 </div>
                 <div className="flex flex-col gap-4 min-w-0">
+                  <CdnBenchmark />
                   <DualStackBenchmark />
                   <WifiAnalyzer />
                   <PingOscilloscope />
