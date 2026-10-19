@@ -428,20 +428,6 @@ export default function InAppUpdater() {
           </div>
         </div>
 
-        {/* Release Notes */}
-        {release && (
-          <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 flex flex-col gap-2">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="font-bold text-slate-800 dark:text-slate-200">Current Release ({release.tag_name})</span>
-              <span className="text-[9px] text-slate-400 font-mono">{release.published_at}</span>
-            </div>
-
-            <div className="text-[10px] text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800 whitespace-pre-line font-mono max-h-24 overflow-y-auto">
-              {release.body}
-            </div>
-          </div>
-        )}
-
       </div>
 
     </div>
