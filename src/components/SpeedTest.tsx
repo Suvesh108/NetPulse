@@ -8,7 +8,7 @@ import {
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
 import RollingCounter from './reactbits/RollingCounter';
-import { CustomGauge } from './CustomGauge';
+import { CustomGauge, computeDynamicGaugeMax } from './CustomGauge';
 import { motion } from 'motion/react';
 import { springs } from '../lib/motion';
 
@@ -62,6 +62,17 @@ export default function SpeedTest({
   const [measuredTime, setMeasuredTime] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedJson, setCopiedJson] = useState(false);
+
+  // Dynamic scale auto-ranging peak tracking
+  const [phasePeakSpeed, setPhasePeakSpeed] = useState<number>(0);
+  const activePhaseRef = useRef<TestStatus>(status);
+
+  useEffect(() => {
+    if (status !== activePhaseRef.current) {
+      activePhaseRef.current = status;
+      setPhasePeakSpeed(0);
+    }
+  }, [status]);
 
   const safetyTimeoutRef = useRef<number | null>(null);
   const engineRef = useRef<any>(null);
@@ -497,6 +508,22 @@ export default function SpeedTest({
     ? (activeSpeedMbps / 8) 
     : activeSpeedMbps;
 
+  // Track phase peak speed during active measurement
+  useEffect(() => {
+    if (status === 'downloading' || status === 'uploading') {
+      if (displaySpeedNumeric > phasePeakSpeed) {
+        setPhasePeakSpeed(displaySpeedNumeric);
+      }
+    }
+  }, [displaySpeedNumeric, status, phasePeakSpeed]);
+
+  // Dynamic scale auto-ranging ceiling (latches to peak of active phase)
+  const gaugeEffectiveSpeed = (status === 'downloading' || status === 'uploading')
+    ? Math.max(displaySpeedNumeric, phasePeakSpeed)
+    : (status === 'completed' ? displaySpeedNumeric : 0);
+
+  const gaugeMax = computeDynamicGaugeMax(gaugeEffectiveSpeed, unit);
+
   // Active display values adjusted for unit (Mbps vs MB/s)
   const displayCurrentSpeed = unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1);
   const displayDownload = downloadVal !== null ? (unit === 'MB/s' ? (downloadVal / 8).toFixed(1) : downloadVal.toFixed(1)) : '--';
@@ -792,7 +819,7 @@ export default function SpeedTest({
                   ? '#10B981'
                   : 'var(--primary)'
               }
-              max={Math.max(1000, Math.ceil(displaySpeedNumeric / 100) * 100)}
+              max={gaugeMax}
             />
           </div>
 

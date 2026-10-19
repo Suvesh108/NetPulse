@@ -7,6 +7,34 @@ import {
   GaugeValue,
 } from "@/components/gauge"
 
+export function computeDynamicGaugeMax(val: number, unit: string = "Mbps"): number {
+  if (unit === "MB/s") {
+    if (val <= 0) return 20;
+    if (val <= 1.2) return 2;
+    if (val <= 3) return 5;
+    if (val <= 6) return 10;
+    if (val <= 14) return 20;
+    if (val <= 35) return 50;
+    if (val <= 75) return 100;
+    if (val <= 160) return 250;
+    return Math.ceil(val / 50) * 50;
+  }
+
+  // Default: Mbps
+  if (val <= 0) return 100;
+  if (val <= 6) return 10;
+  if (val <= 14) return 20;
+  if (val <= 28) return 40;
+  if (val <= 55) return 75;
+  if (val <= 85) return 100;
+  if (val <= 170) return 200;
+  if (val <= 300) return 400;
+  if (val <= 500) return 600;
+  if (val <= 850) return 1000;
+  if (val <= 1700) return 2000;
+  return Math.ceil(val / 500) * 500;
+}
+
 export interface CustomGaugeProps {
   value: number
   max?: number
@@ -19,22 +47,24 @@ export interface CustomGaugeProps {
 
 export function CustomGauge({
   value,
-  max = Math.max(1000, Math.ceil(value / 250) * 250),
+  max,
   unit = "Mbps",
   label = "Download",
   color = "var(--primary)",
   decimals = 0,
   className,
 }: CustomGaugeProps) {
+  const resolvedMax = max ?? computeDynamicGaugeMax(value, unit);
+
   return (
     <Gauge
       value={value}
       min={0}
-      max={max}
+      max={resolvedMax}
       startAngle={90}
       endAngle={270}
       radius={180}
-      padding={30}
+      padding={32}
       fit="content"
       transition={{ type: "spring", visualDuration: 0.5, bounce: 0.1 }}
       className={className}
@@ -90,6 +120,28 @@ export function CustomGauge({
         weight="semibold"
       >
         {label}
+      </GaugeText>
+      <GaugeText
+        x={-165}
+        y={20}
+        fontSize={12}
+        color="var(--muted-foreground)"
+        font="mono"
+        weight="medium"
+        anchor="middle"
+      >
+        0
+      </GaugeText>
+      <GaugeText
+        x={165}
+        y={20}
+        fontSize={12}
+        color="var(--muted-foreground)"
+        font="mono"
+        weight="medium"
+        anchor="middle"
+      >
+        {resolvedMax}
       </GaugeText>
     </Gauge>
   )
