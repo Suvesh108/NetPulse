@@ -561,10 +561,10 @@ export default function SpeedTest({
     <div className="w-full flex flex-col gap-3.5 sm:gap-4 min-w-0 select-none pb-2" id="speed-cockpit-arena">
       
       {/* 1. Cockpit Header Control Ribbon */}
-      <div className="hud-panel rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 min-w-0">
+      <div className="hud-panel rounded-2xl p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3 min-w-0">
         
         {/* Left: Engine Route & Node Telemetry */}
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0 justify-start">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
           <div className="flex items-center gap-2 min-w-0 text-xs font-mono">
             <span className="font-bold text-slate-900 dark:text-white truncate">
@@ -578,59 +578,61 @@ export default function SpeedTest({
         </div>
 
         {/* Center: Stream Connection Mode (Multi vs Single Stream) with FLIP Indicator */}
-        <div className="relative flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] shrink-0">
-          <motion.button
-            type="button"
-            disabled={status !== 'idle' && status !== 'completed'}
-            onClick={() => {
-              setConnectionMode('multi');
-              onUpdateSettings({ ...settings, connectionMode: 'multi' });
-            }}
-            whileTap={{ scale: 0.95 }}
-            className={`relative z-10 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
-              connectionMode === 'multi'
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-            title="Multi-Stream: Saturated concurrent streams for maximum broadband capacity testing"
-          >
-            {connectionMode === 'multi' && (
-              <motion.div
-                layoutId="stream-mode-pill"
-                className="absolute inset-0 rounded-lg bg-white dark:bg-[#1C202E] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
-                transition={springs.snappy}
-              />
-            )}
-            <span className="relative z-10">Multi-Stream</span>
-          </motion.button>
-          <motion.button
-            type="button"
-            disabled={status !== 'idle' && status !== 'completed'}
-            onClick={() => {
-              setConnectionMode('single');
-              onUpdateSettings({ ...settings, connectionMode: 'single' });
-            }}
-            whileTap={{ scale: 0.95 }}
-            className={`relative z-10 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
-              connectionMode === 'single'
-                ? 'text-indigo-600 dark:text-indigo-400'
-                : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-            title="Single-Stream: Evaluates single socket TCP throughput and router queue congestion"
-          >
-            {connectionMode === 'single' && (
-              <motion.div
-                layoutId="stream-mode-pill"
-                className="absolute inset-0 rounded-lg bg-white dark:bg-[#1C202E] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
-                transition={springs.snappy}
-              />
-            )}
-            <span className="relative z-10">Single-Stream</span>
-          </motion.button>
+        <div className="flex items-center justify-center">
+          <div className="relative flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] shrink-0">
+            <motion.button
+              type="button"
+              disabled={status !== 'idle' && status !== 'completed'}
+              onClick={() => {
+                setConnectionMode('multi');
+                onUpdateSettings({ ...settings, connectionMode: 'multi' });
+              }}
+              whileTap={{ scale: 0.95 }}
+              className={`relative z-10 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
+                connectionMode === 'multi'
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Multi-Stream: Saturated concurrent streams for maximum broadband capacity testing"
+            >
+              {connectionMode === 'multi' && (
+                <motion.div
+                  layoutId="stream-mode-pill"
+                  className="absolute inset-0 rounded-lg bg-white dark:bg-[#1C202E] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
+                  transition={springs.snappy}
+                />
+              )}
+              <span className="relative z-10">Multi-Stream</span>
+            </motion.button>
+            <motion.button
+              type="button"
+              disabled={status !== 'idle' && status !== 'completed'}
+              onClick={() => {
+                setConnectionMode('single');
+                onUpdateSettings({ ...settings, connectionMode: 'single' });
+              }}
+              whileTap={{ scale: 0.95 }}
+              className={`relative z-10 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
+                connectionMode === 'single'
+                  ? 'text-indigo-600 dark:text-indigo-400'
+                  : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Single-Stream: Evaluates single socket TCP throughput and router queue congestion"
+            >
+              {connectionMode === 'single' && (
+                <motion.div
+                  layoutId="stream-mode-pill"
+                  className="absolute inset-0 rounded-lg bg-white dark:bg-[#1C202E] shadow-xs border border-slate-200/60 dark:border-white/[0.1]"
+                  transition={springs.snappy}
+                />
+              )}
+              <span className="relative z-10">Single-Stream</span>
+            </motion.button>
+          </div>
         </div>
 
         {/* Right: Active Test Phase Status Badge */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center justify-end gap-2 shrink-0">
           <div className={`px-2.5 py-1 rounded-full text-[11px] font-mono font-bold flex items-center gap-1.5 border transition-all ${
             status === 'idle'
               ? 'bg-slate-100 dark:bg-white/[0.04] text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-white/[0.08]'
