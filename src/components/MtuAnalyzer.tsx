@@ -106,15 +106,33 @@ export default function MtuAnalyzer() {
         </motion.button>
       </div>
 
-      {/* Detected MTU Banner */}
-      {detectedMtu && (
-        <div className="hud-subpanel rounded-xl p-2.5 flex items-center justify-between text-xs font-mono min-w-0">
-          <span className="text-slate-400 dark:text-zinc-500">MAX EFFECTIVE MTU:</span>
-          <span className="font-bold text-emerald-500">
-            {detectedMtu} Bytes (Standard Unfragmented Payload)
+      {/* Always Visible PMTUD Status & Packet Framing Ribbon (Zero Blank Space) */}
+      <div className="hud-subpanel rounded-xl p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-2.5 text-xs font-mono min-w-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-slate-400 dark:text-zinc-500 shrink-0">
+            {detectedMtu ? 'MAX PATH MTU:' : 'PMTUD STATUS:'}
+          </span>
+          <span className={`font-bold truncate ${detectedMtu ? 'text-emerald-500' : 'text-slate-700 dark:text-zinc-200'}`}>
+            {detectedMtu 
+              ? `${detectedMtu} Bytes (Standard Unfragmented Payload)` 
+              : isTesting 
+              ? 'Probing Payload Boundaries (RFC 4821)...' 
+              : 'Standby • 1500 B Ethernet Wire Baseline'}
           </span>
         </div>
-      )}
+        
+        <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-zinc-400 shrink-0">
+          <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/[0.06] border border-slate-200/60 dark:border-white/[0.08]">
+            TCP MSS: {detectedMtu ? detectedMtu - 40 : 1460} B
+          </span>
+          <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/[0.06] border border-slate-200/60 dark:border-white/[0.08]">
+            DF Bit: Set
+          </span>
+          <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/[0.06] border border-slate-200/60 dark:border-white/[0.08] hidden sm:inline">
+            RFC 1191
+          </span>
+        </div>
+      </div>
 
       {/* Boundary Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 min-w-0">
