@@ -2,8 +2,11 @@ name: Release NetPulse APK
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,11 +24,10 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build Web Assets
-        run: npm run build
+      - name: Install Dependencies & Verify Web Build
+        run: |
+          npm ci
+          npm run build
 
       - name: Setup Java JDK 21
         uses: actions/setup-java@v4
@@ -33,19 +35,22 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Sync Capacitor Android
-        run: npx cap sync android
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Build Android Release APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease --no-daemon --stacktrace
           cd ..
-          cp android/app/build/outputs/apk/release/app-release.apk NetPulse-${{ github.ref_name }}.apk
-          cp android/app/build/outputs/apk/release/app-release.apk netpulse.apk
+          mkdir -p release
+          TAG_OR_VERSION="${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'v1.1' }}"
+          cp android/app/build/outputs/apk/release/app-release.apk "NetPulse-${TAG_OR_VERSION}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "release/NetPulse-${TAG_OR_VERSION}.apk"
 
       - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
@@ -55,18 +60,14 @@ jobs:
           body: |
             ## 🚀 NetPulse ${{ github.ref_name }} - Enterprise Edge Network Telemetry & Diagnostics
 
-            ### 📦 Download Release Assets
+            ### 📦 Download Release Asset
             - **Android APK (Direct Install)**: [NetPulse-${{ github.ref_name }}.apk](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/NetPulse-${{ github.ref_name }}.apk)
-            - **Universal Latest Android APK**: [netpulse.apk](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/netpulse.apk)
             
-            ### ✨ What's New in NetPulse ${{ github.ref_name }}
-            - 🏎️ **Brand New Speedometer Logo**: High-fidelity aerodynamic speed meter branding across web, PWA, Windows, and Android adaptive mipmap icons.
+            ### ✨ Highlights in NetPulse ${{ github.ref_name }}
+            - 🏎️ **100% Native Jetpack Compose Architecture**: Engineered completely in idiomatic Kotlin with hardware-accelerated Canvas speedometer and real-time spline graphs.
             - 📶 **Real-Time Bufferbloat Loaded Latency Engine**: True active saturation delta (download loaded latency & upload loaded latency) with Waveform-grade letter grading (A+ to F).
-            - 🔀 **Single-Stream vs Multi-Stream Testing**: Interactive connection mode toggle for auditing single TCP pipe throughput vs saturated multi-connection capacity.
-            - 🛡️ **Autonomous Watchdog Daemon**: Background degradation monitoring with configurable interval and push notifications for SLA drops.
-            - ⚡ **Multi-Cloud CDN Shootout**: Real concurrent HTTP/3 latency and throughput benchmarking across Cloudflare, AWS CloudFront, and Fastly edge networks.
-            - 🔐 **DNS-over-HTTPS (DoH) Resolver Shootout**: Cryptographic DNSSEC validation (`AD` flag) and sub-millisecond resolver timing across Cloudflare, Google, AdGuard, Quad9, and OpenDNS.
-            - 📏 **Exact Unit Conversion Math**: Corrected 8× factor across Mbps and MB/s modes in live preview and 1200x680 speed certificate card export.
+            - 🔐 **DNS-over-HTTPS (DoH) Resolver Shootout**: Direct latency comparison across Cloudflare, Google, Quad9, and OpenDNS.
+            - 📡 **VoIP & WebRTC MOS Score**: ITU-T G.107 Mean Opinion Score calculation for real-time call and video conferencing fidelity.
+            - 🔄 **In-App OTA Engine**: Native in-app update checking and installation signed with permanent keystore (valid through 2054).
           files: |
             NetPulse-${{ github.ref_name }}.apk
-            netpulse.apk
