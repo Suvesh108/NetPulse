@@ -238,7 +238,7 @@ fun EngineConfigScreen(
         var isDownloadingUpdate by remember { mutableStateOf(false) }
         var updateProgress by remember { mutableStateOf(0) }
         var updateInfo by remember { mutableStateOf<com.netpulse.speedtest.updater.AppUpdater.UpdateInfo?>(null) }
-        var updateStatusMsg by remember { mutableStateOf("NetPulse v2.0.0 is up to date") }
+        var updateStatusMsg by remember { mutableStateOf("NetPulse v1.1.0 is up to date") }
         val updateScope = rememberCoroutineScope()
 
         Box(
@@ -256,7 +256,7 @@ fun EngineConfigScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text("Current Version: v2.0.0", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Current Version: v1.1.0", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Text(updateStatusMsg, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = if (updateInfo?.hasUpdate == true) NeonCyan else Color.White.copy(alpha = 0.5f))
                     }
 
@@ -270,13 +270,13 @@ fun EngineConfigScreen(
                                     updateScope.launch {
                                         isCheckingUpdate = true
                                         updateStatusMsg = "Checking GitHub release channel..."
-                                        val info = com.netpulse.speedtest.updater.AppUpdater.checkForUpdate("v2.0")
+                                        val info = com.netpulse.speedtest.updater.AppUpdater.checkForUpdate("v1.1")
                                         updateInfo = info
                                         isCheckingUpdate = false
                                         updateStatusMsg = if (info.hasUpdate) {
                                             "New update available: ${info.latestVersion}"
                                         } else {
-                                            "NetPulse v2.0.0 is up to date"
+                                            "NetPulse v1.1.0 is up to date"
                                         }
                                     }
                                 }

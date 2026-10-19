@@ -15,5 +15,5 @@ release-builds/
 *.zip
 *.exe
 *.apk
-!NetPulse*.apk
+!release/NetPulse-v1.1.apk
 

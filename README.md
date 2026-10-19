@@ -1,17 +1,22 @@
 <div align="center">
 
-<img src="public/favicon.png" width="92" height="92" alt="NetPulse Logo" style="border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35);" />
+<img src="public/favicon.png" width="96" height="96" alt="NetPulse Logo" style="border-radius: 22px; box-shadow: 0 10px 30px -5px rgba(6, 182, 212, 0.4);" />
 
 # NetPulse
-### Enterprise-Grade Edge Network Telemetry & Real-Time Bandwidth Engine
 
-[![Version](https://img.shields.io/badge/Release-v1.1-059669?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v1.1)
+### Carrier-Grade Edge Network Telemetry & Real-Time Bandwidth Engine
+
+[![Version](https://img.shields.io/badge/Release-v1.1-06b6d4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/tag/v1.1)
+[![Android APK](https://img.shields.io/badge/Android_APK-v1.1_Kotlin-3DDC84?style=for-the-badge&logo=android&logoColor=white)](release/NetPulse-v1.1.apk)
 [![Windows App](https://img.shields.io/badge/Windows_Desktop-v1.1-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-Windows-v1.1.zip)
-[![Android APK](https://img.shields.io/badge/Android_APK-v1.1-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk)
 [![Live Web App](https://img.shields.io/badge/Live_Web_App-net--pulse-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://net-pulse-iota.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 
-[![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+<br />
+
+[![Jetpack Compose](https://img.shields.io/badge/Android-100%25_Jetpack_Compose-4285F4?style=flat-square&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![Kotlin](https://img.shields.io/badge/Language-Kotlin_2.0-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![React 19](https://img.shields.io/badge/Frontend-React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.1-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Electron](https://img.shields.io/badge/Desktop-Electron_44-47848F?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
@@ -20,9 +25,9 @@
 
 <br />
 
-**[ 🌐 Launch Live Web App ](https://net-pulse-iota.vercel.app/)** &nbsp;•&nbsp;
-**[ 💻 Download Windows App (v1.1) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-Windows-v1.1.zip)** &nbsp;•&nbsp;
-**[ 📱 Download Android APK (v1.1) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk)** &nbsp;•&nbsp;
+**[ 🌐 Launch Web App ](https://net-pulse-iota.vercel.app/)** &nbsp;•&nbsp;
+**[ 📱 Download Android APK (v1.1) ](release/NetPulse-v1.1.apk)** &nbsp;•&nbsp;
+**[ 💻 Download Windows Desktop (v1.1) ](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-Windows-v1.1.zip)** &nbsp;•&nbsp;
 **[ 📦 GitHub Releases ](https://github.com/Suvesh108/NetPulse/releases)** &nbsp;•&nbsp;
 **[ 📄 MIT License ](LICENSE)**
 
@@ -32,202 +37,168 @@
 
 </div>
 
-## 📖 Executive Summary & Mission
+## 📌 Overview
 
-Traditional speed test services are notorious for ad congestion, intrusive tracking beacons, artificial throughput smoothing, and restrictive local ISP routing biases. 
+**NetPulse** is a high-precision, carrier-grade network telemetry engine and speed diagnostics suite engineered for Gigabit broadband, 5G NR carriers, Wi-Fi 6E/7 frequency bands, and enterprise WAN backbones.
 
-**NetPulse** re-engineers network telemetry from first principles. By opening direct, unthrottled TCP and HTTP/3 QUIC socket streams against Cloudflare's global Anycast edge network (330+ points of presence), NetPulse measures raw packet transit times, bufferbloat loaded latency, and sustained inbound/outbound saturation with sub-millisecond precision. 
+Unlike commercial speed tests that suffer from ad bloat, tracking scripts, artificial throughput smoothing, and ISP-sponsored local routing, NetPulse connects directly to Cloudflare's Anycast edge network (330+ global PoPs) over raw HTTP/3 QUIC and TCP socket streams. It delivers sub-millisecond precision, bufferbloat loaded latency measurements, and deep packet diagnostics without third-party surveillance.
 
-Whether diagnosing high-speed Gigabit fiber broadband, ultra-dense 5G NR carriers, or local Wi-Fi 6E/7 frequency congestion, NetPulse gives engineers and power users zero-latency observability without third-party advertisements or data harvesting.
-
----
-
-## ⚡ Architecture & Telemetry Ingestion
-
-```
-                       ┌─────────────────────────────────────────────────────────┐
-                       │                     NetPulse Engine                     │
-                       │           (React 19 • TypeScript • Capacitor)           │
-                       └────────────────────────────┬────────────────────────────┘
-                                                    │
-                 ┌──────────────────────────────────┼──────────────────────────────────┐
-                 ▼                                  ▼                                  ▼
-   ┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
-   │    Cloudflare Anycast     │      │   AWS CloudFront Global   │      │    Google Cloud Premium   │
-   │      Edge POP Backbone    │      │     Edge Edge CDN Node    │      │       Edge PoP Tier       │
-   ├───────────────────────────┤      ├───────────────────────────┤      ├───────────────────────────┤
-   │ • HTTP/3 QUIC Streaming   │      │ • Multi-CDN Benchmarking  │      │ • Regional Latency Audits │
-   │ • Bufferbloat A+ to F     │      │ • Node Winner Telemetry   │      │ • Geo-Proximity Routing   │
-   │ • 90th Percentile Splines │      │ • TCP Handshake Drift     │      │ • Anycast Route Auditing  │
-   └─────────────┬─────────────┘      └─────────────┬─────────────┘      └─────────────┬─────────────┘
-                 │                                  │                                  │
-                 └──────────────────────────────────┼──────────────────────────────────┘
-                                                    ▼
-                               ┌────────────────────────────────────────┐
-                               │     Professional Diagnostics Suite     │
-                               ├────────────────────────────────────────┤
-                               │ • Bufferbloat Grade (A+ to F)          │
-                               │ • DNS Shootout (Cloudflare vs Google)  │
-                               │ • VoIP WebRTC Audio MOS Score          │
-                               │ • 25-Probe Micro-Burst Timeline        │
-                               │ • IPv4 vs IPv6 Dual-Stack Duel         │
-                               │ • Path MTU (PMTUD) Frame Boundary      │
-                               │ • Hop-by-Hop Edge Route & PoP Trace    │
-                               │ • Wi-Fi RF Signal RSSI (-dBm) & SNR    │
-                               │ • 1200x680 Verified Speed Certificate  │
-                               │ • 100% In-App Background APK Updater   │
-                               └────────────────────────────────────────┘
-```
+Available across **Native Android (100% Jetpack Compose in pure Kotlin)**, **Windows Desktop (Electron 44)**, and **Modern Web (React 19 & Tailwind CSS v4)**.
 
 ---
 
-## 🚀 Enterprise Edge Diagnostics & Telemetry Suite (v1.1)
+## ⚡ Core Diagnostic Engines & Features
 
-### 🌟 1. Bufferbloat Letter Grade (A+ to F)
-- **Loaded Latency Delta**: Automatically compares idle unloaded latency against active saturation delay during download/upload phases.
-- **Grading Standard**: Awards `A+` (<=5ms delta, zero bloat), `A` (<=15ms), `B` (<=30ms), `C` (<=60ms), `D` (<=120ms), or `F` (>120ms, severe buffer bloat) on the Speed Test console header and verified Speed Certificate.
+### 🚀 1. Real-Time Speed Cockpit
+* **Dynamic 180° Dome Speedometer**: Wide visual arc with auto-ranging scale expansion (10 Mbps to 10 Gbps) and phase peak latching.
+* **Dual Real-Time Splines**: Continuous Bézier curve visualization for download and upload throughput trajectories.
+* **Bufferbloat Loaded Latency**: Measures real-time latency under full network saturation compared against idle baseline delay.
+* **Live Telemetry Badges**: Instant readouts for jitter, packet loss percentage, public IP colocation, and carrier Autonomous System Number (ASN).
 
-### 🌟 2. DNS Resolver Speed Shootout (DoH)
-- **Side-by-Side Resolver Benchmark**: Benchmarks lookups against the world's fastest recursive DNS resolvers using direct DNS-over-HTTPS queries (**Cloudflare 1.1.1.1**, **Google 8.8.8.8**, **Quad9 9.9.9.9**, and **OpenDNS 208.67.222.222**).
-- **Automated Winner Badge**: Crowns the fastest DNS provider with microsecond response time differentials.
+### 🔬 2. Edge Diagnostics Suite
+* **Bufferbloat Letter Grade (A+ to F)**: Automated grading based on bufferbloat loaded latency delta ($A+\le 5\,\text{ms}$, $A\le 15\,\text{ms}$, $B\le 30\,\text{ms}$, $C\le 60\,\text{ms}$, $D\le 120\,\text{ms}$, $F>120\,\text{ms}$).
+* **DNS Resolver Speed Shootout**: Parallel DNS-over-HTTPS (DoH) latency benchmarks comparing Cloudflare (`1.1.1.1`), Google (`8.8.8.8`), Quad9 (`9.9.9.9`), and OpenDNS (`208.67.222.222`).
+* **VoIP & WebRTC MOS Score**: ITU-T G.107 standard Mean Opinion Score calculation ($1.0$ to $4.5$) assessing real-time call and video conferencing fidelity.
+* **25-Probe Micro-Burst Loss Timeline**: High-density sequential ping strip detecting burst packet drops vs. steady random packet loss.
+* **IPv4 vs. IPv6 Dual-Stack Duel**: Direct concurrent latency comparison highlighting Carrier-Grade NAT (CGNAT) overhead and modern IPv6 routing gains.
+* **Path MTU & Frame Fragmentation (PMTUD)**: Probes packet boundaries across 1420 B (WireGuard/VPN), 1492 B (PPPoE DSL), 1500 B (Standard Ethernet), and 1508 B (Baby Jumbo).
+* **Hop-by-Hop Edge Route Trace**: Identifies nearest Anycast Tier-1 edge data centers using IATA airport codes (e.g., DEL, BOM, SIN, FRA, LHR, SJC).
+* **Wi-Fi RF Signal Analyzer**: Native RSSI signal strength meter in $-\text{dBm}$ with Signal-to-Noise Ratio (SNR) calculations.
 
-### 🌟 3. VoIP / WebRTC MOS Audio Quality (1.0 to 4.5)
-- **ITU-T G.107 E-Model Scoring**: Computes real-time Mean Opinion Score (MOS) from live packet latency, jitter, and packet loss.
-- **Readiness Rating**: Categorizes connection fidelity into *Crystal Clear (HD Voice & WebRTC)*, *High Quality*, *Acceptable*, or *Degraded*.
+### 📜 3. Verified Diagnostic Speed Certificate
+* Generates a cryptographic $1200\times 680$ diagnostic summary card containing upload/download bandwidth, bufferbloat grade, jitter, server location, carrier metadata, and verification hash.
+* One-click instant high-resolution PNG export and system clipboard sharing.
 
-### 🌟 4. Timeline Packet Loss & Micro-Burst Logger
-- **25-Probe Interactive Track**: Visualizes 25 discrete ping packets in a high-density timeline strip with individual probe RTTs and drop telemetry.
-- **Micro-Burst Drop Detection**: Distinguishes between uniform random loss and burst drops caused by buffer overrun or router queuing bottlenecks.
+### 🔄 4. Native In-App OTA Update Engine
+* Background checking against GitHub Releases with instant version comparison.
+* In-app download progress indicator with seamless `FileProvider` package installer invocation.
+* **Permanent Keystore Signature**: Built and signed with a permanent release keystore (valid through 2054) to eliminate any update conflict or signature mismatch issues.
 
-### 🌟 5. IPv4 vs. IPv6 Dual-Stack Routing Duel
-- **Protocol Audit**: Tests both stacks concurrently to detect whether your carrier routes via legacy Carrier-Grade NAT (CGNAT) or native dual-stack IPv6.
-- **Latency Differential**: Highlights latency advantages when routing over modern IPv6 backbones.
+### 📊 5. Audit History & Analytics
+* Persistent local audit logs with detailed breakdown of all past test sessions.
+* Instant CSV and JSON telemetry export for ISP service disputes or network performance tracking.
 
-### 🌟 6. Path MTU & Packet Fragmentation Analyzer (PMTUD)
-- **Frame Boundary Probing**: Analyzes packet boundary handling across 1420 B (WireGuard/IPsec VPN), 1492 B (PPPoE DSL), 1500 B (Standard Ethernet/WAN), and 1508 B (Baby Jumbo Frame).
-- **Overhead Calculation**: Detects packet fragmentation boundaries and tunnel encapsulation overhead.
-
-### 🌟 7. Visual Hop-by-Hop Edge Route Trace
-- **Edge Colocation Identification**: Identifies the nearest Anycast Tier-1 data center using IATA airport codes (e.g. DEL, BOM, SIN, FRA, LHR, SJC).
-- **Carrier ASN & Protocol Telemetry**: Displays BGP Autonomous System numbers, ISP transit routing, HTTP/3 QUIC and TLS 1.3 protocol handshake states.
-
-### 🌟 8. Wi-Fi RF Signal Analyzer (RSSI & SNR)
-- **Calibrated RSSI Meter**: Measures RF signal strength in -dBm (from -30 dBm Pristine to -90 dBm Weak) with color-coded signal thresholds.
-- **Signal-to-Noise Ratio (SNR)**: Calculates SNR margin (+dB) above ambient RF noise floor and provides actionable placement advice.
-
----
-
-## 📊 Comparison: NetPulse vs Traditional Speed Tests
-
-| Feature | Legacy Speed Tests (Ookla / Fast) | NetPulse v0.9 |
-| :--- | :---: | :---: |
-| **Telemetry Engine** | Third-party proxy / Sponsored nodes | **Direct Cloudflare Anycast HTTP/3 QUIC** |
-| **Ad Bloat & Tracking** | ❌ Heavy banner ads & tracking scripts | **✅ 100% Zero Ads & Zero Tracking** |
-| **Dual-Gauge Sparklines** | ❌ Sequential single-dial readout | **✅ Real-time dual Download & Upload splines** |
-| **Bufferbloat Letter Grade** | ⚠️ Hidden or incomplete | **✅ Letter Grade (A+ to F) with buffer delta** |
-| **VoIP WebRTC MOS Score** | ❌ Not available | **✅ ITU-T G.107 standard MOS (1.0 to 4.5)** |
-| **Micro-Burst Loss Logger** | ❌ Single percentage average | **✅ 25-probe interactive timeline track** |
-| **DNS Resolver Shootout** | ❌ Not available | **✅ Cloudflare vs Google vs Quad9 vs OpenDNS** |
-| **IPv4 vs IPv6 Duel** | ❌ Not available | **✅ Dual-stack latency and CGNAT detection** |
-| **Path MTU Analyzer** | ❌ Not available | **✅ PMTUD frame boundary analysis (1420-1508B)** |
-| **Edge Route PoP Trace** | ❌ Not available | **✅ IATA airport colocation & ASN routing** |
-| **Wi-Fi RSSI & SNR** | ❌ Not available | **✅ Calibrated -dBm meter & RF SNR ratio** |
-| **Verified PNG Certificate** | ⚠️ Static watermarked screenshot | **✅ 1200x680 verified export card** |
-| **Native Android App** | ⚠️ Ad-supported app store binary | **✅ Hardened APK with internal self-updater** |
-| **Open Source** | ❌ Proprietary closed-source | **✅ 100% Open Source under MIT License** |
+### ⚙️ 6. Engine Configuration Console
+* Configurable parallel socket streams (1 to 16 threads).
+* Selectable test payload sizes and ping sample intervals.
+* Custom DNS resolver targeting and diagnostic timeout adjustments.
 
 ---
 
-## 🔒 Security Architecture & Defensive Hardening
+## 📱 Native Android App (Jetpack Compose)
 
-| Protection Layer | Technical Implementation | Security & Privacy Benefit |
-| :--- | :--- | :--- |
-| **Strict HTTPS Enforced** | `network_security_config.xml` (`cleartextTrafficPermitted="false"`) | Rejects plain-text unencrypted HTTP traffic to eliminate Man-in-the-Middle (MitM) attacks. |
-| **DevTools Lockdown** | `webContentsDebuggingEnabled: false` | Disables USB debugging and inspector access in production Android releases. |
-| **Backup Leak Prevention** | `android:allowBackup="false"` | Prevents `adb backup` extraction of local storage, cached results, and test history. |
-| **Content Security Policy** | Strict CSP meta tags with `frame-ancestors 'none'` | Eliminates Cross-Site Scripting (XSS) and prevents iframe clickjacking. |
-| **Code Obfuscation & R8** | ProGuard rules with log stripping (`Log.d`, `Log.v`) | Strips debug telemetry, stack signatures, and sensitive metadata from compiled binaries. |
+The Android application is written in **100% idiomatic Kotlin** using modern **Jetpack Compose Material 3** — completely free of legacy WebViews or Cordova wrappers.
 
----
-
-## 📦 Native Android & Desktop Packages (v1.1)
-
-* **Direct Android APK**: [NetPulse-v1.1.apk (GitHub Release v1.1)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1.apk)
-* **Windows Installer**: [NetPulse-v1.1-Setup.exe (GitHub Release v1.1)](https://github.com/Suvesh108/NetPulse/releases/download/v1.1/NetPulse-v1.1-Setup.exe)
-* **All Releases & Assets**: [GitHub Releases](https://github.com/Suvesh108/NetPulse/releases)
+### Android Engine Specifications
+* **UI Toolkit**: Jetpack Compose Material 3 with OLED dark palette and neon cyan telemetry accents.
+* **Networking**: Direct `OkHttpClient` with coroutine-driven non-blocking I/O.
+* **Graphics**: Custom hardware-accelerated Canvas speedometer and spline path interpolation.
 * **Package Name**: `com.netpulse.speedtest`
-* **Target Android Version**: Android 15 (API Level 35)
-* **Minimum Android Version**: Android 5.1 Lollipop (API Level 22)
-* **APK Size**: ~5.15 MB (Ultra-lightweight)
+* **Target SDK**: Android 15 (API Level 35)
+* **Minimum SDK**: Android 7.0 Nougat (API Level 24)
+* **Permanent Keystore Fingerprint**:
+  ```
+  SHA-256: 04:EF:E6:B0:6A:3D:D0:AD:BD:1D:60:FB:55:80:04:C3:DD:B7:A9:66:A0:BD:B9:69:D3:3A:C7:B3:F7:BF:31:81
+  ```
+
+### Direct Download
+The latest official release APK is kept organized in the dedicated [`release/`](release/) directory:
+* **[Download NetPulse-v1.1.apk](release/NetPulse-v1.1.apk)** (~13 MB)
+
+---
+
+## 📊 Feature Comparison
+
+| Capability | Legacy Tools (Ookla / Fast) | NetPulse v1.1 |
+| :--- | :---: | :---: |
+| **Telemetry Backbone** | Third-party sponsored proxy nodes | **Direct Cloudflare Anycast HTTP/3 Edge** |
+| **Ads & Trackers** | ❌ Banner ads, tracking scripts, bloat | **✅ 100% Zero Ads & Zero Tracking** |
+| **Dual Real-Time Splines** | ❌ Sequential dial without curve retention | **✅ Live concurrent Bézier spline graphs** |
+| **Bufferbloat Letter Grade** | ⚠️ Incomplete or absent | **✅ Industry standard (A+ to F)** |
+| **VoIP / WebRTC MOS Score** | ❌ Unavailable | **✅ ITU-T G.107 standard (1.0 to 4.5)** |
+| **Micro-Burst Drop Logger** | ❌ Single blended average | **✅ 25-probe interactive packet track** |
+| **DNS Resolver Shootout** | ❌ Unavailable | **✅ 4-way parallel DoH benchmark** |
+| **IPv4 vs IPv6 Duel** | ❌ Unavailable | **✅ Dual-stack routing & CGNAT detection** |
+| **Path MTU (PMTUD) Analyzer** | ❌ Unavailable | **✅ 1420 B – 1508 B frame boundary probe** |
+| **Edge Route PoP Trace** | ❌ Unavailable | **✅ IATA airport colocation identification** |
+| **Verified PNG Certificate** | ⚠️ Low-res watermarked screen | **✅ 1200x680 cryptographic export card** |
+| **Native Mobile App** | ⚠️ Ad-supported hybrid app | **✅ 100% Jetpack Compose Kotlin APK** |
+| **OTA Self-Updating** | ❌ App store dependency only | **✅ Native in-app GitHub release updater** |
+| **Open Source** | ❌ Closed-source proprietary | **✅ 100% Open Source under MIT License** |
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Layer | Technologies |
+| Platform / Layer | Technology |
 | :--- | :--- |
-| **Core Framework** | React 19, TypeScript 5.8, Vite 6 |
-| **Styling & Theming** | Tailwind CSS v4.1, Modern Glassmorphism, OLED Dark Mode |
-| **Iconography & Motion** | Lucide Icons, Motion (Framer Motion v12) |
-| **Network Engine** | @cloudflare/speedtest Web SDK, HTTP/3 Anycast Edge |
-| **Mobile Runtime** | Capacitor 8 (Android Platform) |
-| **Compilation** | OpenJDK 21 LTS, Gradle 8.14, Android SDK Build Tools 35.0.0 |
+| **Android Native** | Kotlin 2.0, Jetpack Compose Material 3, AndroidX Lifecycle, OkHttp 4 |
+| **Web Application** | React 19, TypeScript 5.8, Tailwind CSS v4.1, Lucide React, Motion |
+| **Desktop Application** | Electron 44, Chromium 132, Node.js 22 LTS |
+| **Network Engine** | Cloudflare Anycast HTTP/3 QUIC, DNS-over-HTTPS (DoH), STUN RFC 5389 |
+| **Build Tools** | Vite 6, Gradle 8.14, Android SDK Build Tools 35.0.0, OpenJDK 21 LTS |
 
 ---
 
-## 💻 Local Development & Build Guide
+## 🚀 Getting Started & Local Build
 
-### Prerequisites
-- **Node.js**: v18.0+ or v20.0+ (Node v20 LTS recommended)
-- **npm** or **pnpm**
-- **JDK 21 LTS** & **Android Studio / Command Line Tools** (for APK builds)
+### 1. Web Application
 
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone https://github.com/Suvesh108/NetPulse.git
-cd NetPulse
+cd netpulse
 
-# 2. Install dependencies
+# Install dependencies
 npm install
 
-# 3. Start local development server (Accessible on local network via http://0.0.0.0:3000)
+# Start local development server
 npm run dev
 
-# 4. Compile optimized web production bundle
+# Build production web bundle
 npm run build
-
-# 5. Sync Capacitor Android project
-npx cap sync android
-
-# 6. Build release Android APK
-cd android
-./gradlew assembleDebug
 ```
 
-Compiled APK will be generated at:
-`android/app/build/outputs/apk/debug/app-debug.apk`
+### 2. Windows Desktop Application
+
+```bash
+# Launch Electron in development
+npm run electron:start
+
+# Package Windows desktop binary
+npm run build:win
+```
+
+### 3. Android Native APK
+
+```bash
+cd android
+
+# Compile debug APK
+./gradlew assembleDebug
+
+# Compile signed release APK
+./gradlew assembleRelease
+```
+
+The compiled release APK will be generated at:
+`android/app/build/outputs/apk/release/app-release.apk`
 
 ---
 
-## 📄 License & Intellectual Property
+## 📄 License
 
-This project is open-source software licensed under the **[MIT License](LICENSE)**.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for complete details.
 
 ```
 MIT License
 Copyright (c) 2026 Suvesh Kumar
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction...
 ```
-
-See the full license terms in [LICENSE](LICENSE).
 
 <div align="center">
 
 ---
 
-**Crafted with precision by [Suvesh Kumar](https://github.com/Suvesh108)** • Built for edge speed enthusiasts worldwide.
+**Crafted with precision by [Suvesh Kumar](https://github.com/Suvesh108)** • Built for edge performance enthusiasts worldwide.
 
 </div>

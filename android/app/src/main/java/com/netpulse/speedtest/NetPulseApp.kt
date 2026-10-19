@@ -101,7 +101,7 @@ fun NetPulseApp() {
                                 .padding(horizontal = 4.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "v2.0",
+                                text = "v1.1",
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = FontFamily.Monospace,
