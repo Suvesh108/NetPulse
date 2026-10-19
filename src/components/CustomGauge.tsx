@@ -31,41 +31,41 @@ export function CustomGauge({
       value={value}
       min={0}
       max={max}
-      startAngle={60}
-      endAngle={300}
-      radius={130}
-      padding={32}
+      startAngle={90}
+      endAngle={270}
+      radius={180}
+      padding={30}
       fit="content"
       transition={{ type: "spring", visualDuration: 0.5, bounce: 0.1 }}
       className={className}
     >
       <GaugeTrack
-        width={12}
+        width={16}
         color="var(--muted)"
         opacity={1}
         cap="round"
         offset={0}
       />
       <GaugeArc
-        width={12}
+        width={16}
         color={color}
         opacity={1}
         cap="round"
         offset={0}
       />
       <GaugeTicks
-        count={36}
-        length={5}
-        width={1.2}
+        count={37}
+        length={7}
+        width={1.6}
         color="var(--muted-foreground)"
-        offset={-20}
+        offset={-18}
         cap="round"
         opacity={0.45}
       />
       <GaugeValue
         x={0}
-        y={-10}
-        fontSize={60}
+        y={-50}
+        fontSize={78}
         color="var(--foreground)"
         font="rounded"
         weight="bold"
@@ -73,8 +73,8 @@ export function CustomGauge({
       />
       <GaugeText
         x={0}
-        y={34}
-        fontSize={16}
+        y={-8}
+        fontSize={18}
         color="var(--muted-foreground)"
         font="sans"
         weight="medium"
@@ -83,7 +83,7 @@ export function CustomGauge({
       </GaugeText>
       <GaugeText
         x={0}
-        y={78}
+        y={24}
         fontSize={15}
         color="var(--muted-foreground)"
         font="sans"

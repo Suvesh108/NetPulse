@@ -770,7 +770,7 @@ export default function SpeedTest({
           </div>
 
           {/* The Speedometer Gauge Arena */}
-          <div className="relative w-full max-w-[240px] sm:max-w-[260px] mx-auto flex flex-col items-center justify-center">
+          <div className="relative w-full max-w-[380px] sm:max-w-[420px] mx-auto flex flex-col items-center justify-center">
             <CustomGauge
               value={status === 'idle' ? 0 : Math.round(displaySpeedNumeric)}
               unit={unit}
