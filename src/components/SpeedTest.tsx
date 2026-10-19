@@ -7,6 +7,7 @@ import {
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
 import RollingCounter from './reactbits/RollingCounter';
+import { CustomGauge } from './CustomGauge';
 
 interface ProbeRecord {
   id: number;
@@ -454,34 +455,8 @@ export default function SpeedTest({
     [uploadSpeedHistory]
   );
 
-  // Non-linear calibration scale stops (identical to Speedtest.net)
-  const SPEEDOMETER_STOPS = [
-    { val: 0, pct: 0, label: '0' },
-    { val: 5, pct: 0.12, label: '5' },
-    { val: 10, pct: 0.22, label: '10' },
-    { val: 50, pct: 0.40, label: '50' },
-    { val: 100, pct: 0.56, label: '100' },
-    { val: 250, pct: 0.70, label: '250' },
-    { val: 500, pct: 0.82, label: '500' },
-    { val: 750, pct: 0.92, label: '750' },
-    { val: 1000, pct: 1.00, label: '1000' },
-  ];
 
-  const getSpeedProgress = (speed: number): number => {
-    if (speed <= 0) return 0;
-    if (speed >= 1000) return Math.min(1.05, 1.0 + (speed - 1000) / 4000);
-    for (let i = 0; i < SPEEDOMETER_STOPS.length - 1; i++) {
-      const s1 = SPEEDOMETER_STOPS[i];
-      const s2 = SPEEDOMETER_STOPS[i + 1];
-      if (speed >= s1.val && speed <= s2.val) {
-        const frac = (speed - s1.val) / (s2.val - s1.val);
-        return s1.pct + frac * (s2.pct - s1.pct);
-      }
-    }
-    return 1;
-  };
-
-  // Active speed in Mbps (used for gauge calibration and needle progress)
+  // Active speed in Mbps (used for gauge telemetry and unit conversions)
   const activeSpeedMbps = status === 'completed' 
     ? (downloadVal ?? currentSpeed) 
     : currentSpeed;
@@ -550,13 +525,6 @@ export default function SpeedTest({
     return { browsing, gaming, streaming, calling };
   }, [pingVal, downloadLoadedLatencyVal, jitterVal, packetLossVal, downloadVal, status, currentSpeed, voipMos]);
 
-  // Speedometer Gauge Arc Geometry
-  // Center: (160, 145), Radius: 108, Span: 250 deg (-125 to +125 from top)
-  // Arc length = 2 * PI * 108 * (250/360) = 471.24
-  const gaugeArcLength = 471.24;
-  const speedProgress = getSpeedProgress(activeSpeedMbps);
-  const needleAngle = -125 + (speedProgress * 250);
-  const gaugeDashOffset = gaugeArcLength * (1 - Math.min(1, Math.max(0, speedProgress)));
 
   return (
     <div className="w-full flex flex-col gap-4 min-w-0 select-none pb-8" id="speed-cockpit-arena">
@@ -753,169 +721,30 @@ export default function SpeedTest({
           </div>
 
           {/* The Speedometer Gauge Arena */}
-          <div className="relative w-full max-w-[340px] mx-auto flex flex-col items-center justify-center">
-            <svg 
-              className="w-full h-auto overflow-visible select-none"
-              viewBox="0 0 320 250"
-            >
-              <defs>
-                {/* Active Stream Gradients */}
-                <linearGradient id="gaugeDownloadGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#00D2FF" />
-                  <stop offset="50%" stopColor="#00F5A0" />
-                  <stop offset="100%" stopColor="#10B981" />
-                </linearGradient>
-
-                <linearGradient id="gaugeUploadGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#A855F7" />
-                  <stop offset="100%" stopColor="#EC4899" />
-                </linearGradient>
-
-                <linearGradient id="gaugeCompleteGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#10B981" />
-                  <stop offset="100%" stopColor="#34D399" />
-                </linearGradient>
-
-                {/* Needle Gradient */}
-                <linearGradient id="gaugeNeedleGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
-                  <stop offset="60%" stopColor="rgba(255,255,255,0.5)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0.95)" />
-                </linearGradient>
-
-                {/* Metallic Pivot Gradient */}
-                <radialGradient id="gaugePivotCapGrad" cx="35%" cy="35%" r="65%">
-                  <stop offset="0%" stopColor="#94A3B8" />
-                  <stop offset="50%" stopColor="#475569" />
-                  <stop offset="100%" stopColor="#0F172A" />
-                </radialGradient>
-              </defs>
-
-              {/* 1. Background Arc Track */}
-              <path
-                d="M 71.53 206.95 A 108 108 0 1 1 248.47 206.95"
-                fill="none"
-                stroke="currentColor"
-                className="text-slate-200/90 dark:text-[#181C28]"
-                strokeWidth="20"
-                strokeLinecap="round"
-              />
-
-              {/* 2. Active Filled Arc Track */}
-              <path
-                d="M 71.53 206.95 A 108 108 0 1 1 248.47 206.95"
-                fill="none"
-                stroke={
-                  status === 'uploading' 
-                    ? 'url(#gaugeUploadGrad)' 
-                    : (status === 'completed' ? 'url(#gaugeCompleteGrad)' : 'url(#gaugeDownloadGrad)')
-                }
-                strokeWidth="20"
-                strokeDasharray="471.24"
-                strokeDashoffset={gaugeDashOffset}
-                strokeLinecap="round"
-                className="transition-all duration-150 ease-out"
-                filter={speedProgress > 0.02 ? 'drop-shadow(0 0 6px rgba(0, 245, 160, 0.35))' : undefined}
-              />
-
-              {/* 3. Scale Markers & Numbers */}
-              {SPEEDOMETER_STOPS.map((stop, idx) => {
-                const deg = -125 + (stop.pct * 250);
-                const rad = (-90 + deg) * (Math.PI / 180);
-                const lx = 160 + 78 * Math.cos(rad);
-                const ly = 145 + 78 * Math.sin(rad);
-                const isPassed = speedProgress >= stop.pct && speedProgress > 0;
-
-                return (
-                  <text
-                    key={idx}
-                    x={lx}
-                    y={ly}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    className={`font-mono text-[11px] select-none transition-colors duration-150 ${
-                      isPassed 
-                        ? 'fill-slate-900 dark:fill-white font-black' 
-                        : 'fill-slate-400 dark:fill-zinc-500 font-bold'
-                    }`}
-                  >
-                    {stop.label}
-                  </text>
-                );
-              })}
-
-              {/* 4. Tapered Rotating Speed Needle */}
-              <g 
-                style={{
-                  transform: `rotate(${needleAngle}deg)`,
-                  transformOrigin: '160px 145px',
-                  transition: 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1)',
-                }}
-              >
-                <polygon
-                  points="156,145 158.5,46 161.5,46 164,145"
-                  fill="url(#gaugeNeedleGrad)"
-                  filter="drop-shadow(0 0 4px rgba(255,255,255,0.4))"
-                />
-                <circle
-                  cx="160"
-                  cy="47"
-                  r="2"
-                  className={
-                    status === 'uploading' 
-                      ? 'fill-purple-400' 
-                      : (status === 'completed' ? 'fill-emerald-400' : 'fill-cyan-400')
-                  }
-                />
-              </g>
-
-              {/* 5. Center Pivot Cap */}
-              <circle
-                cx="160"
-                cy="145"
-                r="10"
-                fill="url(#gaugePivotCapGrad)"
-                stroke="rgba(255,255,255,0.2)"
-                strokeWidth="1.5"
-              />
-              <circle
-                cx="160"
-                cy="145"
-                r="3.5"
-                className="fill-[#090B10]"
-              />
-            </svg>
-
-            {/* Dial Center Telemetry Readout (Right Below Pivot) */}
-            <div className="flex flex-col items-center justify-center text-center -mt-12 sm:-mt-14 z-10 pointer-events-none">
-              <div className="flex items-baseline justify-center">
-                <RollingCounter
-                  value={status === 'idle' ? 0 : displaySpeedNumeric}
-                  decimals={displaySpeedNumeric >= 100 ? 1 : 2}
-                  className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight"
-                />
-              </div>
-
-              {/* Direction Indicator & Unit Pill (Identical to Speedtest.net) */}
-              <div className="flex items-center gap-1.5 mt-0.5">
-                {status === 'uploading' ? (
-                  <span className="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center">
-                    <ArrowUp className="w-2.5 h-2.5 stroke-[2.5]" />
-                  </span>
-                ) : status === 'completed' ? (
-                  <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center">
-                    <Check className="w-2.5 h-2.5 stroke-[2.5]" />
-                  </span>
-                ) : (
-                  <span className="w-4 h-4 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center">
-                    <ArrowDown className="w-2.5 h-2.5 stroke-[2.5]" />
-                  </span>
-                )}
-                <span className="text-xs font-mono font-bold tracking-wider text-slate-700 dark:text-zinc-300">
-                  {unit}
-                </span>
-              </div>
-            </div>
+          <div className="relative w-full max-w-[340px] sm:max-w-[360px] mx-auto flex flex-col items-center justify-center py-1">
+            <CustomGauge
+              value={status === 'idle' ? 0 : Math.round(displaySpeedNumeric)}
+              unit={unit}
+              label={
+                status === 'uploading'
+                  ? 'Upload'
+                  : status === 'completed'
+                  ? 'Download'
+                  : status === 'idle'
+                  ? 'Ready'
+                  : status === 'pinging' || status === 'jittering'
+                  ? 'Latency'
+                  : 'Download'
+              }
+              color={
+                status === 'uploading'
+                  ? '#A855F7'
+                  : status === 'completed'
+                  ? '#10B981'
+                  : 'var(--primary)'
+              }
+              max={Math.max(1000, Math.ceil(displaySpeedNumeric / 100) * 100)}
+            />
           </div>
 
           {/* Primary Mechanical Launch Trigger */}
