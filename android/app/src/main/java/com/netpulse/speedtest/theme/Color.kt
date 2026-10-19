@@ -2,36 +2,56 @@ package com.netpulse.speedtest.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Elevated Dark Theme Surfaces (Deep Space Titanium)
-val DarkBackground = Color(0xFF07080C)
-val DarkSurface = Color(0xFF0F121C)
-val DarkSubpanel = Color(0xFF161B29)
-val DarkElevated = Color(0xFF1D2335)
-val DarkBorder = Color(0x1AFFFFFF)
-val DarkBorderHighlight = Color(0x33FFFFFF)
+// ============================================================================
+// LUXURY DARK & LIGHT CREAM PALETTE (Taste & Anti-Slop)
+// Warm espresso obsidian surfaces paired with tactile light cream / ivory.
+// ============================================================================
 
-// Refined Light Theme Surfaces
-val LightBackground = Color(0xFFF6F8FC)
-val LightSurface = Color(0xFFFFFFFF)
-val LightSubpanel = Color(0xFFEFF3F9)
-val LightElevated = Color(0xFFE2E8F0)
-val LightBorder = Color(0x1F0F172A)
-val LightBorderHighlight = Color(0x330F172A)
+// Warm Obsidian Surfaces (Dark Theme)
+val DarkBackground = Color(0xFF100F0E)       // Deep warm espresso/obsidian
+val DarkSurface = Color(0xFF181715)          // Primary card surface
+val DarkSubpanel = Color(0xFF22201D)         // Secondary inset surface
+val DarkElevated = Color(0xFF2C2925)         // Inset / pressed / elevated surface
+val DarkBorder = Color(0x1EF4EFE6)           // 12% alpha light cream border
+val DarkBorderHighlight = Color(0x3DF4EFE6)  // 24% alpha light cream rim
 
-// Curated Electric Accent Palette (Anti-Slop High-Taste)
-val NeonCyan = Color(0xFF00E5FF)
-val NeonEmerald = Color(0xFF00F5A0)
-val NeonViolet = Color(0xFF8B5CF6)
-val NeonBlue = Color(0xFF38BDF8)
-val NeonOrange = Color(0xFFFB923C)
-val NeonAmber = Color(0xFFFBBF24)
-val NeonRose = Color(0xFFF43F5E)
+// Warm Alabaster Surfaces (Light Theme)
+val LightBackground = Color(0xFFF7F5F0)      // Soothing warm cream alabaster
+val LightSurface = Color(0xFFFFFFFF)         // Pure card surface
+val LightSubpanel = Color(0xFFEFECE6)        // Inset subpanel
+val LightElevated = Color(0xFFE5E0D5)        // Elevated light surface
+val LightBorder = Color(0x1F22201D)          // Subtle dark border for light theme
+val LightBorderHighlight = Color(0x3322201D)
 
-// Text Hierarchy (Clear contrast decay)
-val TextPrimaryDark = Color(0xFFF8FAFC)
-val TextSecondaryDark = Color(0xFF94A3B8)
-val TextMutedDark = Color(0xFF64748B)
+// Hero Light Cream & Ivory Accents (Primary Brand Identity)
+val LightCream = Color(0xFFF4EFE6)           // Signature warm cream / ivory
+val LightCreamBright = Color(0xFFFAF7F2)     // Pure illuminated cream
+val LightCreamMuted = Color(0xFFC7C0B3)      // Secondary warm cream
+val LightCreamSubtle = Color(0xFF8C8578)     // Tertiary muted cream
+val CreamSurface = Color(0xFFEDE8DF)         // Solid tactile cream surface
+val CreamDark = Color(0xFF141311)            // Deep obsidian text on cream buttons
 
-val TextPrimaryLight = Color(0xFF0F172A)
-val TextSecondaryLight = Color(0xFF475569)
-val TextMutedLight = Color(0xFF94A3B8)
+// Restrained Functional Accents (Earthy, Muted, Anti-Slop)
+val WarmGold = Color(0xFFD8A868)             // Refined warm gold/amber
+val SageGreen = Color(0xFF7EAA92)            // Muted sage green (good ping / pass)
+val Terracotta = Color(0xFFD97762)           // Earthy terracotta (loss / warning)
+val SlateBlue = Color(0xFF8B9DAF)            // Technical muted slate blue (upload)
+val CharcoalMuted = Color(0xFF383531)        // Subtle hairline separator
+
+// Legacy mappings for backwards-compatible engine & module styling
+val NeonCyan = LightCream                    // Primary accent is now Warm Light Cream!
+val NeonEmerald = SageGreen
+val NeonViolet = WarmGold
+val NeonBlue = SlateBlue
+val NeonOrange = Terracotta
+val NeonAmber = WarmGold
+val NeonRose = Terracotta
+
+// Typography Hierarchy (Clear contrast decay with warmth)
+val TextPrimaryDark = Color(0xFFFAF7F2)      // Bright cream
+val TextSecondaryDark = Color(0xFFC7C0B3)    // Warm cream
+val TextMutedDark = Color(0xFF8C8578)        // Subtle warm grey
+
+val TextPrimaryLight = Color(0xFF181715)
+val TextSecondaryLight = Color(0xFF5A544A)
+val TextMutedLight = Color(0xFF9E9789)

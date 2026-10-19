@@ -10,7 +10,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Bolt
@@ -23,9 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,18 +54,13 @@ fun BottomCommandDock(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(CircleShape)
-                .background(DarkSurface.copy(alpha = 0.92f))
+                .background(DarkSurface.copy(alpha = 0.96f))
                 .border(
                     width = 1.dp,
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.18f),
-                            Color.White.copy(alpha = 0.05f)
-                        )
-                    ),
+                    color = DarkBorderHighlight,
                     shape = CircleShape
                 )
-                .padding(horizontal = 6.dp, vertical = 6.dp),
+                .padding(horizontal = 5.dp, vertical = 5.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -75,15 +69,21 @@ fun BottomCommandDock(
                 val interactionSource = remember { MutableInteractionSource() }
                 val isPressed by interactionSource.collectIsPressedAsState()
                 val tabScale by animateFloatAsState(
-                    targetValue = if (isPressed) 0.90f else 1f,
-                    animationSpec = spring(dampingRatio = 0.6f, stiffness = 500f),
+                    targetValue = if (isPressed) 0.91f else 1f,
+                    animationSpec = spring(dampingRatio = 0.65f, stiffness = 450f),
                     label = "tabScale"
                 )
 
-                val tint by animateColorAsState(
-                    targetValue = if (isSelected) NeonCyan else TextSecondaryDark,
-                    animationSpec = spring(dampingRatio = 0.8f, stiffness = 300f),
-                    label = "tint"
+                val bgColor by animateColorAsState(
+                    targetValue = if (isSelected) LightCreamBright else Color.Transparent,
+                    animationSpec = spring(dampingRatio = 0.8f, stiffness = 320f),
+                    label = "tabBg"
+                )
+
+                val contentColor by animateColorAsState(
+                    targetValue = if (isSelected) CreamDark else LightCreamSubtle,
+                    animationSpec = spring(dampingRatio = 0.8f, stiffness = 320f),
+                    label = "tabContentColor"
                 )
 
                 Box(
@@ -91,55 +91,41 @@ fun BottomCommandDock(
                         .weight(1f)
                         .scale(tabScale)
                         .clip(CircleShape)
-                        .then(
-                            if (isSelected) {
-                                Modifier.background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(
-                                            NeonCyan.copy(alpha = 0.22f),
-                                            NeonCyan.copy(alpha = 0.08f)
-                                        )
-                                    )
-                                )
-                            } else Modifier
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = if (isSelected) NeonCyan.copy(alpha = 0.35f) else Color.Transparent,
-                            shape = CircleShape
-                        )
+                        .background(bgColor)
                         .clickable(
                             interactionSource = interactionSource,
                             indication = null
                         ) { onTabSelected(tab) }
-                        .padding(vertical = 10.dp),
+                        .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
                                 imageVector = tab.icon,
                                 contentDescription = tab.title,
-                                tint = tint,
-                                modifier = Modifier.size(20.dp)
+                                tint = contentColor,
+                                modifier = Modifier.size(17.dp)
                             )
                             if (tab == NavTab.HISTORY && historyBadgeCount > 0) {
                                 Box(
                                     modifier = Modifier
-                                        .offset(x = 10.dp, y = (-4).dp)
-                                        .size(14.dp)
+                                        .offset(x = 8.dp, y = (-4).dp)
+                                        .size(12.dp)
                                         .clip(CircleShape)
-                                        .background(NeonCyan),
+                                        .background(Terracotta),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = if (historyBadgeCount > 99) "99+" else "$historyBadgeCount",
+                                        text = if (historyBadgeCount > 9) "9+" else "$historyBadgeCount",
                                         fontSize = 7.sp,
                                         fontWeight = FontWeight.Black,
-                                        color = Color.Black
+                                        fontFamily = FontFamily.Monospace,
+                                        color = LightCreamBright
                                     )
                                 }
                             }
@@ -147,10 +133,11 @@ fun BottomCommandDock(
 
                         Text(
                             text = tab.title,
-                            fontSize = 10.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                            color = tint,
-                            letterSpacing = 0.4.sp
+                            fontSize = 11.sp,
+                            fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
+                            fontFamily = FontFamily.SansSerif,
+                            color = contentColor,
+                            letterSpacing = (-0.2).sp
                         )
                     }
                 }

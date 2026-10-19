@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -60,7 +59,7 @@ fun SpeedCockpitScreen(
         TestStatus.DOWNLOADING -> "Download Stream"
         TestStatus.UPLOADING -> "Upload Stream"
         TestStatus.COMPLETED -> "Test Complete"
-        TestStatus.IDLE -> "Ready"
+        TestStatus.IDLE -> "Standby"
     }
 
     val activeSpeed = when (engineState.status) {
@@ -89,7 +88,7 @@ fun SpeedCockpitScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .padding(bottom = 96.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         // 1. Sleek Floating Edge Capsule (Server + Mode + Unit)
         Row(
@@ -99,9 +98,7 @@ fun SpeedCockpitScreen(
                 .background(DarkSurface)
                 .border(
                     width = 1.dp,
-                    brush = Brush.verticalGradient(
-                        listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.04f))
-                    ),
+                    color = DarkBorderHighlight,
                     shape = CircleShape
                 )
                 .padding(horizontal = 14.dp, vertical = 8.dp),
@@ -117,20 +114,21 @@ fun SpeedCockpitScreen(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(if (isRunning) NeonCyan else NeonEmerald)
+                        .background(if (isRunning) LightCream else SageGreen)
                 )
                 Column {
                     Text(
                         text = "Cloudflare Edge • Anycast",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontFamily = FontFamily.SansSerif,
+                        color = LightCreamBright
                     )
                     Text(
                         text = "AS13335 • HTTP/3 QUIC",
                         fontSize = 9.sp,
                         fontFamily = FontFamily.Monospace,
-                        color = TextSecondaryDark
+                        color = LightCreamSubtle
                     )
                 }
             }
@@ -144,19 +142,19 @@ fun SpeedCockpitScreen(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(if (connectionMode == "multi") NeonCyan.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.05f))
-                        .border(1.dp, if (connectionMode == "multi") NeonCyan.copy(alpha = 0.4f) else Color.Transparent, CircleShape)
+                        .background(if (connectionMode == "multi") DarkSubpanel else Color.Transparent)
+                        .border(1.dp, if (connectionMode == "multi") DarkBorderHighlight else DarkBorder, CircleShape)
                         .clickable(enabled = !isRunning) {
                             connectionMode = if (connectionMode == "multi") "single" else "multi"
                         }
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .padding(horizontal = 9.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = connectionMode.uppercase(),
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Black,
                         fontFamily = FontFamily.Monospace,
-                        color = if (connectionMode == "multi") NeonCyan else TextSecondaryDark
+                        color = if (connectionMode == "multi") LightCream else LightCreamSubtle
                     )
                 }
 
@@ -164,8 +162,8 @@ fun SpeedCockpitScreen(
                 Row(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.05f))
-                        .border(1.dp, Color.White.copy(alpha = 0.08f), CircleShape)
+                        .background(DarkSubpanel)
+                        .border(1.dp, DarkBorder, CircleShape)
                         .padding(2.dp)
                 ) {
                     listOf("Mbps", "MB/s").forEach { u ->
@@ -173,16 +171,16 @@ fun SpeedCockpitScreen(
                         Box(
                             modifier = Modifier
                                 .clip(CircleShape)
-                                .background(if (isSelected) NeonCyan.copy(alpha = 0.25f) else Color.Transparent)
+                                .background(if (isSelected) LightCreamBright else Color.Transparent)
                                 .clickable { onUnitChanged(u) }
                                 .padding(horizontal = 8.dp, vertical = 3.dp)
                         ) {
                             Text(
                                 text = u,
                                 fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
                                 fontFamily = FontFamily.Monospace,
-                                color = if (isSelected) NeonCyan else TextSecondaryDark
+                                color = if (isSelected) CreamDark else LightCreamSubtle
                             )
                         }
                     }
@@ -212,7 +210,7 @@ fun SpeedCockpitScreen(
                     modifier = Modifier.weight(1f),
                     title = "DOWNLOAD",
                     icon = Icons.Default.ArrowDownward,
-                    accentColor = NeonCyan,
+                    accentColor = LightCream,
                     primaryValue = String.format(java.util.Locale.US, "%.1f", dlVal),
                     unit = unit,
                     subtitle = engineState.downloadLoadedLatencyMs?.let { "+${it}ms load" } ?: "Active saturation"
@@ -224,7 +222,7 @@ fun SpeedCockpitScreen(
                     modifier = Modifier.weight(1f),
                     title = "UPLOAD",
                     icon = Icons.Default.ArrowUpward,
-                    accentColor = NeonEmerald,
+                    accentColor = SlateBlue,
                     primaryValue = String.format(java.util.Locale.US, "%.1f", ulVal),
                     unit = unit,
                     subtitle = engineState.uploadLoadedLatencyMs?.let { "+${it}ms load" } ?: "Reverse bandwidth"
@@ -243,7 +241,7 @@ fun SpeedCockpitScreen(
                     modifier = Modifier.weight(1f),
                     title = "PING / JITTER",
                     icon = Icons.Default.NetworkPing,
-                    accentColor = NeonAmber,
+                    accentColor = WarmGold,
                     primaryValue = "$pingVal ms",
                     unit = "",
                     subtitle = "Jitter: ${String.format(java.util.Locale.US, "%.1f", jitterVal)} ms"
@@ -253,14 +251,10 @@ fun SpeedCockpitScreen(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(18.dp))
                         .background(DarkSurface)
-                        .border(
-                            1.dp,
-                            Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.04f))),
-                            RoundedCornerShape(20.dp)
-                        )
-                        .padding(14.dp)
+                        .border(1.dp, DarkBorderHighlight, RoundedCornerShape(18.dp))
+                        .padding(13.dp)
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(
@@ -270,16 +264,17 @@ fun SpeedCockpitScreen(
                         ) {
                             Text(
                                 text = "BUFFERBLOAT",
-                                fontSize = 10.sp,
+                                fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = FontFamily.Monospace,
-                                color = TextSecondaryDark
+                                color = LightCreamSubtle,
+                                letterSpacing = 0.6.sp
                             )
                             Icon(
                                 imageVector = Icons.Default.Speed,
                                 contentDescription = null,
-                                tint = NeonRose,
-                                modifier = Modifier.size(15.dp)
+                                tint = LightCreamMuted,
+                                modifier = Modifier.size(14.dp)
                             )
                         }
 
@@ -288,57 +283,43 @@ fun SpeedCockpitScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             // Grade Letter Box
+                            val gradeColor = when (engineState.bufferbloatGrade) {
+                                "A+", "A" -> SageGreen
+                                "B" -> LightCream
+                                "C" -> WarmGold
+                                else -> Terracotta
+                            }
+
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(
-                                        when (engineState.bufferbloatGrade) {
-                                            "A+" -> NeonEmerald.copy(alpha = 0.2f)
-                                            "A" -> NeonEmerald.copy(alpha = 0.15f)
-                                            "B" -> NeonCyan.copy(alpha = 0.15f)
-                                            "C" -> NeonAmber.copy(alpha = 0.15f)
-                                            else -> NeonRose.copy(alpha = 0.15f)
-                                        }
-                                    )
-                                    .border(
-                                        1.dp,
-                                        when (engineState.bufferbloatGrade) {
-                                            "A+", "A" -> NeonEmerald
-                                            "B" -> NeonCyan
-                                            "C" -> NeonAmber
-                                            else -> NeonRose
-                                        },
-                                        RoundedCornerShape(10.dp)
-                                    ),
+                                    .clip(RoundedCornerShape(9.dp))
+                                    .background(DarkSubpanel)
+                                    .border(1.dp, gradeColor.copy(alpha = 0.5f), RoundedCornerShape(9.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = engineState.bufferbloatGrade,
-                                    fontSize = 18.sp,
+                                    fontSize = 17.sp,
                                     fontWeight = FontWeight.Black,
                                     fontFamily = FontFamily.Monospace,
-                                    color = when (engineState.bufferbloatGrade) {
-                                        "A+", "A" -> NeonEmerald
-                                        "B" -> NeonCyan
-                                        "C" -> NeonAmber
-                                        else -> NeonRose
-                                    }
+                                    color = gradeColor
                                 )
                             }
 
                             Column {
                                 Text(
-                                    text = if (engineState.bufferbloatGrade in listOf("A+", "A")) "Grade: Minimal Bloat" else "Grade: ${engineState.bufferbloatGrade}",
+                                    text = if (engineState.bufferbloatGrade in listOf("A+", "A")) "Minimal Bloat" else "Grade ${engineState.bufferbloatGrade}",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    fontFamily = FontFamily.SansSerif,
+                                    color = LightCreamBright
                                 )
                                 Text(
                                     text = "Loss: ${String.format(java.util.Locale.US, "%.1f", engineState.packetLossPct ?: 0.0)}%",
                                     fontSize = 9.sp,
                                     fontFamily = FontFamily.Monospace,
-                                    color = TextSecondaryDark
+                                    color = LightCreamSubtle
                                 )
                             }
                         }
@@ -351,20 +332,16 @@ fun SpeedCockpitScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(22.dp))
+                .clip(RoundedCornerShape(18.dp))
                 .background(DarkSurface)
-                .border(
-                    1.dp,
-                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.14f), Color.White.copy(alpha = 0.04f))),
-                    RoundedCornerShape(22.dp)
-                )
+                .border(1.dp, DarkBorderHighlight, RoundedCornerShape(18.dp))
                 .padding(14.dp)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 RealtimeSplineGraph(
                     title = if (engineState.status == TestStatus.UPLOADING) "Upload Spectrum" else "Download Spectrum",
-                    streamTag = if (engineState.status == TestStatus.UPLOADING) "TX Multiplex" else "RX Socket Spline",
-                    themeColor = if (engineState.status == TestStatus.UPLOADING) NeonEmerald else NeonCyan,
+                    streamTag = if (engineState.status == TestStatus.UPLOADING) "TX Socket" else "RX Socket",
+                    themeColor = if (engineState.status == TestStatus.UPLOADING) SlateBlue else LightCream,
                     history = if (engineState.status == TestStatus.UPLOADING) engineState.uploadSpeedHistory else engineState.downloadSpeedHistory,
                     unit = unit,
                     modifier = Modifier.fillMaxWidth().height(105.dp)
@@ -390,20 +367,9 @@ fun SpeedCockpitScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .scale(btnScale)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    NeonCyan.copy(alpha = 0.20f),
-                                    NeonEmerald.copy(alpha = 0.20f)
-                                )
-                            )
-                        )
-                        .border(
-                            1.dp,
-                            Brush.horizontalGradient(listOf(NeonCyan, NeonEmerald)),
-                            RoundedCornerShape(20.dp)
-                        )
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(LightCreamBright)
+                        .border(1.dp, Color.White.copy(alpha = 0.8f), RoundedCornerShape(18.dp))
                         .clickable(
                             interactionSource = interaction,
                             indication = null
@@ -421,20 +387,36 @@ fun SpeedCockpitScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(36.dp)
+                                    .size(34.dp)
                                     .clip(CircleShape)
-                                    .background(NeonCyan.copy(alpha = 0.25f)),
+                                    .background(DarkBackground),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.Verified, contentDescription = null, tint = NeonCyan, modifier = Modifier.size(20.dp))
+                                Icon(
+                                    Icons.Default.Verified,
+                                    contentDescription = null,
+                                    tint = LightCreamBright,
+                                    modifier = Modifier.size(18.dp)
+                                )
                             }
                             Column {
-                                Text("Verified Speed Certificate", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                                Text("Download: ${String.format(java.util.Locale.US, "%.1f", res.downloadMbps / factor)} $unit • Grade ${res.bufferbloatGrade}", fontSize = 10.sp, color = TextSecondaryDark)
+                                Text(
+                                    "Verified Speed Certificate",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Black,
+                                    fontFamily = FontFamily.SansSerif,
+                                    color = CreamDark
+                                )
+                                Text(
+                                    "Download: ${String.format(java.util.Locale.US, "%.1f", res.downloadMbps / factor)} $unit • Grade ${res.bufferbloatGrade}",
+                                    fontSize = 10.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    color = CreamDark.copy(alpha = 0.7f)
+                                )
                             }
                         }
 
-                        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.White)
+                        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = CreamDark)
                     }
                 }
             }
@@ -454,14 +436,10 @@ fun TelemetryMetricCard(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(18.dp))
             .background(DarkSurface)
-            .border(
-                1.dp,
-                Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.04f))),
-                RoundedCornerShape(20.dp)
-            )
-            .padding(14.dp)
+            .border(1.dp, DarkBorderHighlight, RoundedCornerShape(18.dp))
+            .padding(13.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(
@@ -471,37 +449,37 @@ fun TelemetryMetricCard(
             ) {
                 Text(
                     text = title,
-                    fontSize = 10.sp,
+                    fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Monospace,
-                    color = TextSecondaryDark,
-                    letterSpacing = 0.8.sp
+                    color = LightCreamSubtle,
+                    letterSpacing = 0.6.sp
                 )
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = accentColor,
-                    modifier = Modifier.size(15.dp)
+                    modifier = Modifier.size(14.dp)
                 )
             }
 
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
                     text = primaryValue,
-                    fontSize = 22.sp,
+                    fontSize = 21.sp,
                     fontWeight = FontWeight.Black,
                     fontFamily = FontFamily.SansSerif,
-                    color = Color.White
+                    color = LightCreamBright
                 )
                 if (unit.isNotEmpty()) {
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(3.dp))
                     Text(
                         text = unit,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace,
                         color = accentColor,
-                        modifier = Modifier.padding(bottom = 3.dp)
+                        modifier = Modifier.padding(bottom = 2.dp)
                     )
                 }
             }
@@ -510,7 +488,7 @@ fun TelemetryMetricCard(
                 text = subtitle,
                 fontSize = 9.sp,
                 fontFamily = FontFamily.Monospace,
-                color = TextSecondaryDark
+                color = LightCreamSubtle
             )
         }
     }

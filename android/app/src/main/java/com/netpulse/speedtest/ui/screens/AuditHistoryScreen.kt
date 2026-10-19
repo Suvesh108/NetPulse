@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -37,7 +36,7 @@ import kotlinx.coroutines.launch
 fun AuditHistoryScreen(
     repository: HistoryRepository,
     unit: String,
-    onOpenCertificate: (SpeedTestResult) -> Unit,
+    onViewCertificate: (SpeedTestResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -74,10 +73,10 @@ fun AuditHistoryScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            SummaryKpiBox(modifier = Modifier.weight(1f), label = "SESSIONS", value = "$totalCount", color = Color.White)
-            SummaryKpiBox(modifier = Modifier.weight(1f), label = "PEAK DL", value = String.format(java.util.Locale.US, "%.0f", peakDownload), color = NeonCyan)
-            SummaryKpiBox(modifier = Modifier.weight(1f), label = "PEAK UL", value = String.format(java.util.Locale.US, "%.0f", peakUpload), color = NeonEmerald)
-            SummaryKpiBox(modifier = Modifier.weight(1f), label = "AVG PING", value = "${avgPing}ms", color = NeonAmber)
+            SummaryKpiBox(modifier = Modifier.weight(1f), label = "SESSIONS", value = "$totalCount", color = LightCreamBright)
+            SummaryKpiBox(modifier = Modifier.weight(1f), label = "PEAK DL", value = String.format(java.util.Locale.US, "%.0f", peakDownload), color = LightCreamBright)
+            SummaryKpiBox(modifier = Modifier.weight(1f), label = "PEAK UL", value = String.format(java.util.Locale.US, "%.0f", peakUpload), color = SlateBlue)
+            SummaryKpiBox(modifier = Modifier.weight(1f), label = "AVG PING", value = "${avgPing}ms", color = WarmGold)
         }
 
         // 2. Action & Search Bar
@@ -92,16 +91,16 @@ fun AuditHistoryScreen(
                     .weight(1f)
                     .clip(CircleShape)
                     .background(DarkSurface)
-                    .border(1.dp, Color.White.copy(alpha = 0.08f), CircleShape)
+                    .border(1.dp, DarkBorder, CircleShape)
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondaryDark, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Search, contentDescription = null, tint = LightCreamSubtle, modifier = Modifier.size(16.dp))
                     Text(
-                        text = if (searchQuery.isEmpty()) "Filter history records..." else searchQuery,
+                        text = if (searchQuery.isEmpty()) "Filter audit sessions..." else searchQuery,
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
-                        color = if (searchQuery.isEmpty()) TextMutedDark else Color.White
+                        color = if (searchQuery.isEmpty()) LightCreamSubtle else LightCreamBright
                     )
                 }
             }
@@ -114,7 +113,7 @@ fun AuditHistoryScreen(
                     .size(36.dp)
                     .clip(CircleShape)
                     .background(DarkSurface)
-                    .border(1.dp, Color.White.copy(alpha = 0.12f), CircleShape)
+                    .border(1.dp, DarkBorderHighlight, CircleShape)
                     .clickable {
                         try {
                             val json = Gson().toJson(historyList)
@@ -130,7 +129,7 @@ fun AuditHistoryScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Share, contentDescription = "Export JSON", tint = NeonCyan, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Share, contentDescription = "Export JSON", tint = LightCreamBright, modifier = Modifier.size(16.dp))
             }
 
             Spacer(modifier = Modifier.width(6.dp))
@@ -142,11 +141,11 @@ fun AuditHistoryScreen(
                         .size(36.dp)
                         .clip(CircleShape)
                         .background(DarkSurface)
-                        .border(1.dp, NeonRose.copy(alpha = 0.3f), CircleShape)
+                        .border(1.dp, Terracotta.copy(alpha = 0.5f), CircleShape)
                         .clickable { showClearConfirm = true },
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.DeleteOutline, contentDescription = "Clear All", tint = NeonRose, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.DeleteOutline, contentDescription = "Clear All", tint = Terracotta, modifier = Modifier.size(16.dp))
                 }
             }
         }
@@ -160,9 +159,9 @@ fun AuditHistoryScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Default.Speed, contentDescription = null, tint = TextMutedDark, modifier = Modifier.size(42.dp))
-                    Text("No Telemetry Audits Recorded", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    Text("Run a speed test to log historical network performance", fontSize = 10.sp, color = TextSecondaryDark)
+                    Icon(Icons.Default.Speed, contentDescription = null, tint = LightCreamSubtle, modifier = Modifier.size(42.dp))
+                    Text("No Telemetry Audits Recorded", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                    Text("Run a speed test to log historical network performance", fontSize = 10.sp, color = LightCreamSubtle)
                 }
             }
         } else {
@@ -180,7 +179,7 @@ fun AuditHistoryScreen(
                         onToggleExpand = {
                             expandedId = if (isExpanded) null else item.id
                         },
-                        onOpenCertificate = { onOpenCertificate(item) },
+                        onOpenCertificate = { onViewCertificate(item) },
                         onDelete = {
                             scope.launch { repository.deleteResult(item.id) }
                         }
@@ -193,8 +192,8 @@ fun AuditHistoryScreen(
     if (showClearConfirm) {
         AlertDialog(
             onDismissRequest = { showClearConfirm = false },
-            title = { Text("Clear All Audit History?", fontWeight = FontWeight.Bold) },
-            text = { Text("This will permanently remove all $totalCount logged network test sessions.") },
+            title = { Text("Clear All Audit History?", fontWeight = FontWeight.Bold, color = LightCreamBright) },
+            text = { Text("This will permanently remove all $totalCount logged network test sessions.", color = LightCreamMuted) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -202,17 +201,17 @@ fun AuditHistoryScreen(
                         showClearConfirm = false
                     }
                 ) {
-                    Text("CLEAR ALL", color = NeonRose, fontWeight = FontWeight.Bold)
+                    Text("CLEAR ALL", color = Terracotta, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showClearConfirm = false }) {
-                    Text("CANCEL")
+                    Text("CANCEL", color = LightCreamSubtle)
                 }
             },
             containerColor = DarkSurface,
-            titleContentColor = Color.White,
-            textContentColor = TextSecondaryDark
+            titleContentColor = LightCreamBright,
+            textContentColor = LightCreamMuted
         )
     }
 }
@@ -223,12 +222,12 @@ fun SummaryKpiBox(label: String, value: String, color: Color, modifier: Modifier
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
             .background(DarkSurface)
-            .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
+            .border(1.dp, DarkBorderHighlight, RoundedCornerShape(14.dp))
             .padding(vertical = 8.dp, horizontal = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(label, fontSize = 8.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, color = TextSecondaryDark)
+            Text(label, fontSize = 8.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, color = LightCreamSubtle)
             Text(value, fontSize = 14.sp, fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Black, color = color)
         }
     }
@@ -249,108 +248,135 @@ fun HistoryItemCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
             .background(DarkSurface)
-            .border(
-                1.dp,
-                Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.04f))),
-                RoundedCornerShape(18.dp)
-            )
+            .border(1.dp, DarkBorderHighlight, RoundedCornerShape(18.dp))
             .clickable { onToggleExpand() }
-            .padding(12.dp)
+            .padding(14.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            // Main Row
+            // Main Top Bar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Left: Speeds & Server
+                // Left: Speeds & Date
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Icon(Icons.Default.ArrowDownward, contentDescription = null, tint = NeonCyan, modifier = Modifier.size(13.dp))
+                            Icon(Icons.Default.ArrowDownward, contentDescription = null, tint = LightCreamBright, modifier = Modifier.size(13.dp))
                             Text(
-                                text = "${String.format(java.util.Locale.US, "%.1f", item.downloadMbps / factor)} $unit",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                text = String.format(java.util.Locale.US, "%.1f", item.downloadMbps / factor),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = FontFamily.SansSerif,
+                                color = LightCreamBright
                             )
                         }
+
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Icon(Icons.Default.ArrowUpward, contentDescription = null, tint = NeonEmerald, modifier = Modifier.size(13.dp))
+                            Icon(Icons.Default.ArrowUpward, contentDescription = null, tint = SlateBlue, modifier = Modifier.size(13.dp))
                             Text(
-                                text = "${String.format(java.util.Locale.US, "%.1f", item.uploadMbps / factor)} $unit",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                text = String.format(java.util.Locale.US, "%.1f", item.uploadMbps / factor),
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = FontFamily.SansSerif,
+                                color = SlateBlue
                             )
                         }
+
+                        Text(unit, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                     }
 
                     Text(
                         text = "${item.serverName} • ${item.timestamp}",
                         fontSize = 9.sp,
                         fontFamily = FontFamily.Monospace,
-                        color = TextSecondaryDark
+                        color = LightCreamSubtle
                     )
                 }
 
-                // Right: Bufferbloat Badge
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(NeonCyan.copy(alpha = 0.15f))
-                        .border(1.dp, NeonCyan.copy(alpha = 0.35f), RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
+                // Right: Bufferbloat Badge & Ping
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = item.bufferbloatGrade,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Black,
+                        text = "${item.pingMs} ms",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace,
-                        color = NeonCyan
+                        color = WarmGold
                     )
+
+                    val gradeColor = when (item.bufferbloatGrade) {
+                        "A+", "A" -> SageGreen
+                        "B" -> LightCream
+                        "C" -> WarmGold
+                        else -> Terracotta
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(DarkSubpanel)
+                            .border(1.dp, gradeColor.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = item.bufferbloatGrade,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Black,
+                            fontFamily = FontFamily.Monospace,
+                            color = gradeColor
+                        )
+                    }
                 }
             }
 
-            // Expanded Detail Deck
+            // Expanded Details Tray
             AnimatedVisibility(visible = isExpanded) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 6.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(top = 8.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(DarkSubpanel)
+                        .border(1.dp, DarkBorder, RoundedCornerShape(12.dp))
+                        .padding(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.08f))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Loaded Latency: +${item.downloadLoadedLatencyMs ?: 0}ms DL / +${item.uploadLoadedLatencyMs ?: 0}ms UL", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
+                        Text("Jitter: ${item.jitterMs}ms", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
+                    }
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Latency: ${item.pingMs} ms • Jitter: ${item.jitterMs} ms", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
-                        Text("Loss: ${item.packetLoss}%", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = if (item.packetLoss > 0) NeonRose else NeonEmerald)
+                        Text("Packet Loss: ${item.packetLoss}%", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = if (item.packetLoss > 0) Terracotta else SageGreen)
+                        Text("Protocol: ${item.routingProtocol}", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                     }
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Certificate button
-                        Button(
-                            onClick = onOpenCertificate,
-                            colors = ButtonDefaults.buttonColors(containerColor = NeonCyan.copy(alpha = 0.18f), contentColor = NeonCyan),
-                            shape = CircleShape,
-                            modifier = Modifier.weight(1f).height(36.dp)
+                        // View Certificate Pill Button (Tactile Light Cream)
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(LightCreamBright)
+                                .clickable { onOpenCertificate() }
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Icon(Icons.Default.Verified, contentDescription = null, modifier = Modifier.size(14.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("CERTIFICATE", fontSize = 9.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Icon(Icons.Default.Verified, contentDescription = null, tint = CreamDark, modifier = Modifier.size(13.dp))
+                                Text("Speed Certificate", fontSize = 10.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = CreamDark)
+                            }
                         }
 
-                        // Delete button
-                        IconButton(
-                            onClick = onDelete,
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(Icons.Default.DeleteOutline, contentDescription = "Delete", tint = NeonRose, modifier = Modifier.size(16.dp))
+                        // Delete Single Record
+                        IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+                            Icon(Icons.Default.DeleteOutline, contentDescription = "Delete", tint = Terracotta, modifier = Modifier.size(16.dp))
                         }
                     }
                 }

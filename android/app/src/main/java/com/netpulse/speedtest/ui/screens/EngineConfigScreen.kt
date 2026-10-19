@@ -18,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -34,6 +33,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun EngineConfigScreen(
     repository: SettingsRepository,
+    unit: String,
+    onUnitChanged: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -45,7 +46,7 @@ fun EngineConfigScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .padding(bottom = 96.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         // Section 1: Engine Backend Infrastructure
         ConfigGroup(title = "Engine Infrastructure", subtitle = "Global edge Anycast backbone endpoints") {
@@ -55,8 +56,8 @@ fun EngineConfigScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
-                        .background(if (isSelected) NeonCyan.copy(alpha = 0.12f) else DarkSubpanel)
-                        .border(1.dp, if (isSelected) NeonCyan.copy(alpha = 0.4f) else Color.Transparent, RoundedCornerShape(14.dp))
+                        .background(if (isSelected) DarkElevated else DarkSubpanel)
+                        .border(1.dp, if (isSelected) DarkBorderHighlight else Color.Transparent, RoundedCornerShape(14.dp))
                         .clickable { repository.updateSettings(settings.copy(engineBackend = backend)) }
                         .padding(12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -64,16 +65,16 @@ fun EngineConfigScreen(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(backend.displayName, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text(backend.badge, fontSize = 8.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                            Text(backend.displayName, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                            Text(backend.badge, fontSize = 8.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = LightCream)
                         }
-                        Text(backend.pops, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                        Text(backend.pops, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                     }
 
                     RadioButton(
                         selected = isSelected,
                         onClick = { repository.updateSettings(settings.copy(engineBackend = backend)) },
-                        colors = RadioButtonDefaults.colors(selectedColor = NeonCyan)
+                        colors = RadioButtonDefaults.colors(selectedColor = LightCreamBright, unselectedColor = LightCreamSubtle)
                     )
                 }
             }
@@ -87,8 +88,8 @@ fun EngineConfigScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(14.dp))
-                        .background(if (isSelected) NeonViolet.copy(alpha = 0.12f) else DarkSubpanel)
-                        .border(1.dp, if (isSelected) NeonViolet.copy(alpha = 0.4f) else Color.Transparent, RoundedCornerShape(14.dp))
+                        .background(if (isSelected) DarkElevated else DarkSubpanel)
+                        .border(1.dp, if (isSelected) DarkBorderHighlight else Color.Transparent, RoundedCornerShape(14.dp))
                         .clickable { repository.updateSettings(settings.copy(routingProtocol = proto)) }
                         .padding(12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -96,16 +97,16 @@ fun EngineConfigScreen(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(proto.displayName, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text(proto.speedTag, fontSize = 8.sp, fontFamily = FontFamily.Monospace, color = NeonViolet)
+                            Text(proto.displayName, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                            Text(proto.speedTag, fontSize = 8.sp, fontFamily = FontFamily.Monospace, color = WarmGold)
                         }
-                        Text("Transport: ${proto.idName}", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                        Text("Transport: ${proto.idName}", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                     }
 
                     RadioButton(
                         selected = isSelected,
                         onClick = { repository.updateSettings(settings.copy(routingProtocol = proto)) },
-                        colors = RadioButtonDefaults.colors(selectedColor = NeonViolet)
+                        colors = RadioButtonDefaults.colors(selectedColor = LightCreamBright, unselectedColor = LightCreamSubtle)
                     )
                 }
             }
@@ -115,8 +116,8 @@ fun EngineConfigScreen(
         ConfigGroup(title = "Telemetry & Probing Density", subtitle = "Packet probe density and bufferbloat loaded delay") {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Packet Probe Track", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    Text("${settings.packetProbesCount} Probes", fontSize = 12.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                    Text("Packet Probe Track", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                    Text("${settings.packetProbesCount} Probes", fontSize = 12.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = LightCreamBright)
                 }
 
                 Slider(
@@ -124,12 +125,16 @@ fun EngineConfigScreen(
                     onValueChange = { repository.updateSettings(settings.copy(packetProbesCount = it.toInt())) },
                     valueRange = 10f..50f,
                     steps = 7,
-                    colors = SliderDefaults.colors(thumbColor = NeonCyan, activeTrackColor = NeonCyan, inactiveTrackColor = DarkElevated)
+                    colors = SliderDefaults.colors(
+                        thumbColor = LightCreamBright,
+                        activeTrackColor = LightCreamBright,
+                        inactiveTrackColor = DarkSubpanel
+                    )
                 )
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("10 (Fast)", fontSize = 8.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
-                    Text("50 (Deep Matrix)", fontSize = 8.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                    Text("10 (Fast)", fontSize = 8.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
+                    Text("50 (Deep Matrix)", fontSize = 8.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                 }
             }
         }
@@ -150,16 +155,15 @@ fun EngineConfigScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text("Current Version: v1.2.0", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        Text(updateStatusMsg, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = if (updateInfo?.hasUpdate == true) NeonCyan else TextSecondaryDark)
+                        Text("Current Version: v1.2.0", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                        Text(updateStatusMsg, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = if (updateInfo?.hasUpdate == true) LightCream else LightCreamSubtle)
                     }
 
                     if (!isDownloadingUpdate) {
                         Box(
                             modifier = Modifier
                                 .clip(CircleShape)
-                                .background(NeonCyan.copy(alpha = 0.15f))
-                                .border(1.dp, NeonCyan.copy(alpha = 0.45f), CircleShape)
+                                .background(LightCreamBright)
                                 .clickable(enabled = !isCheckingUpdate) {
                                     updateScope.launch {
                                         isCheckingUpdate = true
@@ -181,7 +185,7 @@ fun EngineConfigScreen(
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Black,
                                 fontFamily = FontFamily.Monospace,
-                                color = NeonCyan
+                                color = CreamDark
                             )
                         }
                     }
@@ -189,18 +193,18 @@ fun EngineConfigScreen(
 
                 // Download & Install Action when update is found
                 if (updateInfo?.hasUpdate == true || isDownloadingUpdate) {
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.08f))
+                    HorizontalDivider(color = DarkBorder)
                     if (isDownloadingUpdate) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Downloading latest release...", fontSize = 10.sp, color = Color.White)
-                                Text("$updateProgress%", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                                Text("Downloading latest release...", fontSize = 10.sp, color = LightCreamBright)
+                                Text("$updateProgress%", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = LightCreamBright)
                             }
                             LinearProgressIndicator(
                                 progress = { updateProgress / 100f },
                                 modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape),
-                                color = NeonCyan,
-                                trackColor = DarkElevated
+                                color = LightCreamBright,
+                                trackColor = DarkSubpanel
                             )
                         }
                     } else {
@@ -219,7 +223,7 @@ fun EngineConfigScreen(
                                     )
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = NeonCyan, contentColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(containerColor = LightCreamBright, contentColor = CreamDark),
                             shape = CircleShape,
                             modifier = Modifier.fillMaxWidth().height(42.dp)
                         ) {
@@ -243,21 +247,21 @@ fun ConfigGroup(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(22.dp))
+            .clip(RoundedCornerShape(18.dp))
             .background(DarkSurface)
             .border(
                 1.dp,
-                Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.04f))),
-                RoundedCornerShape(22.dp)
+                DarkBorderHighlight,
+                RoundedCornerShape(18.dp)
             )
             .padding(14.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(title, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                Text(subtitle, fontSize = 10.sp, color = TextSecondaryDark)
+                Text(title, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                Text(subtitle, fontSize = 10.sp, color = LightCreamSubtle)
             }
-            HorizontalDivider(color = Color.White.copy(alpha = 0.06f))
+            HorizontalDivider(color = DarkBorder)
             content()
         }
     }

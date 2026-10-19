@@ -18,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -57,7 +56,7 @@ fun NetPulseApp() {
     NetPulseTheme(darkTheme = isDarkTheme) {
         Scaffold(
             topBar = {
-                // Precision Titanium Header Bar
+                // Precision Warm Obsidian & Light Cream Header Bar
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -65,60 +64,56 @@ fun NetPulseApp() {
                         .background(if (isDarkTheme) DarkBackground else LightBackground)
                         .border(
                             width = 1.dp,
-                            color = if (isDarkTheme) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.06f)
+                            color = if (isDarkTheme) DarkBorder else LightBorder
                         )
-                        .padding(horizontal = 18.dp, vertical = 10.dp),
+                        .padding(horizontal = 18.dp, vertical = 11.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Left Brand Identity
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.clickable { currentTab = NavTab.SPEED }
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(30.dp)
-                                .clip(RoundedCornerShape(9.dp))
-                                .background(
-                                    Brush.linearGradient(
-                                        listOf(NeonCyan.copy(alpha = 0.25f), NeonEmerald.copy(alpha = 0.15f))
-                                    )
-                                )
-                                .border(1.dp, NeonCyan.copy(alpha = 0.4f), RoundedCornerShape(9.dp)),
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(if (isDarkTheme) DarkSubpanel else LightSubpanel)
+                                .border(1.dp, if (isDarkTheme) DarkBorderHighlight else LightBorder, RoundedCornerShape(10.dp)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Bolt,
                                 contentDescription = "NetPulse Logo",
-                                tint = NeonCyan,
-                                modifier = Modifier.size(18.dp)
+                                tint = if (isDarkTheme) LightCreamBright else TextPrimaryLight,
+                                modifier = Modifier.size(19.dp)
                             )
                         }
 
                         Text(
                             text = "NetPulse",
-                            fontSize = 17.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Black,
                             fontFamily = FontFamily.SansSerif,
                             color = if (isDarkTheme) TextPrimaryDark else TextPrimaryLight,
-                            letterSpacing = (-0.5).sp
+                            letterSpacing = (-0.6).sp
                         )
 
                         Box(
                             modifier = Modifier
                                 .clip(CircleShape)
-                                .background(NeonCyan.copy(alpha = 0.14f))
-                                .border(1.dp, NeonCyan.copy(alpha = 0.35f), CircleShape)
+                                .background(if (isDarkTheme) DarkSubpanel else LightSubpanel)
+                                .border(1.dp, if (isDarkTheme) DarkBorderHighlight else LightBorder, CircleShape)
                                 .padding(horizontal = 7.dp, vertical = 2.dp)
                         ) {
                             Text(
                                 text = "v1.2",
                                 fontSize = 8.sp,
-                                fontWeight = FontWeight.Black,
+                                fontWeight = FontWeight.Bold,
                                 fontFamily = FontFamily.Monospace,
-                                color = NeonCyan
+                                color = if (isDarkTheme) LightCreamMuted else TextSecondaryLight
                             )
                         }
                     }
@@ -132,14 +127,25 @@ fun NetPulseApp() {
                             Box(
                                 modifier = Modifier
                                     .clip(CircleShape)
-                                    .background(NeonCyan.copy(alpha = 0.14f))
-                                    .border(1.dp, NeonCyan.copy(alpha = 0.35f), CircleShape)
+                                    .background(if (isDarkTheme) DarkSubpanel else LightSubpanel)
+                                    .border(1.dp, if (isDarkTheme) DarkBorderHighlight else LightBorder, CircleShape)
                                     .clickable { certificateTarget = historyList.first() }
                                     .padding(horizontal = 10.dp, vertical = 5.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    Icon(Icons.Default.Verified, contentDescription = null, tint = NeonCyan, modifier = Modifier.size(12.dp))
-                                    Text("Certificate", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                                    Icon(
+                                        Icons.Default.Verified,
+                                        contentDescription = null,
+                                        tint = if (isDarkTheme) LightCream else TextPrimaryLight,
+                                        modifier = Modifier.size(12.dp)
+                                    )
+                                    Text(
+                                        "Certificate",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = FontFamily.Monospace,
+                                        color = if (isDarkTheme) LightCream else TextPrimaryLight
+                                    )
                                 }
                             }
                         }
@@ -148,16 +154,18 @@ fun NetPulseApp() {
                             modifier = Modifier
                                 .size(34.dp)
                                 .clip(CircleShape)
-                                .background(DarkSurface)
-                                .border(1.dp, Color.White.copy(alpha = 0.12f), CircleShape)
-                                .clickable { settingsRepository.toggleTheme() },
+                                .background(if (isDarkTheme) DarkSubpanel else LightSubpanel)
+                                .border(1.dp, if (isDarkTheme) DarkBorderHighlight else LightBorder, CircleShape)
+                                .clickable {
+                                    settingsRepository.toggleTheme()
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
                                 contentDescription = "Toggle Theme",
-                                tint = if (isDarkTheme) NeonAmber else Color.DarkGray,
-                                modifier = Modifier.size(17.dp)
+                                tint = if (isDarkTheme) LightCreamMuted else TextSecondaryLight,
+                                modifier = Modifier.size(16.dp)
                             )
                         }
                     }
@@ -167,60 +175,95 @@ fun NetPulseApp() {
                 BottomCommandDock(
                     currentTab = currentTab,
                     onTabSelected = { currentTab = it },
-                    historyBadgeCount = historyList.size,
-                    modifier = Modifier.navigationBarsPadding()
+                    historyBadgeCount = historyList.size
                 )
             },
-            containerColor = MaterialTheme.colorScheme.background
+            containerColor = if (isDarkTheme) DarkBackground else LightBackground
         ) { innerPadding ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                // Directional Slide + Fade Screen Transitions
+                // Directional Slide & Fade Tab Transition
                 AnimatedContent(
                     targetState = currentTab,
                     transitionSpec = {
-                        if (targetState.ordinal > initialState.ordinal) {
-                            (slideInHorizontally(animationSpec = tween(280)) { width -> width / 3 } + fadeIn(animationSpec = tween(240)))
-                                .togetherWith(slideOutHorizontally(animationSpec = tween(240)) { width -> -width / 3 } + fadeOut(animationSpec = tween(200)))
+                        val direction = targetState.ordinal.compareTo(initialState.ordinal)
+                        if (direction > 0) {
+                            (slideInHorizontally(
+                                initialOffsetX = { fullWidth -> (fullWidth * 0.15f).toInt() },
+                                animationSpec = tween(220)
+                            ) + fadeIn(animationSpec = tween(220)))
+                                .togetherWith(
+                                    slideOutHorizontally(
+                                        targetOffsetX = { fullWidth -> (-fullWidth * 0.15f).toInt() },
+                                        animationSpec = tween(180)
+                                    ) + fadeOut(animationSpec = tween(180))
+                                )
                         } else {
-                            (slideInHorizontally(animationSpec = tween(280)) { width -> -width / 3 } + fadeIn(animationSpec = tween(240)))
-                                .togetherWith(slideOutHorizontally(animationSpec = tween(240)) { width -> width / 3 } + fadeOut(animationSpec = tween(200)))
+                            (slideInHorizontally(
+                                initialOffsetX = { fullWidth -> (-fullWidth * 0.15f).toInt() },
+                                animationSpec = tween(220)
+                            ) + fadeIn(animationSpec = tween(220)))
+                                .togetherWith(
+                                    slideOutHorizontally(
+                                        targetOffsetX = { fullWidth -> (fullWidth * 0.15f).toInt() },
+                                        animationSpec = tween(180)
+                                    ) + fadeOut(animationSpec = tween(180))
+                                )
                         }
                     },
-                    label = "tabScreenTransition"
+                    label = "tabTransition"
                 ) { tab ->
                     when (tab) {
                         NavTab.SPEED -> SpeedCockpitScreen(
                             settings = settings,
                             unit = unit,
-                            onUnitChanged = { settingsRepository.setUnit(it) },
-                            onOpenCertificate = { certificateTarget = it },
-                            onTestComplete = { scope.launch { historyRepository.addResult(it) } }
+                            onUnitChanged = { newUnit ->
+                                scope.launch { settingsRepository.setUnit(newUnit) }
+                            },
+                            onOpenCertificate = { result ->
+                                certificateTarget = result
+                            },
+                            onTestComplete = { result ->
+                                scope.launch {
+                                    historyRepository.addResult(result)
+                                }
+                            }
                         )
+
                         NavTab.DIAGNOSTICS -> EdgeDiagnosticsScreen()
+
                         NavTab.HISTORY -> AuditHistoryScreen(
                             repository = historyRepository,
                             unit = unit,
-                            onOpenCertificate = { certificateTarget = it }
+                            onViewCertificate = { result ->
+                                certificateTarget = result
+                            }
                         )
+
                         NavTab.SETTINGS -> EngineConfigScreen(
-                            repository = settingsRepository
+                            repository = settingsRepository,
+                            unit = unit,
+                            onUnitChanged = { newUnit ->
+                                scope.launch {
+                                    settingsRepository.setUnit(newUnit)
+                                }
+                            }
                         )
                     }
                 }
-
-                // Speed Certificate Dialog Modal
-                certificateTarget?.let { target ->
-                    SpeedCertificateDialog(
-                        result = target,
-                        unit = unit,
-                        onDismiss = { certificateTarget = null }
-                    )
-                }
             }
+        }
+
+        // Speed Certificate Modal Dialog
+        certificateTarget?.let { target ->
+            SpeedCertificateDialog(
+                result = target,
+                unit = unit,
+                onDismiss = { certificateTarget = null }
+            )
         }
     }
 }

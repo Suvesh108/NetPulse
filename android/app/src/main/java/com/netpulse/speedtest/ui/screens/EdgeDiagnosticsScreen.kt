@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -107,10 +107,10 @@ fun EdgeDiagnosticsScreen(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(if (isSelected) NeonCyan.copy(alpha = 0.20f) else DarkSurface)
+                        .background(if (isSelected) LightCreamBright else DarkSubpanel)
                         .border(
                             1.dp,
-                            if (isSelected) NeonCyan.copy(alpha = 0.45f) else Color.White.copy(alpha = 0.08f),
+                            if (isSelected) Color.White else DarkBorder,
                             CircleShape
                         )
                         .clickable { selectedCategory = cat }
@@ -119,9 +119,9 @@ fun EdgeDiagnosticsScreen(
                     Text(
                         text = cat.label,
                         fontSize = 10.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
                         fontFamily = FontFamily.Monospace,
-                        color = if (isSelected) NeonCyan else TextSecondaryDark
+                        color = if (isSelected) CreamDark else LightCreamSubtle
                     )
                 }
             }
@@ -133,7 +133,7 @@ fun EdgeDiagnosticsScreen(
                 title = "DNS Resolver Speed Shootout",
                 badge = "DNS-over-HTTPS (DoH)",
                 icon = Icons.Default.Dns,
-                accentColor = NeonCyan,
+                accentColor = LightCream,
                 isRunning = isDnsTesting,
                 actionLabel = if (isDnsTesting) "TESTING..." else "RUN SHOOTOUT",
                 onAction = {
@@ -156,19 +156,19 @@ fun EdgeDiagnosticsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(if (isWinner) NeonCyan.copy(alpha = 0.12f) else DarkSubpanel)
-                                .border(1.dp, if (isWinner) NeonCyan.copy(alpha = 0.35f) else Color.Transparent, RoundedCornerShape(12.dp))
+                                .background(if (isWinner) DarkElevated else DarkSubpanel)
+                                .border(1.dp, if (isWinner) DarkBorderHighlight else Color.Transparent, RoundedCornerShape(12.dp))
                                 .padding(horizontal = 10.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                 if (isWinner) {
-                                    Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = NeonAmber, modifier = Modifier.size(14.dp))
+                                    Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = WarmGold, modifier = Modifier.size(14.dp))
                                 }
                                 Column {
-                                    Text(res.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                                    Text(res.primaryIp, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                                    Text(res.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                                    Text(res.primaryIp, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                                 }
                             }
 
@@ -179,10 +179,10 @@ fun EdgeDiagnosticsScreen(
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Black,
                                         fontFamily = FontFamily.Monospace,
-                                        color = if (isWinner) NeonCyan else Color.White
+                                        color = if (isWinner) LightCreamBright else LightCreamMuted
                                     )
                                 } else {
-                                    Text("READY", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = TextMutedDark)
+                                    Text("READY", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                                 }
                             }
                         }
@@ -197,7 +197,7 @@ fun EdgeDiagnosticsScreen(
                 title = "Wi-Fi RF Signal & Spectrum",
                 badge = "Realtime RSSI / SNR",
                 icon = Icons.Default.Wifi,
-                accentColor = NeonEmerald,
+                accentColor = SageGreen,
                 isRunning = isWifiScanning,
                 actionLabel = if (isWifiScanning) "SCANNING..." else "SAMPLE RSSI",
                 onAction = {
@@ -222,9 +222,9 @@ fun EdgeDiagnosticsScreen(
                                 .padding(10.dp)
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                Text("SIGNAL (RSSI)", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
-                                Text("${wifi.rssi} dBm", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonEmerald)
-                                Text(wifi.signalRatingLabel, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = NeonEmerald)
+                                Text("SIGNAL (RSSI)", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
+                                Text("${wifi.rssi} dBm", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = LightCreamBright)
+                                Text(wifi.signalRatingLabel, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = SageGreen)
                             }
                         }
 
@@ -237,9 +237,9 @@ fun EdgeDiagnosticsScreen(
                                 .padding(10.dp)
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                Text("SNR MARGIN", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
-                                Text("+${wifi.snr} dB", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonCyan)
-                                Text("${wifi.networkType} • ${wifi.phySpeedMbps} Mbps", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                                Text("SNR MARGIN", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
+                                Text("+${wifi.snr} dB", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = WarmGold)
+                                Text("${wifi.networkType} • ${wifi.phySpeedMbps} Mbps", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                             }
                         }
                     }
@@ -253,7 +253,7 @@ fun EdgeDiagnosticsScreen(
                 title = "VoIP & WebRTC Call Quality",
                 badge = "ITU-T G.107 Standard",
                 icon = Icons.Default.PhoneInTalk,
-                accentColor = NeonViolet,
+                accentColor = WarmGold,
                 isRunning = false,
                 actionLabel = "ACTIVE",
                 onAction = {}
@@ -264,22 +264,22 @@ fun EdgeDiagnosticsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text("MOS SCORE (1.0 - 4.5)", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                        Text("MOS SCORE (1.0 - 4.5)", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                         Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text("4.38", fontSize = 28.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonEmerald)
-                            Text("/ 4.5", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = TextMutedDark, modifier = Modifier.padding(bottom = 3.dp))
+                            Text("4.38", fontSize = 28.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = LightCreamBright)
+                            Text("/ 4.5", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle, modifier = Modifier.padding(bottom = 3.dp))
                         }
-                        Text("Crystal Clear (HD Voice & WebRTC)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Crystal Clear (HD Voice & WebRTC)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
                     }
 
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
-                            .background(NeonEmerald.copy(alpha = 0.15f))
-                            .border(1.dp, NeonEmerald.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                            .background(DarkSubpanel)
+                            .border(1.dp, SageGreen.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
                             .padding(horizontal = 10.dp, vertical = 6.dp)
                     ) {
-                        Text("EXCELLENT", fontSize = 10.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonEmerald)
+                        Text("EXCELLENT", fontSize = 10.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = SageGreen)
                     }
                 }
             }
@@ -291,7 +291,7 @@ fun EdgeDiagnosticsScreen(
                 title = "Multi-Target MTR Live Matrix",
                 badge = "Continuous Probing",
                 icon = Icons.Default.Timeline,
-                accentColor = NeonRose,
+                accentColor = LightCream,
                 isRunning = isMtrRunning,
                 actionLabel = if (isMtrRunning) "STOP MTR" else "START MTR",
                 onAction = {
@@ -319,15 +319,15 @@ fun EdgeDiagnosticsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
-                                Text(tgt.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                                Text("${tgt.sent} sent • ${lossPct}% loss", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                                Text(tgt.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                                Text("${tgt.sent} sent • ${lossPct}% loss", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                             }
                             Text(
                                 text = "${tgt.avg ?: 22} ms",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Black,
                                 fontFamily = FontFamily.Monospace,
-                                color = if (lossPct > 0) NeonRose else NeonCyan
+                                color = if (lossPct > 0) Terracotta else LightCreamBright
                             )
                         }
                     }
@@ -341,7 +341,7 @@ fun EdgeDiagnosticsScreen(
                 title = "Ping Oscilloscope Waveform",
                 badge = "Microsecond Variance",
                 icon = Icons.Default.GraphicEq,
-                accentColor = NeonCyan,
+                accentColor = LightCream,
                 isRunning = isOscRunning,
                 actionLabel = if (isOscRunning) "STOP OSC" else "RUN OSC",
                 onAction = {
@@ -358,12 +358,13 @@ fun EdgeDiagnosticsScreen(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Current: ${oscState.currentPing?.let { "$it ms" } ?: "--"}", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color.White)
-                        Text("Min: ${oscState.minPing} ms • Max: ${oscState.maxPing} ms", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                        Text("Current: ${oscState.currentPing?.let { "$it ms" } ?: "--"}", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = LightCreamBright)
+                        Text("Min: ${oscState.minPing} ms • Max: ${oscState.maxPing} ms", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                     }
                     PingOscilloscopeGraph(
                         history = oscState.history,
                         maxPing = oscState.maxPing,
+                        themeColor = LightCream,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(90.dp)
@@ -378,7 +379,7 @@ fun EdgeDiagnosticsScreen(
                 title = "Path MTU & Packet Fragmentation",
                 badge = "RFC 1191 PMTUD",
                 icon = Icons.Default.FilterFrames,
-                accentColor = NeonAmber,
+                accentColor = WarmGold,
                 isRunning = isMtuTesting,
                 actionLabel = if (isMtuTesting) "PROBING..." else "TEST MTU",
                 onAction = {
@@ -407,8 +408,8 @@ fun EdgeDiagnosticsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
-                                Text(boundary.label, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                                Text("${boundary.size} Bytes frame size", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                                Text(boundary.label, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                                Text("${boundary.size} Bytes frame size", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                             }
                             Text(
                                 text = boundary.status.uppercase(),
@@ -416,9 +417,9 @@ fun EdgeDiagnosticsScreen(
                                 fontWeight = FontWeight.Black,
                                 fontFamily = FontFamily.Monospace,
                                 color = when (boundary.status) {
-                                    "pass" -> NeonEmerald
-                                    "testing" -> NeonCyan
-                                    else -> TextMutedDark
+                                    "pass" -> SageGreen
+                                    "testing" -> LightCream
+                                    else -> LightCreamSubtle
                                 }
                             )
                         }
@@ -432,8 +433,8 @@ fun EdgeDiagnosticsScreen(
             MobileDiagnosticModule(
                 title = "IPv4 vs IPv6 Protocol Duel",
                 badge = "Dual-Stack Routing",
-                icon = Icons.Default.AltRoute,
-                accentColor = NeonViolet,
+                icon = Icons.AutoMirrored.Filled.AltRoute,
+                accentColor = SlateBlue,
                 isRunning = isStackTesting,
                 actionLabel = if (isStackTesting) "AUDITING..." else "RUN DUEL",
                 onAction = {
@@ -460,9 +461,9 @@ fun EdgeDiagnosticsScreen(
                             .padding(10.dp)
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text("IPV4 STACK", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
-                            Text(ipv4Result?.latencyMs?.let { "$it ms" } ?: "14 ms", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = Color.White)
-                            Text("CGNAT Active", fontSize = 9.sp, color = NeonAmber)
+                            Text("IPV4 STACK", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
+                            Text(ipv4Result?.latencyMs?.let { "$it ms" } ?: "14 ms", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = LightCreamBright)
+                            Text("CGNAT Active", fontSize = 9.sp, color = WarmGold)
                         }
                     }
 
@@ -474,9 +475,9 @@ fun EdgeDiagnosticsScreen(
                             .padding(10.dp)
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text("IPV6 STACK", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
-                            Text(ipv6Result?.latencyMs?.let { "$it ms" } ?: "11 ms", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = NeonEmerald)
-                            Text(if (ipv6Result?.supported == true) "Native Route" else "Assigned", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = NeonEmerald)
+                            Text("IPV6 STACK", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
+                            Text(ipv6Result?.latencyMs?.let { "$it ms" } ?: "11 ms", fontSize = 18.sp, fontWeight = FontWeight.Black, fontFamily = FontFamily.Monospace, color = SageGreen)
+                            Text(if (ipv6Result?.supported == true) "Native Route" else "Assigned", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = SageGreen)
                         }
                     }
                 }
@@ -489,7 +490,7 @@ fun EdgeDiagnosticsScreen(
                 title = "Edge Route & Anycast PoP Trace",
                 badge = "Transit Colocation",
                 icon = Icons.Default.FlightTakeoff,
-                accentColor = NeonCyan,
+                accentColor = LightCream,
                 isRunning = isRouteTracing,
                 actionLabel = if (isRouteTracing) "TRACING..." else "REFRESH",
                 onAction = {
@@ -503,8 +504,8 @@ fun EdgeDiagnosticsScreen(
                 routeTrace?.let { trace ->
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Client IP: ${trace.clientIp}", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color.White)
-                            Text("${trace.city} (${trace.colo})", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                            Text("Client IP: ${trace.clientIp}", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = LightCreamBright)
+                            Text("${trace.city} (${trace.colo})", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = LightCream)
                         }
 
                         Row(
@@ -517,10 +518,10 @@ fun EdgeDiagnosticsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
-                                Text(trace.org, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                                Text("${trace.asn} • ${trace.http} • ${trace.tls}", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                                Text(trace.org, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                                Text("${trace.asn} • ${trace.http} • ${trace.tls}", fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                             }
-                            Text("${trace.latencyMs} ms", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = NeonCyan)
+                            Text("${trace.latencyMs} ms", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = LightCreamBright)
                         }
                     }
                 }
@@ -550,12 +551,12 @@ fun MobileDiagnosticModule(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(18.dp))
             .background(DarkSurface)
             .border(
                 1.dp,
-                Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.04f))),
-                RoundedCornerShape(20.dp)
+                DarkBorderHighlight,
+                RoundedCornerShape(18.dp)
             )
             .padding(14.dp)
     ) {
@@ -574,24 +575,25 @@ fun MobileDiagnosticModule(
                         modifier = Modifier
                             .size(30.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(accentColor.copy(alpha = 0.18f)),
+                            .background(DarkSubpanel)
+                            .border(1.dp, DarkBorder, RoundedCornerShape(8.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(imageVector = icon, contentDescription = null, tint = accentColor, modifier = Modifier.size(16.dp))
+                        Icon(imageVector = icon, contentDescription = null, tint = LightCreamBright, modifier = Modifier.size(16.dp))
                     }
                     Column {
-                        Text(title, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        Text(badge, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = TextSecondaryDark)
+                        Text(title, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = LightCreamBright)
+                        Text(badge, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = LightCreamSubtle)
                     }
                 }
 
-                // Action Pill Button
+                // Action Pill Button (Tactile Cream Pill)
                 Box(
                     modifier = Modifier
                         .scale(btnScale)
                         .clip(CircleShape)
-                        .background(accentColor.copy(alpha = 0.18f))
-                        .border(1.dp, accentColor.copy(alpha = 0.45f), CircleShape)
+                        .background(if (isRunning) DarkSubpanel else LightCreamBright)
+                        .border(1.dp, if (isRunning) DarkBorderHighlight else Color.White, CircleShape)
                         .clickable(
                             interactionSource = interaction,
                             indication = null,
@@ -605,7 +607,7 @@ fun MobileDiagnosticModule(
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Black,
                         fontFamily = FontFamily.Monospace,
-                        color = accentColor
+                        color = if (isRunning) LightCreamSubtle else CreamDark
                     )
                 }
             }

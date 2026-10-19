@@ -18,16 +18,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.netpulse.speedtest.theme.NeonCyan
-import com.netpulse.speedtest.theme.NeonOrange
-import com.netpulse.speedtest.theme.NeonViolet
+import com.netpulse.speedtest.theme.*
 import kotlin.math.max
 
 @Composable
 fun RealtimeSplineGraph(
     title: String,
     streamTag: String,
-    themeColor: Color,
+    themeColor: Color = LightCream,
     history: List<Double>,
     unit: String = "Mbps",
     modifier: Modifier = Modifier
@@ -73,7 +71,7 @@ fun RealtimeSplineGraph(
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Medium,
                     fontFamily = FontFamily.Monospace,
-                    color = Color.White.copy(alpha = 0.4f)
+                    color = LightCreamSubtle
                 )
             }
 
@@ -82,7 +80,7 @@ fun RealtimeSplineGraph(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Black,
                 fontFamily = FontFamily.Monospace,
-                color = Color.White
+                color = LightCreamBright
             )
         }
 
@@ -96,7 +94,7 @@ fun RealtimeSplineGraph(
 
             // Draw grid lines
             drawLine(
-                color = Color.White.copy(alpha = 0.05f),
+                color = DarkBorder,
                 start = Offset(0f, height / 2),
                 end = Offset(width, height / 2),
                 strokeWidth = 1.dp.toPx()
@@ -146,7 +144,7 @@ fun RealtimeSplineGraph(
             drawPath(
                 path = areaPath,
                 brush = Brush.verticalGradient(
-                    colors = listOf(themeColor.copy(alpha = 0.25f), themeColor.copy(alpha = 0.01f)),
+                    colors = listOf(themeColor.copy(alpha = 0.22f), Color.Transparent),
                     startY = 0f,
                     endY = height
                 )
@@ -156,19 +154,19 @@ fun RealtimeSplineGraph(
             drawPath(
                 path = linePath,
                 color = themeColor,
-                style = Stroke(width = 2.2.dp.toPx(), cap = StrokeCap.Round)
+                style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
             )
 
             // Draw Leading Beacon Dot
             val lastPoint = points.last()
             drawCircle(
-                color = themeColor.copy(alpha = pulseAlpha * 0.4f),
-                radius = 8.dp.toPx(),
+                color = themeColor.copy(alpha = pulseAlpha * 0.35f),
+                radius = 7.dp.toPx(),
                 center = lastPoint
             )
             drawCircle(
                 color = themeColor,
-                radius = 4.dp.toPx(),
+                radius = 3.5.dp.toPx(),
                 center = lastPoint
             )
         }

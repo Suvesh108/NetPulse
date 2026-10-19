@@ -12,13 +12,14 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.netpulse.speedtest.theme.NeonEmerald
+import com.netpulse.speedtest.theme.*
 import kotlin.math.max
 
 @Composable
 fun PingOscilloscopeGraph(
     history: List<Int>,
     maxPing: Int,
+    themeColor: Color = LightCream,
     modifier: Modifier = Modifier
 ) {
     val scaleMax = max(50, maxPing + 10)
@@ -32,7 +33,7 @@ fun PingOscilloscopeGraph(
         val gridLines = listOf(0.25f, 0.5f, 0.75f)
         gridLines.forEach { frac ->
             drawLine(
-                color = Color.White.copy(alpha = 0.05f),
+                color = DarkBorder,
                 start = Offset(0f, height * frac),
                 end = Offset(width, height * frac),
                 strokeWidth = 1.dp.toPx()
@@ -41,7 +42,7 @@ fun PingOscilloscopeGraph(
 
         if (history.size < 2) {
             drawLine(
-                color = NeonEmerald.copy(alpha = 0.3f),
+                color = themeColor.copy(alpha = 0.3f),
                 start = Offset(0f, height / 2),
                 end = Offset(width, height / 2),
                 strokeWidth = 2.dp.toPx()
@@ -73,7 +74,7 @@ fun PingOscilloscopeGraph(
         drawPath(
             path = areaPath,
             brush = Brush.verticalGradient(
-                colors = listOf(NeonEmerald.copy(alpha = 0.22f), Color.Transparent),
+                colors = listOf(themeColor.copy(alpha = 0.18f), Color.Transparent),
                 startY = 0f,
                 endY = height
             )
@@ -81,7 +82,7 @@ fun PingOscilloscopeGraph(
 
         drawPath(
             path = linePath,
-            color = NeonEmerald,
+            color = themeColor,
             style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
         )
     }

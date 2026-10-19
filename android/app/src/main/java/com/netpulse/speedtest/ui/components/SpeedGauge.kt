@@ -72,26 +72,26 @@ fun SpeedGauge(
     // Fluid spring physics for the speedometer needle/arc
     val animatedSpeed by animateFloatAsState(
         targetValue = if (isRunning) displaySpeed.toFloat() else 0f,
-        animationSpec = spring(dampingRatio = 0.78f, stiffness = 160f),
+        animationSpec = spring(dampingRatio = 0.82f, stiffness = 140f),
         label = "gaugeSpeed"
     )
 
-    // Breathing pulse for idle & testing states
+    // Breathing pulse for idle & testing states in warm cream tone
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (isRunning) 1.05f else 1.08f,
+        targetValue = if (isRunning) 1.04f else 1.06f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = if (isRunning) 800 else 1800, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = if (isRunning) 900 else 2200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulseScale"
     )
     val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.25f,
-        targetValue = 0.05f,
+        initialValue = 0.16f,
+        targetValue = 0.04f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = if (isRunning) 800 else 1800, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = if (isRunning) 900 else 2200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulseAlpha"
@@ -106,18 +106,18 @@ fun SpeedGauge(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val buttonScale by animateFloatAsState(
-        targetValue = if (isPressed) 0.92f else 1f,
-        animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
+        targetValue = if (isPressed) 0.93f else 1f,
+        animationSpec = spring(dampingRatio = 0.65f, stiffness = 450f),
         label = "buttonPressScale"
     )
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(290.dp),
+            .height(300.dp),
         contentAlignment = Alignment.Center
     ) {
-        // 1. Ambient Background Glow Behind Gauge
+        // 1. Warm Ambient Cream Halo Behind Gauge
         Box(
             modifier = Modifier
                 .size(240.dp)
@@ -126,14 +126,14 @@ fun SpeedGauge(
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            if (isRunning) NeonCyan.copy(alpha = pulseAlpha) else NeonEmerald.copy(alpha = pulseAlpha * 0.7f),
+                            LightCream.copy(alpha = pulseAlpha),
                             Color.Transparent
                         )
                     )
                 )
         )
 
-        // 2. High-Performance Hardware Accelerated Canvas (Track, Ticks & Glowing Arc)
+        // 2. High-Performance Hardware Accelerated Canvas (Precision Notches & Cream Arc)
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -141,16 +141,16 @@ fun SpeedGauge(
         ) {
             val width = size.width
             val height = size.height
-            val strokeWidth = 14.dp.toPx()
-            val diameter = minOf(width, height) - strokeWidth * 2 - 12.dp.toPx()
+            val strokeWidth = 10.dp.toPx()
+            val diameter = minOf(width, height) - strokeWidth * 2 - 16.dp.toPx()
             val radius = diameter / 2
             val center = Offset(width / 2, height / 2 + 6.dp.toPx())
             val arcTopLeft = Offset(center.x - radius, center.y - radius)
             val arcSize = Size(diameter, diameter)
 
-            // A. Base Track Rail (Dark Titanium Arc)
+            // A. Base Track Rail (Warm Charcoal Arc with hairline rim)
             drawArc(
-                color = Color.White.copy(alpha = 0.06f),
+                color = DarkBorder,
                 startAngle = startAngle,
                 sweepAngle = totalSweep,
                 useCenter = false,
@@ -159,47 +159,54 @@ fun SpeedGauge(
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
 
-            // B. Geometric Ticks (49 precision calibrated notches)
-            val tickCount = 49
-            val tickInnerRadius = radius - strokeWidth / 2 - 8.dp.toPx()
-            val tickOuterRadius = tickInnerRadius - 6.dp.toPx()
-
-            for (i in 0 until tickCount) {
-                val tickFraction = i.toFloat() / (tickCount - 1)
-                val angleDeg = startAngle + totalSweep * tickFraction
+            // B. Discrete Precision Notches & Tick Marks (Anti-Slop Micro-Engravings)
+            val totalTicks = 32
+            for (i in 0..totalTicks) {
+                val tickFraction = i.toFloat() / totalTicks
+                val angleDeg = startAngle + tickFraction * totalSweep
                 val angleRad = Math.toRadians(angleDeg.toDouble())
 
-                val startX = center.x + (tickInnerRadius * cos(angleRad)).toFloat()
-                val startY = center.y + (tickInnerRadius * sin(angleRad)).toFloat()
                 val isMajor = i % 8 == 0
-                val tickLength = if (isMajor) 9.dp.toPx() else 5.dp.toPx()
-                val endX = center.x + ((tickInnerRadius - tickLength) * cos(angleRad)).toFloat()
-                val endY = center.y + ((tickInnerRadius - tickLength) * sin(angleRad)).toFloat()
+                val isMedium = i % 4 == 0
+                val tickLength = if (isMajor) 14.dp.toPx() else if (isMedium) 9.dp.toPx() else 5.dp.toPx()
+                val tickWidth = if (isMajor) 2.dp.toPx() else 1.dp.toPx()
 
-                val isLit = tickFraction <= progress && isRunning
-                val tickColor = when {
-                    isLit && tickFraction > 0.75f -> NeonRose
-                    isLit && tickFraction > 0.45f -> NeonCyan
-                    isLit -> NeonEmerald
-                    isMajor -> Color.White.copy(alpha = 0.28f)
-                    else -> Color.White.copy(alpha = 0.10f)
+                val outerR = radius - strokeWidth / 2 - 5.dp.toPx()
+                val innerR = outerR - tickLength
+
+                val startX = center.x + outerR * cos(angleRad).toFloat()
+                val startY = center.y + outerR * sin(angleRad).toFloat()
+                val endX = center.x + innerR * cos(angleRad).toFloat()
+                val endY = center.y + innerR * sin(angleRad).toFloat()
+
+                val isPassed = tickFraction <= progress
+                val tickColor = if (isPassed && isRunning) {
+                    LightCream.copy(alpha = 0.90f)
+                } else if (isMajor) {
+                    LightCreamMuted.copy(alpha = 0.40f)
+                } else {
+                    LightCreamSubtle.copy(alpha = 0.18f)
                 }
 
                 drawLine(
                     color = tickColor,
                     start = Offset(startX, startY),
                     end = Offset(endX, endY),
-                    strokeWidth = if (isMajor) 2.5.dp.toPx() else 1.5.dp.toPx(),
+                    strokeWidth = tickWidth,
                     cap = StrokeCap.Round
                 )
             }
 
-            // C. Active Glowing Speed Arc with Multi-stop Gradient
-            if (isRunning && progress > 0.005f) {
+            // C. Active Progress Arc (Luminous Light Cream with Warm Champagne Edge)
+            if (progress > 0.005f) {
                 val activeSweep = totalSweep * progress
                 drawArc(
                     brush = Brush.sweepGradient(
-                        colors = listOf(NeonEmerald, NeonCyan, NeonViolet, NeonRose),
+                        colors = listOf(
+                            LightCream.copy(alpha = 0.70f),
+                            LightCreamBright,
+                            WarmGold.copy(alpha = 0.85f)
+                        ),
                         center = center
                     ),
                     startAngle = startAngle,
@@ -210,53 +217,51 @@ fun SpeedGauge(
                     style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )
 
-                // D. Leading Laser Bead / Cursor Dot at Arc Head
-                val headAngleRad = Math.toRadians((startAngle + activeSweep).toDouble())
-                val beadX = center.x + (radius * cos(headAngleRad)).toFloat()
-                val beadY = center.y + (radius * sin(headAngleRad)).toFloat()
+                // D. Needle Tip Specular Pip (Machined Warm Cream Indicator)
+                val tipAngleRad = Math.toRadians((startAngle + activeSweep).toDouble())
+                val pipX = center.x + radius * cos(tipAngleRad).toFloat()
+                val pipY = center.y + radius * sin(tipAngleRad).toFloat()
 
-                // Glow halo
                 drawCircle(
-                    color = NeonCyan.copy(alpha = 0.4f),
-                    radius = strokeWidth * 0.9f,
-                    center = Offset(beadX, beadY)
+                    color = LightCreamBright,
+                    radius = 5.dp.toPx(),
+                    center = Offset(pipX, pipY)
                 )
-                // Crisp core bead
                 drawCircle(
-                    color = Color.White,
-                    radius = strokeWidth * 0.45f,
-                    center = Offset(beadX, beadY)
+                    color = CreamDark,
+                    radius = 2.dp.toPx(),
+                    center = Offset(pipX, pipY)
                 )
             }
         }
 
-        // 3. Central Morphing Core (Tactile Hero "GO" Button vs Live Digital Telemetry)
+        // 3. Central Morphing Tactile Core (Standby Luxury Button vs Live Digital Readout)
         AnimatedContent(
             targetState = isRunning,
             transitionSpec = {
-                fadeIn(animationSpec = tween(220)) + scaleIn(initialScale = 0.88f) togetherWith
-                fadeOut(animationSpec = tween(180)) + scaleOut(targetScale = 1.08f)
+                fadeIn(animationSpec = tween(220)) + scaleIn(initialScale = 0.92f) togetherWith
+                        fadeOut(animationSpec = tween(180)) + scaleOut(targetScale = 1.05f)
             },
             label = "coreMorph"
         ) { running ->
             if (!running) {
-                // IDLE HERO "START / GO" TRIGGER
+                // TACTILE CONVEX CREAM DIAL ("START" HERO BUTTON)
                 Box(
                     modifier = Modifier
                         .size(136.dp)
                         .scale(buttonScale)
                         .clip(CircleShape)
                         .background(
-                            Brush.radialGradient(
+                            Brush.verticalGradient(
                                 colors = listOf(
-                                    DarkElevated,
-                                    DarkSurface
+                                    LightCreamBright,
+                                    LightCream
                                 )
                             )
                         )
                         .border(
-                            width = 2.dp,
-                            brush = Brush.sweepGradient(listOf(NeonCyan, NeonEmerald, NeonCyan)),
+                            width = 1.5.dp,
+                            color = Color.White.copy(alpha = 0.6f),
                             shape = CircleShape
                         )
                         .clickable(
@@ -266,90 +271,111 @@ fun SpeedGauge(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    // Fine inner shadow rim
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(4.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, Color.Black.copy(alpha = 0.08f), CircleShape),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = if (speed > 0) "TEST AGAIN" else "START",
-                            fontSize = if (speed > 0) 13.sp else 22.sp,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.SansSerif,
-                            color = Color.White,
-                            letterSpacing = 1.5.sp
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = if (speed > 0) String.format(java.util.Locale.US, "%.1f %s", displaySpeed, unit) else "TAP TO RUN",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            color = NeonEmerald
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "START",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = FontFamily.SansSerif,
+                                color = CreamDark,
+                                letterSpacing = 2.sp
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "TAP TO TEST",
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                color = CreamDark.copy(alpha = 0.65f),
+                                letterSpacing = 1.sp
+                            )
+                        }
                     }
                 }
             } else {
-                // ACTIVE SPEED INSTRUMENT READOUT
+                // HIGH-DENSITY DIGITAL INSTRUMENT READOUT
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
-                    // Massive Tabular Speed Readout
-                    Text(
-                        text = String.format(java.util.Locale.US, "%.1f", displaySpeed),
-                        fontSize = 52.sp,
-                        fontWeight = FontWeight.Black,
-                        color = Color.White,
-                        fontFamily = FontFamily.SansSerif,
-                        letterSpacing = (-2).sp
-                    )
-
-                    // Unit Badge
+                    // Phase Badge
                     Box(
                         modifier = Modifier
-                            .offset(y = (-4).dp)
                             .clip(CircleShape)
-                            .background(NeonCyan.copy(alpha = 0.15f))
-                            .border(1.dp, NeonCyan.copy(alpha = 0.35f), CircleShape)
-                            .padding(horizontal = 10.dp, vertical = 2.dp)
+                            .background(DarkSubpanel)
+                            .border(1.dp, DarkBorderHighlight, CircleShape)
+                            .padding(horizontal = 9.dp, vertical = 3.dp)
                     ) {
                         Text(
-                            text = unit.uppercase(),
-                            fontSize = 11.sp,
+                            text = phaseLabel.uppercase(),
+                            fontSize = 8.sp,
                             fontWeight = FontWeight.Black,
                             fontFamily = FontFamily.Monospace,
-                            color = NeonCyan,
-                            letterSpacing = 1.sp
+                            color = LightCream,
+                            letterSpacing = 0.8.sp
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                    // Active Phase Pill
-                    Text(
-                        text = phaseLabel.uppercase(),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace,
-                        color = when {
-                            phaseLabel.contains("Download", ignoreCase = true) -> NeonCyan
-                            phaseLabel.contains("Upload", ignoreCase = true) -> NeonEmerald
-                            phaseLabel.contains("Ping", ignoreCase = true) -> NeonAmber
-                            else -> TextSecondaryDark
-                        },
-                        letterSpacing = 1.2.sp
-                    )
+                    // Speed Readout (Big Cream Tabular Numerals)
+                    val speedInt = animatedSpeed.toInt()
+                    val speedFrac = ((animatedSpeed - speedInt) * 10).toInt().coerceIn(0, 9)
 
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "$speedInt",
+                            fontSize = 44.sp,
+                            fontWeight = FontWeight.Black,
+                            fontFamily = FontFamily.Monospace,
+                            color = LightCreamBright,
+                            letterSpacing = (-1.5).sp
+                        )
+                        Text(
+                            text = ".$speedFrac",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace,
+                            color = LightCreamMuted,
+                            modifier = Modifier.padding(bottom = 5.dp)
+                        )
+                    }
 
-                    Text(
-                        text = "MAX ${gaugeMax.toInt()} $unit",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = FontFamily.Monospace,
-                        color = Color.White.copy(alpha = 0.35f)
-                    )
+                    // Unit & Gauge Ceiling
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = unit,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Black,
+                            fontFamily = FontFamily.Monospace,
+                            color = LightCream
+                        )
+                        Text(
+                            text = "• max ${gaugeMax.toInt()}",
+                            fontSize = 9.sp,
+                            fontFamily = FontFamily.Monospace,
+                            color = LightCreamSubtle
+                        )
+                    }
                 }
             }
         }
