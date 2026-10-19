@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Play, RotateCcw, Activity, ArrowDown, ArrowUp, 
   Layers, Headphones, ShieldCheck, Share2, Check, Copy,
-  Wifi, Server, Globe, Clock, Zap
+  Wifi, Server, Globe, Clock, Zap, Monitor, Gamepad2, Tv, Video
 } from 'lucide-react';
 import { TestStatus, SimulationSettings, SpeedTestResult } from '../types';
 import SpeedTestEngine from '@cloudflare/speedtest';
+import RollingCounter from './reactbits/RollingCounter';
 
 interface ProbeRecord {
   id: number;
@@ -453,6 +454,43 @@ export default function SpeedTest({
     [uploadSpeedHistory]
   );
 
+  // Non-linear calibration scale stops (identical to Speedtest.net)
+  const SPEEDOMETER_STOPS = [
+    { val: 0, pct: 0, label: '0' },
+    { val: 5, pct: 0.12, label: '5' },
+    { val: 10, pct: 0.22, label: '10' },
+    { val: 50, pct: 0.40, label: '50' },
+    { val: 100, pct: 0.56, label: '100' },
+    { val: 250, pct: 0.70, label: '250' },
+    { val: 500, pct: 0.82, label: '500' },
+    { val: 750, pct: 0.92, label: '750' },
+    { val: 1000, pct: 1.00, label: '1000' },
+  ];
+
+  const getSpeedProgress = (speed: number): number => {
+    if (speed <= 0) return 0;
+    if (speed >= 1000) return Math.min(1.05, 1.0 + (speed - 1000) / 4000);
+    for (let i = 0; i < SPEEDOMETER_STOPS.length - 1; i++) {
+      const s1 = SPEEDOMETER_STOPS[i];
+      const s2 = SPEEDOMETER_STOPS[i + 1];
+      if (speed >= s1.val && speed <= s2.val) {
+        const frac = (speed - s1.val) / (s2.val - s1.val);
+        return s1.pct + frac * (s2.pct - s1.pct);
+      }
+    }
+    return 1;
+  };
+
+  // Active speed in Mbps (used for gauge calibration and needle progress)
+  const activeSpeedMbps = status === 'completed' 
+    ? (downloadVal ?? currentSpeed) 
+    : currentSpeed;
+
+  // Active numerical value according to selected unit (Mbps vs MB/s)
+  const displaySpeedNumeric = unit === 'MB/s' 
+    ? (activeSpeedMbps / 8) 
+    : activeSpeedMbps;
+
   // Active display values adjusted for unit (Mbps vs MB/s)
   const displayCurrentSpeed = unit === 'MB/s' ? (currentSpeed / 8).toFixed(1) : currentSpeed.toFixed(1);
   const displayDownload = downloadVal !== null ? (unit === 'MB/s' ? (downloadVal / 8).toFixed(1) : downloadVal.toFixed(1)) : '--';
@@ -460,13 +498,65 @@ export default function SpeedTest({
   const bufferbloatGrade = computeBufferbloatGrade(pingVal, downloadLoadedLatencyVal, uploadLoadedLatencyVal);
   const voipMos = pingVal ? computeVoipMos(pingVal, jitterVal || 1.5, packetLossVal || 0) : null;
 
-  // 240-Degree Avionics Sweep Gauge Math
-  // Radius = 88, Circumference = 2 * PI * 88 = 552.92
-  // Arc angle = 240 deg (ratio = 240/360 = 0.6667) -> Arc length = 368.6
-  const gaugeArcLength = 368.6;
-  const maxScaleSpeed = unit === 'MB/s' ? 125 : 1000; // 1000 Mbps = 125 MB/s
-  const speedProgress = Math.min(1, Math.max(0, currentSpeed / (unit === 'MB/s' ? maxScaleSpeed * 8 : maxScaleSpeed)));
-  const gaugeDashOffset = gaugeArcLength - (gaugeArcLength * speedProgress);
+  // Real-time experience rating calculations (Speedtest.net experiential 5-dot ratings)
+  const experienceRatings = useMemo(() => {
+    let browsing = 0;
+    if (pingVal !== null) {
+      const effPing = pingVal + (downloadLoadedLatencyVal ? (downloadLoadedLatencyVal - pingVal) * 0.3 : 0);
+      if (effPing <= 25) browsing = 5;
+      else if (effPing <= 50) browsing = 4;
+      else if (effPing <= 100) browsing = 3;
+      else if (effPing <= 200) browsing = 2;
+      else browsing = 1;
+    }
+
+    let gaming = 0;
+    if (pingVal !== null) {
+      const j = jitterVal || 1.5;
+      const loss = packetLossVal || 0;
+      const score = pingVal + j * 2 + loss * 20;
+      if (score <= 30) gaming = 5;
+      else if (score <= 55) gaming = 4;
+      else if (score <= 95) gaming = 3;
+      else if (score <= 150) gaming = 2;
+      else gaming = 1;
+    }
+
+    let streaming = 0;
+    const effDl = downloadVal ?? (status === 'downloading' ? currentSpeed : 0);
+    if (effDl > 0) {
+      if (effDl >= 45) streaming = 5;
+      else if (effDl >= 20) streaming = 4;
+      else if (effDl >= 10) streaming = 3;
+      else if (effDl >= 4) streaming = 2;
+      else streaming = 1;
+    } else if (status === 'completed' && downloadVal) {
+      if (downloadVal >= 45) streaming = 5;
+      else if (downloadVal >= 20) streaming = 4;
+      else if (downloadVal >= 10) streaming = 3;
+      else if (downloadVal >= 4) streaming = 2;
+      else streaming = 1;
+    }
+
+    let calling = 0;
+    if (voipMos !== null) {
+      if (voipMos >= 4.2) calling = 5;
+      else if (voipMos >= 3.8) calling = 4;
+      else if (voipMos >= 3.3) calling = 3;
+      else if (voipMos >= 2.8) calling = 2;
+      else calling = 1;
+    }
+
+    return { browsing, gaming, streaming, calling };
+  }, [pingVal, downloadLoadedLatencyVal, jitterVal, packetLossVal, downloadVal, status, currentSpeed, voipMos]);
+
+  // Speedometer Gauge Arc Geometry
+  // Center: (160, 145), Radius: 108, Span: 250 deg (-125 to +125 from top)
+  // Arc length = 2 * PI * 108 * (250/360) = 471.24
+  const gaugeArcLength = 471.24;
+  const speedProgress = getSpeedProgress(activeSpeedMbps);
+  const needleAngle = -125 + (speedProgress * 250);
+  const gaugeDashOffset = gaugeArcLength * (1 - Math.min(1, Math.max(0, speedProgress)));
 
   return (
     <div className="w-full flex flex-col gap-4 min-w-0 select-none pb-8" id="speed-cockpit-arena">
@@ -550,91 +640,286 @@ export default function SpeedTest({
       {/* 2. Main Avionics Stage (Gauge + 4 Precision Telemetry Modules) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch min-w-0">
         
-        {/* Left Column (5 Cols): The Precision Sweep Avionics Gauge */}
-        <div className="lg:col-span-5 hud-panel rounded-2xl p-5 sm:p-6 flex flex-col items-center justify-between gap-4 min-w-0 relative overflow-hidden">
+        {/* Left Column (5 Cols): The Precision Speedtest-Grade Vector Gauge */}
+        <div className="lg:col-span-5 hud-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-3 min-w-0 relative overflow-hidden">
           
-          <div className="w-full flex items-center justify-between text-xs font-mono text-slate-400 dark:text-zinc-500">
-            <span className="tracking-widest uppercase font-bold text-[10px]">REAL-TIME VECTOR METER</span>
-            <span>{connectionMode.toUpperCase()} STREAM</span>
+          {/* Top Row: Ping ms Header (Idle, Loaded Down, Loaded Up) */}
+          <div className="w-full flex items-center justify-between text-xs font-mono border-b border-slate-100 dark:border-white/[0.06] pb-2.5">
+            <span className="text-slate-400 dark:text-zinc-400 font-bold uppercase tracking-wider text-[11px]">
+              Ping ms
+            </span>
+            <div className="flex items-center gap-3 text-xs">
+              {/* Idle Ping */}
+              <div className="flex items-center gap-1.5" title="Idle Latency">
+                <span className="w-5 h-5 rounded-full bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-400">
+                  <Zap className="w-2.5 h-2.5 fill-amber-400" />
+                </span>
+                <span className="font-mono font-bold text-slate-800 dark:text-zinc-200 tabular-nums">
+                  {pingVal !== null ? pingVal : '—'}
+                </span>
+              </div>
+
+              {/* Download Loaded Ping */}
+              <div className="flex items-center gap-1.5" title="Download Loaded Latency">
+                <span className="w-5 h-5 rounded-full bg-cyan-400/15 border border-cyan-400/30 flex items-center justify-center text-cyan-400">
+                  <ArrowDown className="w-2.5 h-2.5 stroke-[2.5]" />
+                </span>
+                <span className="font-mono font-bold text-slate-800 dark:text-zinc-200 tabular-nums">
+                  {downloadLoadedLatencyVal !== null ? downloadLoadedLatencyVal : '—'}
+                </span>
+              </div>
+
+              {/* Upload Loaded Ping */}
+              <div className="flex items-center gap-1.5" title="Upload Loaded Latency">
+                <span className="w-5 h-5 rounded-full bg-purple-400/15 border border-purple-400/30 flex items-center justify-center text-purple-400">
+                  <ArrowUp className="w-2.5 h-2.5 stroke-[2.5]" />
+                </span>
+                <span className="font-mono font-bold text-slate-800 dark:text-zinc-200 tabular-nums">
+                  {uploadLoadedLatencyVal !== null ? uploadLoadedLatencyVal : '—'}
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* Precision Circular Sweep Dial */}
-          <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
+          {/* Experiential Category Ratings (Browsing, Gaming, Streaming, Calling) */}
+          <div className="w-full grid grid-cols-4 gap-2 py-1 text-center border-b border-slate-100 dark:border-white/[0.06]">
+            {/* 1. Browsing */}
+            <div className="flex flex-col items-center gap-1" title="Web Browsing Performance">
+              <Monitor className={`w-4 h-4 transition-colors ${experienceRatings.browsing >= 3 ? 'text-cyan-400' : 'text-slate-400 dark:text-zinc-500'}`} />
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((dot) => (
+                  <span
+                    key={dot}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                      dot <= experienceRatings.browsing 
+                        ? 'bg-cyan-400 shadow-[0_0_5px_rgba(34,211,238,0.7)]' 
+                        : 'bg-slate-200 dark:bg-white/[0.1]'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Gaming */}
+            <div className="flex flex-col items-center gap-1" title="Online Gaming Responsiveness">
+              <Gamepad2 className={`w-4 h-4 transition-colors ${experienceRatings.gaming >= 3 ? 'text-emerald-400' : 'text-slate-400 dark:text-zinc-500'}`} />
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((dot) => (
+                  <span
+                    key={dot}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                      dot <= experienceRatings.gaming 
+                        ? 'bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.7)]' 
+                        : 'bg-slate-200 dark:bg-white/[0.1]'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Streaming */}
+            <div className="flex flex-col items-center gap-1" title="4K / HD Video Streaming">
+              <Tv className={`w-4 h-4 transition-colors ${experienceRatings.streaming >= 3 ? 'text-indigo-400' : 'text-slate-400 dark:text-zinc-500'}`} />
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((dot) => (
+                  <span
+                    key={dot}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                      dot <= experienceRatings.streaming 
+                        ? 'bg-indigo-400 shadow-[0_0_5px_rgba(129,140,248,0.7)]' 
+                        : 'bg-slate-200 dark:bg-white/[0.1]'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Calling */}
+            <div className="flex flex-col items-center gap-1" title="VoIP Video Calling">
+              <Video className={`w-4 h-4 transition-colors ${experienceRatings.calling >= 3 ? 'text-purple-400' : 'text-slate-400 dark:text-zinc-500'}`} />
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((dot) => (
+                  <span
+                    key={dot}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                      dot <= experienceRatings.calling 
+                        ? 'bg-purple-400 shadow-[0_0_5px_rgba(192,132,252,0.7)]' 
+                        : 'bg-slate-200 dark:bg-white/[0.1]'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* The Speedometer Gauge Arena */}
+          <div className="relative w-full max-w-[340px] mx-auto flex flex-col items-center justify-center">
             <svg 
-              className="w-full h-full -rotate-90 transform overflow-visible"
-              viewBox="0 0 220 220"
+              className="w-full h-auto overflow-visible select-none"
+              viewBox="0 0 320 250"
             >
-              {/* Background Guide Arc */}
-              <circle
-                cx="110"
-                cy="110"
-                r="88"
+              <defs>
+                {/* Active Stream Gradients */}
+                <linearGradient id="gaugeDownloadGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#00D2FF" />
+                  <stop offset="50%" stopColor="#00F5A0" />
+                  <stop offset="100%" stopColor="#10B981" />
+                </linearGradient>
+
+                <linearGradient id="gaugeUploadGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#A855F7" />
+                  <stop offset="100%" stopColor="#EC4899" />
+                </linearGradient>
+
+                <linearGradient id="gaugeCompleteGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#10B981" />
+                  <stop offset="100%" stopColor="#34D399" />
+                </linearGradient>
+
+                {/* Needle Gradient */}
+                <linearGradient id="gaugeNeedleGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
+                  <stop offset="60%" stopColor="rgba(255,255,255,0.5)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.95)" />
+                </linearGradient>
+
+                {/* Metallic Pivot Gradient */}
+                <radialGradient id="gaugePivotCapGrad" cx="35%" cy="35%" r="65%">
+                  <stop offset="0%" stopColor="#94A3B8" />
+                  <stop offset="50%" stopColor="#475569" />
+                  <stop offset="100%" stopColor="#0F172A" />
+                </radialGradient>
+              </defs>
+
+              {/* 1. Background Arc Track */}
+              <path
+                d="M 71.53 206.95 A 108 108 0 1 1 248.47 206.95"
                 fill="none"
                 stroke="currentColor"
-                className="text-slate-200/80 dark:text-white/[0.06]"
-                strokeWidth="8"
-                strokeDasharray="368.6 552.9"
-                strokeDashoffset="0"
+                className="text-slate-200/90 dark:text-[#181C28]"
+                strokeWidth="20"
                 strokeLinecap="round"
               />
 
-              {/* Dynamic Active Stream Arc */}
-              <circle
-                cx="110"
-                cy="110"
-                r="88"
+              {/* 2. Active Filled Arc Track */}
+              <path
+                d="M 71.53 206.95 A 108 108 0 1 1 248.47 206.95"
                 fill="none"
-                stroke={status === 'uploading' ? '#8B5CF6' : (status === 'completed' ? '#10B981' : '#2563EB')}
-                strokeWidth="8"
-                strokeDasharray="368.6 552.9"
+                stroke={
+                  status === 'uploading' 
+                    ? 'url(#gaugeUploadGrad)' 
+                    : (status === 'completed' ? 'url(#gaugeCompleteGrad)' : 'url(#gaugeDownloadGrad)')
+                }
+                strokeWidth="20"
+                strokeDasharray="471.24"
                 strokeDashoffset={gaugeDashOffset}
                 strokeLinecap="round"
                 className="transition-all duration-150 ease-out"
+                filter={speedProgress > 0.02 ? 'drop-shadow(0 0 6px rgba(0, 245, 160, 0.35))' : undefined}
               />
 
-              {/* Dial Scale Tick Points */}
-              {[0, 0.25, 0.5, 0.75, 1].map((pct, idx) => {
-                const angle = -120 + (pct * 240);
-                const rad = (angle * Math.PI) / 180;
-                const tx = 110 + 72 * Math.cos(rad);
-                const ty = 110 + 72 * Math.sin(rad);
+              {/* 3. Scale Markers & Numbers */}
+              {SPEEDOMETER_STOPS.map((stop, idx) => {
+                const deg = -125 + (stop.pct * 250);
+                const rad = (-90 + deg) * (Math.PI / 180);
+                const lx = 160 + 78 * Math.cos(rad);
+                const ly = 145 + 78 * Math.sin(rad);
+                const isPassed = speedProgress >= stop.pct && speedProgress > 0;
+
                 return (
-                  <circle
+                  <text
                     key={idx}
-                    cx={tx}
-                    cy={ty}
-                    r="1.5"
-                    className="fill-slate-400 dark:fill-zinc-600"
-                  />
+                    x={lx}
+                    y={ly}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    className={`font-mono text-[11px] select-none transition-colors duration-150 ${
+                      isPassed 
+                        ? 'fill-slate-900 dark:fill-white font-black' 
+                        : 'fill-slate-400 dark:fill-zinc-500 font-bold'
+                    }`}
+                  >
+                    {stop.label}
+                  </text>
                 );
               })}
+
+              {/* 4. Tapered Rotating Speed Needle */}
+              <g 
+                style={{
+                  transform: `rotate(${needleAngle}deg)`,
+                  transformOrigin: '160px 145px',
+                  transition: 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
+                <polygon
+                  points="156,145 158.5,46 161.5,46 164,145"
+                  fill="url(#gaugeNeedleGrad)"
+                  filter="drop-shadow(0 0 4px rgba(255,255,255,0.4))"
+                />
+                <circle
+                  cx="160"
+                  cy="47"
+                  r="2"
+                  className={
+                    status === 'uploading' 
+                      ? 'fill-purple-400' 
+                      : (status === 'completed' ? 'fill-emerald-400' : 'fill-cyan-400')
+                  }
+                />
+              </g>
+
+              {/* 5. Center Pivot Cap */}
+              <circle
+                cx="160"
+                cy="145"
+                r="10"
+                fill="url(#gaugePivotCapGrad)"
+                stroke="rgba(255,255,255,0.2)"
+                strokeWidth="1.5"
+              />
+              <circle
+                cx="160"
+                cy="145"
+                r="3.5"
+                className="fill-[#090B10]"
+              />
             </svg>
 
-            {/* Dial Center Telemetry Readout */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-              <span className="font-mono text-4xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white tabular-nums">
-                {status === 'idle' 
-                  ? '0.0' 
-                  : (status === 'completed' 
-                    ? displayDownload 
-                    : displayCurrentSpeed)}
-              </span>
-              <span className="font-mono text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mt-0.5">
-                {unit}
-              </span>
-              <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 mt-1">
-                {status === 'downloading' && 'INBOUND STREAM'}
-                {status === 'uploading' && 'OUTBOUND STREAM'}
-                {status === 'pinging' && 'CALIBRATING...'}
-                {status === 'jittering' && 'SAMPLING JITTER'}
-                {status === 'completed' && 'FINAL THROUGHPUT'}
-                {status === 'idle' && 'READY TO AUDIT'}
-              </span>
+            {/* Dial Center Telemetry Readout (Right Below Pivot) */}
+            <div className="flex flex-col items-center justify-center text-center -mt-12 sm:-mt-14 z-10 pointer-events-none">
+              <div className="flex items-baseline justify-center">
+                <RollingCounter
+                  value={status === 'idle' ? 0 : displaySpeedNumeric}
+                  decimals={displaySpeedNumeric >= 100 ? 1 : 2}
+                  className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight"
+                />
+              </div>
+
+              {/* Direction Indicator & Unit Pill (Identical to Speedtest.net) */}
+              <div className="flex items-center gap-1.5 mt-0.5">
+                {status === 'uploading' ? (
+                  <span className="w-4 h-4 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center">
+                    <ArrowUp className="w-2.5 h-2.5 stroke-[2.5]" />
+                  </span>
+                ) : status === 'completed' ? (
+                  <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center">
+                    <Check className="w-2.5 h-2.5 stroke-[2.5]" />
+                  </span>
+                ) : (
+                  <span className="w-4 h-4 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center">
+                    <ArrowDown className="w-2.5 h-2.5 stroke-[2.5]" />
+                  </span>
+                )}
+                <span className="text-xs font-mono font-bold tracking-wider text-slate-700 dark:text-zinc-300">
+                  {unit}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Primary Mechanical Launch Trigger */}
-          <div className="w-full flex flex-col gap-2">
+          <div className="w-full flex flex-col gap-2 pt-2">
             <button
               id="dial-go-button"
               type="button"
