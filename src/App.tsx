@@ -359,6 +359,55 @@ function MainApp() {
         </AnimatePresence>
       </main>
 
+      {/* Precision Compact Footer */}
+      <footer className="w-full border-t border-slate-200/60 dark:border-white/[0.06] bg-slate-50/50 dark:bg-[#0B0D14]/80 backdrop-blur-md mt-auto py-2.5 px-4 sm:px-6 pb-16 md:pb-2.5">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2.5 text-[11px] font-mono text-slate-500 dark:text-zinc-500">
+          
+          {/* Left: NetPulse Brand & Engine status */}
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-zinc-300">
+              <Zap className="w-3.5 h-3.5 text-blue-500 fill-blue-500/20" />
+              NetPulse
+            </span>
+            <span className="text-slate-300 dark:text-zinc-700">·</span>
+            <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20">
+              v1.1
+            </span>
+            <span className="hidden sm:inline text-slate-400 dark:text-zinc-500">
+              Carrier-Grade Diagnostics
+            </span>
+          </div>
+
+          {/* Center: Protocols & Standards */}
+          <div className="hidden md:flex items-center gap-2 text-[10px]">
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.06]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              HTTP/3 QUIC
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.06]">
+              RFC 2681 SLA
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.06]">
+              BBRv2 CC
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/[0.06]">
+              RFC 8484 DoH
+            </span>
+          </div>
+
+          {/* Right: Edge Mesh & Telemetry Indicator */}
+          <div className="flex items-center gap-2 text-[10px]">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-slate-600 dark:text-zinc-400">Cloudflare Anycast Mesh</span>
+            </span>
+            <span className="text-slate-300 dark:text-zinc-700">·</span>
+            <span className="text-slate-400 dark:text-zinc-500">Zero-Log SLA</span>
+          </div>
+
+        </div>
+      </footer>
+
       {/* Mobile Ergonomic Bottom Command Dock with FLIP Indicator */}
       <nav 
         aria-label="Mobile Navigation"
